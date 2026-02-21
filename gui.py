@@ -227,7 +227,7 @@ class ExcelCruncherApp(ctk.CTk):
             # Automatically calculate the total
             update_total()
 
-        name_combo = ctk.CTkComboBox(row_frame, values=[], width=150, command=on_name_selected)
+        name_combo = ctk.CTkComboBox(row_frame, values=[""], width=150, command=on_name_selected)
         name_combo.pack(side='left', padx=5)
 
         def filter_names(event):
