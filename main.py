@@ -1,8 +1,10 @@
 import customtkinter as ctk
 from tkinter import filedialog
 import os
+from PIL import Image
 
 ctk.set_appearance_mode("System")
+# ctk.set_appearance_mode("Light")
 ctk.set_default_color_theme("blue")
 
 class ExcelCruncherApp(ctk.CTk):
@@ -15,6 +17,18 @@ class ExcelCruncherApp(ctk.CTk):
         self.rows = []
         self.selected_files = []
         self.file_names = ["No files loaded"]
+
+        # --- Load the Icon ---
+        try:
+            # CTkImage handles High-DPI scaling automatically
+            self.excel_icon = ctk.CTkImage(
+                light_image=Image.open("images/excel_icon_light_2.png"),
+                dark_image=Image.open("images/excel_icon_light_2.png"),
+                size=(20, 20) # Forces the icon to a standard size
+            )
+        except FileNotFoundError:
+            # Fallback if you haven't downloaded the image yet
+            self.excel_icon = None
 
         # --- UI Layout ---
 
@@ -108,7 +122,13 @@ class ExcelCruncherApp(ctk.CTk):
                 item_frame = ctk.CTkFrame(self.attachment_frame, fg_color="#2b2b2b", corner_radius=5)
                 item_frame.pack(fill="x", pady=2, padx=5)
 
-                lbl = ctk.CTkLabel(item_frame, text=f"📄 {filename}", anchor="w")
+                # --- Apply the Icon ---
+                if self.excel_icon:
+                    lbl = ctk.CTkLabel(item_frame, text=f"  {filename}", image=self.excel_icon, compound="left", anchor="w")
+                else:
+                    # Fallback if image isn't found
+                    lbl = ctk.CTkLabel(item_frame, text=f"📄 {filename}", anchor="w")
+
                 lbl.pack(side="left", padx=10, pady=5)
 
                 # The 'Remove' button for this specific file
