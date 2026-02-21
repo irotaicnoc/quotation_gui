@@ -15,7 +15,7 @@ class ExcelCruncherApp(ctk.CTk):
         super().__init__()
 
         self.title(config.window_title)
-        self.geometry('800x800')
+        self.geometry(config.window_geometry)
 
         self.rows = []
         self.selected_files = []

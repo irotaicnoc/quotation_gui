@@ -7,3 +7,4 @@ ui_theme = 'System'  # Options: 'System', 'Light', 'Dark'
 color_theme = 'blue'  # Options: 'blue', 'dark-blue', 'green', 'dark-green', 'purple', 'dark-purple', 'orange', 'dark-orange'
 
 window_title = 'Quotation Tool'
+window_geometry = '800x800'
