@@ -1,95 +1,118 @@
 import customtkinter as ctk
-from tkinter import filedialog
-import os
 
 # 1. Setup the modern theme
-ctk.set_appearance_mode("System")  # Automatically matches your OS dark/light mode
-ctk.set_default_color_theme("blue")  # The accent color for buttons and switches
+ctk.set_appearance_mode("System")
+ctk.set_default_color_theme("blue")
 
 
-# 2. Define the Application Class
 class ExcelCruncherApp(ctk.CTk):
     def __init__(self):
         super().__init__()
 
         # Window configuration
-        self.title("Excel Data Cruncher")
-        self.geometry("500x450")
-        self.file_path = None
+        self.title("Data Transcription Tool")
+        self.geometry("600x600")
+
+        # This list will hold dictionaries containing our input widgets
+        # so we can easily loop through them when crunching the numbers.
+        self.rows = []
 
         # --- UI Layout ---
 
         # Title Label
-        self.title_label = ctk.CTkLabel(self, text="Task Automation Tool", font=ctk.CTkFont(size=20, weight="bold"))
-        self.title_label.pack(pady=(20, 10)) # pady adds vertical padding (top, bottom)
+        self.title_label = ctk.CTkLabel(self, text="Image Data Entry", font=ctk.CTkFont(size=20, weight="bold"))
+        self.title_label.pack(pady=(20, 10))
 
-        # File Selection Button
-        self.file_btn = ctk.CTkButton(self, text="Select Excel File", command=self.select_file)
-        self.file_btn.pack(pady=10)
+        # The Scrollable Frame (This acts as our dynamic viewport)
+        self.scroll_frame = ctk.CTkScrollableFrame(self, width=500, height=300)
+        self.scroll_frame.pack(pady=10, padx=20, fill="both", expand=True)
 
-        # Label to show selected file name
-        self.file_label = ctk.CTkLabel(self, text="No file selected", text_color="gray")
-        self.file_label.pack(pady=5)
-
-        # Parameter Input (Entry Widget)
-        self.param_entry = ctk.CTkEntry(self, placeholder_text="Enter a multiplier (e.g., 1.5)", width=200)
-        self.param_entry.pack(pady=20)
+        # Add Row Button
+        self.add_btn = ctk.CTkButton(self, text="+ Add New Row", command=self.add_row)
+        self.add_btn.pack(pady=10)
 
         # Action Button (The "Crunch" trigger)
-        self.run_btn = ctk.CTkButton(self, text="Crunch Numbers", command=self.process_data, fg_color="green", hover_color="darkgreen")
+        self.run_btn = ctk.CTkButton(self, text="Process Data", command=self.process_data, fg_color="green", hover_color="darkgreen")
         self.run_btn.pack(pady=10)
 
         # Output Text Box
-        self.output_box = ctk.CTkTextbox(self, height=120, width=400)
-        self.output_box.pack(pady=10)
-        self.output_box.insert("0.0", "Awaiting input...")
+        self.output_box = ctk.CTkTextbox(self, height=120, width=500)
+        self.output_box.pack(pady=(10, 20), padx=20)
+
+        # Automatically add the first row on startup
+        self.add_row()
 
     # --- Event Functions ---
 
-    def select_file(self):
-        # Opens your operating system's native file picker
-        self.file_path = filedialog.askopenfilename(
-            title="Select Excel File",
-            filetypes=[("Excel files", "*.xlsx *.xls")]
+    def add_row(self):
+        # Create a transparent container frame for this specific row
+        row_frame = ctk.CTkFrame(self.scroll_frame, fg_color="transparent")
+        row_frame.pack(fill="x", pady=5)
+
+        # Input 1
+        entry1 = ctk.CTkEntry(row_frame, placeholder_text="First Value", width=180)
+        entry1.pack(side="left", padx=10)
+
+        # Input 2
+        entry2 = ctk.CTkEntry(row_frame, placeholder_text="Second Value", width=180)
+        entry2.pack(side="left", padx=10)
+
+        # Delete Button (Uses a lambda to pass the specific row's widgets to the delete function)
+        del_btn = ctk.CTkButton(
+            row_frame, text="X", width=30, fg_color="#d9534f", hover_color="#c9302c",
+            command=lambda f=row_frame: self.delete_row(f)
         )
-        if self.file_path:
-            filename = os.path.basename(self.file_path)
-            self.file_label.configure(text=f"Selected: {filename}", text_color="white") # Update label
+        del_btn.pack(side="right", padx=10)
+
+        # Store the frame and entries so we can access them later
+        self.rows.append({
+            "frame": row_frame,
+            "entry1": entry1,
+            "entry2": entry2
+        })
+
+    def delete_row(self, frame_to_delete):
+        # 1. Remove the dictionary from our Python list
+        self.rows = [row for row in self.rows if row["frame"] != frame_to_delete]
+        # 2. Destroy the tkinter frame (this removes it from the screen instantly)
+        frame_to_delete.destroy()
 
     def process_data(self):
-        # Clear previous text from the output box
         self.output_box.delete("0.0", "end")
 
-        # 1. Basic Validation
-        if not self.file_path:
-            self.output_box.insert("0.0", "Error: Please select an Excel file first!\n")
+        extracted_data = []
+
+        # Iterate through the stored entry widgets and extract their text using .get()
+        for i, row in enumerate(self.rows):
+            val1 = row["entry1"].get()
+            val2 = row["entry2"].get()
+
+            # Skip completely empty rows gracefully
+            if not val1 and not val2:
+                continue
+
+            try:
+                # Assuming numerical data for this example
+                num1 = float(val1)
+                num2 = float(val2)
+                extracted_data.append((num1, num2))
+            except ValueError:
+                self.output_box.insert("end", f"Error in Row {i+1}: Please enter valid numbers.\n")
+                return
+
+        if not extracted_data:
+            self.output_box.insert("0.0", "No valid data to process.\n")
             return
 
-        try:
-            multiplier = float(self.param_entry.get())
-        except ValueError:
-            self.output_box.insert("0.0", "Error: Please enter a valid number for the multiplier!\n")
-            return
+        # --- The actual Python logic goes here ---
+        self.output_box.insert("end", f"Successfully extracted {len(extracted_data)} rows of data.\n")
+        self.output_box.insert("end", "-" * 30 + "\n")
 
-        # 2. The actual Python logic
-        try:
-            # Here is where you would do: df = pd.read_excel(self.file_path)
-            # For this demo, we will simulate the crunching:
-            self.output_box.insert("end", f"Loading {os.path.basename(self.file_path)}...\n")
-            self.output_box.insert("end", f"Applying multiplier: {multiplier}\n")
-            self.output_box.insert("end", "-" * 30 + "\n")
-
-            # Simulated result
-            simulated_base_value = 1042
-            final_result = simulated_base_value * multiplier
-
-            self.output_box.insert("end", f"Calculation successful!\nFinal Value: {final_result}")
-
-        except Exception as e:
-            self.output_box.insert("end", f"A fatal error occurred:\n{e}")
+        # Example calculation: Sum of all (Value 1 * Value 2)
+        total = sum(v1 * v2 for v1, v2 in extracted_data)
+        self.output_box.insert("end", f"Calculated Total: {total}\n")
 
 
-# Run the app
 if __name__ == "__main__":
     app = ExcelCruncherApp()
-    app.mainloop()  # This starts the infinite event loop that keeps the window open
+    app.mainloop()
