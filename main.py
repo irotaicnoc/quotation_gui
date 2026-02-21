@@ -1,5 +1,6 @@
 import os
 from PIL import Image
+from pathlib import Path
 import customtkinter as ctk
 from tkinter import filedialog
 
@@ -22,14 +23,16 @@ class ExcelCruncherApp(ctk.CTk):
 
         # --- Load the Icon ---
         try:
-            # CTkImage handles High-DPI scaling automatically
+            # robust, OS-agnostic path
+            light_icon_path = Path(config.assets_path).joinpath(config.excel_icon_name_light)
+            dark_icon_path = Path(config.assets_path).joinpath(config.excel_icon_name_dark)
+
             self.excel_icon = ctk.CTkImage(
-                light_image=Image.open(config.assets_path + config.excel_icon_name_light),
-                dark_image=Image.open(config.assets_path + config.excel_icon_name_dark),
-                size=(20, 20)  # Forces the icon to a standard size
+                light_image=Image.open(light_icon_path),
+                dark_image=Image.open(dark_icon_path),
+                size=(20, 20)
             )
         except FileNotFoundError:
-            # Fallback if you haven't downloaded the image yet
             self.excel_icon = None
 
         # --- UI Layout ---
