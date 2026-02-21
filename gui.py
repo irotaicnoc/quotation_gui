@@ -5,6 +5,7 @@ import customtkinter as ctk
 from tkinter import filedialog
 
 import config
+import processor
 
 ctk.set_appearance_mode(config.ui_theme)
 ctk.set_default_color_theme(config.color_theme)
@@ -15,17 +16,16 @@ class ExcelCruncherApp(ctk.CTk):
         super().__init__()
 
         self.title(config.window_title)
-        self.geometry(config.window_geometry)
+        self.geometry(config.window_geometry) # NEW: Uses config
 
         self.rows = []
         self.selected_files = []
         self.file_names = ['No files loaded']
 
-        # --- Load the Icon ---
+        # --- Load the Icon (Modern Pathlib approach) ---
         try:
-            # robust, OS-agnostic path
-            light_icon_path = Path(config.assets_path).joinpath(config.excel_icon_name_light)
-            dark_icon_path = Path(config.assets_path).joinpath(config.excel_icon_name_dark)
+            light_icon_path = Path(config.assets_path) / config.excel_icon_name_light
+            dark_icon_path = Path(config.assets_path) / config.excel_icon_name_dark
 
             self.excel_icon = ctk.CTkImage(
                 light_image=Image.open(light_icon_path),
@@ -57,11 +57,9 @@ class ExcelCruncherApp(ctk.CTk):
         )
         self.browse_btn.pack(fill='x', expand=True)
 
-        #  The Attachment List (Scrollable frame for files)
         self.attachment_frame = ctk.CTkScrollableFrame(self.file_frame, height=80, fg_color='#1e1e1e')
         self.attachment_frame.pack(fill='x', pady=(10, 0))
 
-        # Placeholder text when empty
         self.empty_label = ctk.CTkLabel(self.attachment_frame, text='No files attached yet.', text_color='gray')
         self.empty_label.pack(pady=20)
 
@@ -96,7 +94,6 @@ class ExcelCruncherApp(ctk.CTk):
         self.add_row()
 
     # --- File Management Functions ---
-
     def select_files(self):
         new_file_paths = filedialog.askopenfilenames(
             title='Select Excel Files',
@@ -104,11 +101,9 @@ class ExcelCruncherApp(ctk.CTk):
         )
 
         if new_file_paths:
-            # Append only new files to prevent duplicates
             for path in new_file_paths:
                 if path not in self.selected_files:
                     self.selected_files.append(path)
-
             self.update_file_state()
 
     def remove_file(self, file_path_to_remove):
@@ -117,14 +112,11 @@ class ExcelCruncherApp(ctk.CTk):
             self.update_file_state()
 
     def update_file_state(self):
-        # 1. Update our internal list of base names
         if self.selected_files:
             self.file_names = [os.path.basename(f) for f in self.selected_files]
         else:
             self.file_names = ['No files loaded']
 
-        # 2. Redraw the attachment UI
-        # First, destroy everything currently in the attachment frame
         for widget in self.attachment_frame.winfo_children():
             widget.destroy()
 
@@ -132,30 +124,19 @@ class ExcelCruncherApp(ctk.CTk):
             self.empty_label = ctk.CTkLabel(self.attachment_frame, text='No files attached yet.', text_color='gray')
             self.empty_label.pack(pady=20)
         else:
-            # Rebuild the list of attachments
             for file_path in self.selected_files:
                 filename = os.path.basename(file_path)
 
-                # A mini-container for each file
                 item_frame = ctk.CTkFrame(self.attachment_frame, fg_color='#2b2b2b', corner_radius=5)
                 item_frame.pack(fill='x', pady=2, padx=5)
 
-                # Apply the Icon
                 if self.excel_icon:
-                    lbl = ctk.CTkLabel(
-                        item_frame,
-                        text=f'  {filename}',
-                        image=self.excel_icon,
-                        compound='left',
-                        anchor='w',
-                    )
+                    lbl = ctk.CTkLabel(item_frame, text=f'  {filename}', image=self.excel_icon, compound='left', anchor='w')
                 else:
-                    # Fallback if image isn't found
                     lbl = ctk.CTkLabel(item_frame, text=f'📄 {filename}', anchor='w')
 
                 lbl.pack(side='left', padx=10, pady=5)
 
-                # The 'Remove' button for this specific file
                 remove_btn = ctk.CTkButton(
                     item_frame,
                     text='Remove',
@@ -167,20 +148,14 @@ class ExcelCruncherApp(ctk.CTk):
                 )
                 remove_btn.pack(side='right', padx=10, pady=5)
 
-        # 3. Synchronize all dropdowns in the manual entry rows
         for row in self.rows:
             dropdown = row['dropdown']
             current_selection = dropdown.get()
-
-            # Update the available options
             dropdown.configure(values=self.file_names)
-
-            # If the currently selected file was deleted, default back to the first available option
             if current_selection not in self.file_names:
                 dropdown.set(self.file_names[0])
 
     # --- Row Management Functions ---
-
     def add_row(self):
         row_frame = ctk.CTkFrame(self.scroll_frame, fg_color='transparent')
         row_frame.pack(fill='x', pady=5)
@@ -216,7 +191,6 @@ class ExcelCruncherApp(ctk.CTk):
         frame_to_delete.destroy()
 
     # --- Processing Function ---
-
     def process_data(self):
         self.output_box.delete('0.0', 'end')
 
@@ -244,12 +218,19 @@ class ExcelCruncherApp(ctk.CTk):
             self.output_box.insert('0.0', 'Error: No valid manual data to process.\n')
             return
 
-        self.output_box.insert('end', 'Extraction Successful:\n')
-        self.output_box.insert('end', '-' * 30 + '\n')
+        # NEW: Hand off to processor.py
+        try:
+            self.output_box.insert('end', "Processing...\n")
 
-        for target, v1, v2 in extracted_data:
-            self.output_box.insert('end', f'File: {target} | Vals: {v1}, {v2}\n')
+            # Call the pipeline and get the formatted result string
+            final_output = processor.run_pipeline(extracted_data)
 
+            # Print the results back to the UI
+            self.output_box.delete('0.0', 'end')
+            self.output_box.insert('end', final_output)
+
+        except Exception as e:
+            self.output_box.insert('end', f"\nCRITICAL ERROR: {e}")
 
 if __name__ == '__main__':
     app = ExcelCruncherApp()
