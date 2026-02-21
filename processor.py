@@ -3,26 +3,25 @@ import pandas as pd
 import config
 
 
-def extract_names_from_file(file_path):
+def extract_data_from_file(file_path):
     """
-    Reads the Excel file and extracts the 'name' column as a list of strings.
+    Reads the Excel file and extracts a dictionary mapping 'name' to 'price'.
     """
     try:
         df = pd.read_excel(file_path)
-
-        # Standardize column headers to lowercase to avoid case-sensitivity bugs
-        # (e.g., catching "Name", "NAME", or "name ")
         df.columns = [str(c).lower().strip() for c in df.columns]
 
-        if config.name_column_header in df.columns:
-            # Drop empty rows and convert everything to a clean list of strings
-            return df[config.name_column_header].dropna().astype(str).tolist()
+        if config.name_column_header in df.columns and config.price_column_header in df.columns:
+            # Drop rows where either name or price is missing
+            df = df.dropna(subset=[config.name_column_header, config.price_column_header])
+
+            return dict(zip(df[config.name_column_header].astype(str), df[config.price_column_header]))
         else:
-            return []
+            return {}
 
     except Exception as e:
         print(f"Failed to read {file_path}: {e}")
-        return []
+        return {}
 
 
 def run_pipeline(extracted_data):

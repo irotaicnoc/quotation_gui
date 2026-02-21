@@ -9,4 +9,5 @@ color_theme = 'blue'  # Options: 'blue', 'dark-blue', 'green', 'dark-green', 'pu
 window_title = 'Quotation Tool'
 window_geometry = '800x800'
 
-name_column_header = 'nome'  # Standardized column header for name extraction
+name_column_header = 'nome'
+price_column_header = 'prezzo'

@@ -16,7 +16,7 @@ class ExcelCruncherApp(ctk.CTk):
         super().__init__()
 
         self.title(config.window_title)
-        self.geometry(config.window_geometry) # NEW: Uses config
+        self.geometry(config.window_geometry)
 
         self.rows = []
         self.selected_files = []
@@ -106,10 +106,10 @@ class ExcelCruncherApp(ctk.CTk):
                 if path not in self.selected_files:
                     self.selected_files.append(path)
 
-                    # Extract and cache the names immediately upon selection
+                    # Extract and cache the {name: price} dictionary
                     filename = os.path.basename(path)
-                    extracted_names = processor.extract_names_from_file(path)
-                    self.file_data[filename] = extracted_names
+                    extracted_dict = processor.extract_data_from_file(path)
+                    self.file_data[filename] = extracted_dict
 
             self.update_file_state()
 
@@ -138,7 +138,13 @@ class ExcelCruncherApp(ctk.CTk):
                 item_frame.pack(fill='x', pady=2, padx=5)
 
                 if self.excel_icon:
-                    lbl = ctk.CTkLabel(item_frame, text=f'  {filename}', image=self.excel_icon, compound='left', anchor='w')
+                    lbl = ctk.CTkLabel(
+                        item_frame,
+                        text=f'  {filename}',
+                        image=self.excel_icon,
+                        compound='left',
+                        anchor='w',
+                    )
                 else:
                     lbl = ctk.CTkLabel(item_frame, text=f'📄 {filename}', anchor='w')
 
@@ -167,60 +173,106 @@ class ExcelCruncherApp(ctk.CTk):
         row_frame = ctk.CTkFrame(self.scroll_frame, fg_color='transparent')
         row_frame.pack(fill='x', pady=5)
 
+        # --- Helper: Auto-Calculate Total ---
+        def update_total(*args):
+            try:
+                # Grab the current price and quantity
+                price = float(price_entry.get())
+                qty = float(qty_entry.get())
+                total = price * qty
+
+                # Update the Total cell
+                total_entry.configure(state="normal")
+                total_entry.delete(0, "end")
+                total_entry.insert(0, f"{total:.2f}")
+                total_entry.configure(state="readonly")
+            except ValueError:
+                # If quantity is empty or invalid, clear the total
+                total_entry.configure(state="normal")
+                total_entry.delete(0, "end")
+                total_entry.configure(state="readonly")
+
         # --- CELL 1: Target File ---
-        # The callback function for when the user changes the selected file
         def on_target_file_changed(selected_filename):
-            # 1. Get the cached names for this specific file
-            available_names = self.file_data.get(selected_filename, [])
-            # 2. Push them to Cell 2
+            file_dict = self.file_data.get(selected_filename, {})
+            available_names = list(file_dict.keys())
+
             name_combo.configure(values=available_names)
-            # 3. Clear whatever was previously typed in Cell 2
             name_combo.set("")
 
-        file_dropdown = ctk.CTkOptionMenu(
-            row_frame,
-            values=self.file_names,
-            width=180,
-            dynamic_resizing=False,
-            command=on_target_file_changed # Triggers the cascade
-        )
-        file_dropdown.pack(side='left', padx=(10, 5))
+            price_entry.configure(state="normal")
+            price_entry.delete(0, "end")
+            price_entry.configure(state="readonly")
+            update_total()
 
-        # --- CELL 2: The Searchable Name List ---
-        name_combo = ctk.CTkComboBox(row_frame, values=[], width=200)
+        file_dropdown = ctk.CTkOptionMenu(
+            row_frame, values=self.file_names, width=150,
+            dynamic_resizing=False, command=on_target_file_changed
+        )
+        file_dropdown.pack(side='left', padx=(5, 5))
+
+        # --- CELL 2: Searchable Name ---
+        def on_name_selected(choice):
+            # Find the price for the selected name
+            selected_filename = file_dropdown.get()
+            file_dict = self.file_data.get(selected_filename, {})
+            price = file_dict.get(choice, 0.0)
+
+            # Push the price to Cell 3
+            price_entry.configure(state="normal")
+            price_entry.delete(0, "end")
+            price_entry.insert(0, str(price))
+            price_entry.configure(state="readonly")
+
+            # Automatically calculate the total
+            update_total()
+
+        name_combo = ctk.CTkComboBox(row_frame, values=[], width=150, command=on_name_selected)
         name_combo.pack(side='left', padx=5)
 
-        # The Auto-Filter Logic
         def filter_names(event):
             typed_text = name_combo.get()
             selected_filename = file_dropdown.get()
-            all_names = self.file_data.get(selected_filename, [])
+            file_dict = self.file_data.get(selected_filename, {})
+            all_names = list(file_dict.keys())
 
-            # If the box is empty, show everything. Otherwise, filter by the typed text.
             if not typed_text:
                 name_combo.configure(values=all_names)
             else:
                 filtered = [n for n in all_names if typed_text.lower() in n.lower()]
                 name_combo.configure(values=filtered)
 
-        # Bind the keyboard release event to trigger the filter
         name_combo.bind("<KeyRelease>", filter_names)
 
-        # --- CELL 3: Keep a standard entry for Quantity/Price (optional) ---
-        entry2 = ctk.CTkEntry(row_frame, placeholder_text='Quantity', width=100)
-        entry2.pack(side='left', padx=5)
+        # --- CELL 3: Price (Read-Only) ---
+        price_entry = ctk.CTkEntry(row_frame, width=80, state="readonly", text_color="gray")
+        price_entry.pack(side='left', padx=5)
 
+        # --- CELL 4: Quantity ---
+        qty_entry = ctk.CTkEntry(row_frame, placeholder_text='Qty', width=60)
+        qty_entry.pack(side='left', padx=5)
+        # Bind typing in the quantity box to trigger the total calculation
+        qty_entry.bind("<KeyRelease>", update_total)
+
+        # --- CELL 5: Total (Read-Only) ---
+        total_entry = ctk.CTkEntry(row_frame, width=90, state="readonly", text_color="lightgreen")
+        total_entry.pack(side='left', padx=5)
+
+        # --- Delete Button ---
         del_btn = ctk.CTkButton(
             row_frame, text='X', width=30, fg_color='#d9534f', hover_color='#c9302c',
             command=lambda f=row_frame: self.delete_row(f)
         )
         del_btn.pack(side='right', padx=10)
 
+        # Store references
         self.rows.append({
             'frame': row_frame,
             'dropdown': file_dropdown,
-            'name_combo': name_combo, # Updated reference
-            'entry2': entry2
+            'name_combo': name_combo,
+            'price': price_entry,
+            'qty': qty_entry,
+            'total': total_entry
         })
 
     def delete_row(self, frame_to_delete):
@@ -268,6 +320,7 @@ class ExcelCruncherApp(ctk.CTk):
 
         except Exception as e:
             self.output_box.insert('end', f"\nCRITICAL ERROR: {e}")
+
 
 if __name__ == '__main__':
     app = ExcelCruncherApp()
