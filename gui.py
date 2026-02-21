@@ -21,6 +21,7 @@ class ExcelCruncherApp(ctk.CTk):
         self.rows = []
         self.selected_files = []
         self.file_names = ['No files loaded']
+        self.file_data = {}  # Maps 'filename.xlsx' -> ['Item 1', 'Item 2', ...]
 
         # --- Load the Icon (Modern Pathlib approach) ---
         try:
@@ -104,6 +105,12 @@ class ExcelCruncherApp(ctk.CTk):
             for path in new_file_paths:
                 if path not in self.selected_files:
                     self.selected_files.append(path)
+
+                    # Extract and cache the names immediately upon selection
+                    filename = os.path.basename(path)
+                    extracted_names = processor.extract_names_from_file(path)
+                    self.file_data[filename] = extracted_names
+
             self.update_file_state()
 
     def remove_file(self, file_path_to_remove):
@@ -160,21 +167,51 @@ class ExcelCruncherApp(ctk.CTk):
         row_frame = ctk.CTkFrame(self.scroll_frame, fg_color='transparent')
         row_frame.pack(fill='x', pady=5)
 
-        file_dropdown = ctk.CTkOptionMenu(row_frame, values=self.file_names, width=200, dynamic_resizing=False)
+        # --- CELL 1: Target File ---
+        # The callback function for when the user changes the selected file
+        def on_target_file_changed(selected_filename):
+            # 1. Get the cached names for this specific file
+            available_names = self.file_data.get(selected_filename, [])
+            # 2. Push them to Cell 2
+            name_combo.configure(values=available_names)
+            # 3. Clear whatever was previously typed in Cell 2
+            name_combo.set("")
+
+        file_dropdown = ctk.CTkOptionMenu(
+            row_frame,
+            values=self.file_names,
+            width=180,
+            dynamic_resizing=False,
+            command=on_target_file_changed # Triggers the cascade
+        )
         file_dropdown.pack(side='left', padx=(10, 5))
 
-        entry1 = ctk.CTkEntry(row_frame, placeholder_text='First Value', width=140)
-        entry1.pack(side='left', padx=5)
+        # --- CELL 2: The Searchable Name List ---
+        name_combo = ctk.CTkComboBox(row_frame, values=[], width=200)
+        name_combo.pack(side='left', padx=5)
 
-        entry2 = ctk.CTkEntry(row_frame, placeholder_text='Second Value', width=140)
+        # The Auto-Filter Logic
+        def filter_names(event):
+            typed_text = name_combo.get()
+            selected_filename = file_dropdown.get()
+            all_names = self.file_data.get(selected_filename, [])
+
+            # If the box is empty, show everything. Otherwise, filter by the typed text.
+            if not typed_text:
+                name_combo.configure(values=all_names)
+            else:
+                filtered = [n for n in all_names if typed_text.lower() in n.lower()]
+                name_combo.configure(values=filtered)
+
+        # Bind the keyboard release event to trigger the filter
+        name_combo.bind("<KeyRelease>", filter_names)
+
+        # --- CELL 3: Keep a standard entry for Quantity/Price (optional) ---
+        entry2 = ctk.CTkEntry(row_frame, placeholder_text='Quantity', width=100)
         entry2.pack(side='left', padx=5)
 
         del_btn = ctk.CTkButton(
-            row_frame,
-            text='X',
-            width=30,
-            fg_color='#d9534f',
-            hover_color='#c9302c',
+            row_frame, text='X', width=30, fg_color='#d9534f', hover_color='#c9302c',
             command=lambda f=row_frame: self.delete_row(f)
         )
         del_btn.pack(side='right', padx=10)
@@ -182,7 +219,7 @@ class ExcelCruncherApp(ctk.CTk):
         self.rows.append({
             'frame': row_frame,
             'dropdown': file_dropdown,
-            'entry1': entry1,
+            'name_combo': name_combo, # Updated reference
             'entry2': entry2
         })
 
