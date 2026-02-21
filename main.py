@@ -1,18 +1,19 @@
-import customtkinter as ctk
-from tkinter import filedialog
 import os
 from PIL import Image
+import customtkinter as ctk
+from tkinter import filedialog
 
 ctk.set_appearance_mode("System")
 # ctk.set_appearance_mode("Light")
 ctk.set_default_color_theme("blue")
+
 
 class ExcelCruncherApp(ctk.CTk):
     def __init__(self):
         super().__init__()
 
         self.title("Data Transcription & Processing Tool")
-        self.geometry("800x800") # Slightly taller to fit the attachments box
+        self.geometry("800x800")
 
         self.rows = []
         self.selected_files = []
@@ -52,7 +53,7 @@ class ExcelCruncherApp(ctk.CTk):
         )
         self.browse_btn.pack(fill="x", expand=True)
 
-        # NEW: The Attachment List (Scrollable frame for files)
+        #  The Attachment List (Scrollable frame for files)
         self.attachment_frame = ctk.CTkScrollableFrame(self.file_frame, height=80, fg_color="#1e1e1e")
         self.attachment_frame.pack(fill="x", pady=(10, 0))
 
@@ -122,7 +123,7 @@ class ExcelCruncherApp(ctk.CTk):
                 item_frame = ctk.CTkFrame(self.attachment_frame, fg_color="#2b2b2b", corner_radius=5)
                 item_frame.pack(fill="x", pady=2, padx=5)
 
-                # --- Apply the Icon ---
+                # Apply the Icon
                 if self.excel_icon:
                     lbl = ctk.CTkLabel(item_frame, text=f"  {filename}", image=self.excel_icon, compound="left", anchor="w")
                 else:
@@ -151,7 +152,6 @@ class ExcelCruncherApp(ctk.CTk):
             if current_selection not in self.file_names:
                 dropdown.set(self.file_names[0])
 
-
     # --- Row Management Functions ---
 
     def add_row(self):
@@ -168,7 +168,11 @@ class ExcelCruncherApp(ctk.CTk):
         entry2.pack(side="left", padx=5)
 
         del_btn = ctk.CTkButton(
-            row_frame, text="X", width=30, fg_color="#d9534f", hover_color="#c9302c",
+            row_frame,
+            text="X",
+            width=30,
+            fg_color="#d9534f",
+            hover_color="#c9302c",
             command=lambda f=row_frame: self.delete_row(f)
         )
         del_btn.pack(side="right", padx=10)
@@ -183,7 +187,6 @@ class ExcelCruncherApp(ctk.CTk):
     def delete_row(self, frame_to_delete):
         self.rows = [row for row in self.rows if row["frame"] != frame_to_delete]
         frame_to_delete.destroy()
-
 
     # --- Processing Function ---
 
@@ -219,6 +222,7 @@ class ExcelCruncherApp(ctk.CTk):
 
         for target, v1, v2 in extracted_data:
             self.output_box.insert("end", f"File: {target} | Vals: {v1}, {v2}\n")
+
 
 if __name__ == "__main__":
     app = ExcelCruncherApp()
