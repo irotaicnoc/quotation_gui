@@ -69,14 +69,14 @@ class ExcelCruncherApp(ctk.CTk):
         self.scroll_frame = ctk.CTkScrollableFrame(self, height=250)
         self.scroll_frame.pack(pady=10, padx=20, fill='both', expand=True)
 
+        # Changed parent to scroll_frame. We don't pack it here, add_row will handle packing.
         self.add_btn = ctk.CTkButton(
-            self,
+            self.scroll_frame,
             text='+ Add New Row',
             command=self.add_row,
             fg_color='#4a4a4a',
             hover_color='#5a5a5a',
         )
-        self.add_btn.pack(pady=5)
 
         # 3. Action Button
         self.run_btn = ctk.CTkButton(
@@ -171,6 +171,10 @@ class ExcelCruncherApp(ctk.CTk):
 
     # --- Row Management Functions ---
     def add_row(self):
+        # Temporarily hide the add button so the new row is placed above it
+        if hasattr(self, 'add_btn'):
+            self.add_btn.pack_forget()
+
         row_frame = ctk.CTkFrame(self.scroll_frame, fg_color='transparent')
         row_frame.pack(fill='x', pady=5)
 
@@ -220,7 +224,7 @@ class ExcelCruncherApp(ctk.CTk):
 
         # --- CELL 2: Searchable Name ---
         def on_name_selected(choice):
-            # 1. Visually update the text in the combobox!
+            # 1. Visually update the text in the combobox
             name_combo.set(choice)
 
             # 2. Find the price for the selected name
@@ -246,7 +250,7 @@ class ExcelCruncherApp(ctk.CTk):
             name_combo,
             values=[''],
             command=on_name_selected,
-            autocomplete=True  # Automatically handles the filtering logic!
+            autocomplete=True  # Automatically handles the filtering logic
         )
 
         # --- CELL 3: Price (Read-Only) ---
@@ -281,9 +285,15 @@ class ExcelCruncherApp(ctk.CTk):
             'total': total_entry
         })
 
+        # Repack the add button so it consistently appears below the newest row
+        if hasattr(self, 'add_btn'):
+            self.add_btn.pack(pady=(10, 5))
+
     def delete_row(self, frame_to_delete):
         self.rows = [row for row in self.rows if row['frame'] != frame_to_delete]
         frame_to_delete.destroy()
+        # Note: No need to repack the add button here. Since the deleted row
+        # is just removed from the flow, Tkinter automatically slides the button up.
 
     # --- Processing Function ---
     def process_data(self):
@@ -314,7 +324,7 @@ class ExcelCruncherApp(ctk.CTk):
             self.output_box.insert('0.0', 'Error: No valid manual data to process.\n')
             return
 
-        # NEW: Hand off to processor.py
+        # Hand off to processor.py
         try:
             self.output_box.insert('end', 'Processing...\n')
 
