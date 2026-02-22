@@ -48,8 +48,8 @@ class ExcelCruncherApp(ctk.CTk):
 
         self.browse_btn = ctk.CTkButton(
             self.file_frame,
-            text='📁 Click to Browse for Excel Files\n(You can select multiple files)',
-            height=70,
+            text='📁 Browse for Excel Files',
+            height=40,
             font=ctk.CTkFont(size=14),
             fg_color='#2b2b2b',
             hover_color='#3b3b3b',
@@ -57,7 +57,7 @@ class ExcelCruncherApp(ctk.CTk):
             border_color='#555555',
             command=self.select_files
         )
-        self.browse_btn.pack(fill='x', expand=True)
+        self.browse_btn.pack(fill='x', pady=5)
 
         self.attachment_frame = ctk.CTkScrollableFrame(self.file_frame, height=80, fg_color='#1e1e1e')
         self.attachment_frame.pack(fill='x', pady=(10, 0))
@@ -292,8 +292,6 @@ class ExcelCruncherApp(ctk.CTk):
     def delete_row(self, frame_to_delete):
         self.rows = [row for row in self.rows if row['frame'] != frame_to_delete]
         frame_to_delete.destroy()
-        # Note: No need to repack the add button here. Since the deleted row
-        # is just removed from the flow, Tkinter automatically slides the button up.
 
     # --- Processing Function ---
     def process_data(self):
