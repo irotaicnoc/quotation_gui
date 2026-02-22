@@ -182,15 +182,15 @@ class ExcelCruncherApp(ctk.CTk):
                 total = price * qty
 
                 # Update the Total cell
-                total_entry.configure(state="normal")
-                total_entry.delete(0, "end")
-                total_entry.insert(0, f"{total:.2f}")
-                total_entry.configure(state="readonly")
+                total_entry.configure(state='normal')
+                total_entry.delete(0, 'end')
+                total_entry.insert(0, f'{total:.2f}')
+                total_entry.configure(state='readonly')
             except ValueError:
                 # If quantity is empty or invalid, clear the total
-                total_entry.configure(state="normal")
-                total_entry.delete(0, "end")
-                total_entry.configure(state="readonly")
+                total_entry.configure(state='normal')
+                total_entry.delete(0, 'end')
+                total_entry.configure(state='readonly')
 
         # --- CELL 1: Target File ---
         def on_target_file_changed(selected_filename):
@@ -198,11 +198,11 @@ class ExcelCruncherApp(ctk.CTk):
             available_names = list(file_dict.keys())
 
             name_combo.configure(values=available_names)
-            name_combo.set("")
+            name_combo.set('')
 
-            price_entry.configure(state="normal")
-            price_entry.delete(0, "end")
-            price_entry.configure(state="readonly")
+            price_entry.configure(state='normal')
+            price_entry.delete(0, 'end')
+            price_entry.configure(state='readonly')
             update_total()
 
         file_dropdown = ctk.CTkOptionMenu(
@@ -219,15 +219,15 @@ class ExcelCruncherApp(ctk.CTk):
             price = file_dict.get(choice, 0.0)
 
             # Push the price to Cell 3
-            price_entry.configure(state="normal")
-            price_entry.delete(0, "end")
+            price_entry.configure(state='normal')
+            price_entry.delete(0, 'end')
             price_entry.insert(0, str(price))
-            price_entry.configure(state="readonly")
+            price_entry.configure(state='readonly')
 
             # Automatically calculate the total
             update_total()
 
-        name_combo = ctk.CTkComboBox(row_frame, values=[""], width=150, command=on_name_selected)
+        name_combo = ctk.CTkComboBox(row_frame, values=[''], width=150, command=on_name_selected)
         name_combo.pack(side='left', padx=5)
 
         def filter_names(event):
@@ -242,20 +242,20 @@ class ExcelCruncherApp(ctk.CTk):
                 filtered = [n for n in all_names if typed_text.lower() in n.lower()]
                 name_combo.configure(values=filtered)
 
-        name_combo.bind("<KeyRelease>", filter_names)
+        name_combo.bind('<KeyRelease>', filter_names)
 
         # --- CELL 3: Price (Read-Only) ---
-        price_entry = ctk.CTkEntry(row_frame, width=80, state="readonly", text_color="gray")
+        price_entry = ctk.CTkEntry(row_frame, width=80, state='readonly', text_color='gray')
         price_entry.pack(side='left', padx=5)
 
         # --- CELL 4: Quantity ---
         qty_entry = ctk.CTkEntry(row_frame, placeholder_text='Qty', width=60)
         qty_entry.pack(side='left', padx=5)
         # Bind typing in the quantity box to trigger the total calculation
-        qty_entry.bind("<KeyRelease>", update_total)
+        qty_entry.bind('<KeyRelease>', update_total)
 
         # --- CELL 5: Total (Read-Only) ---
-        total_entry = ctk.CTkEntry(row_frame, width=90, state="readonly", text_color="lightgreen")
+        total_entry = ctk.CTkEntry(row_frame, width=90, state='readonly', text_color='lightgreen')
         total_entry.pack(side='left', padx=5)
 
         # --- Delete Button ---
@@ -309,7 +309,7 @@ class ExcelCruncherApp(ctk.CTk):
 
         # NEW: Hand off to processor.py
         try:
-            self.output_box.insert('end', "Processing...\n")
+            self.output_box.insert('end', 'Processing...\n')
 
             # Call the pipeline and get the formatted result string
             final_output = processor.run_pipeline(extracted_data)
@@ -319,7 +319,7 @@ class ExcelCruncherApp(ctk.CTk):
             self.output_box.insert('end', final_output)
 
         except Exception as e:
-            self.output_box.insert('end', f"\nCRITICAL ERROR: {e}")
+            self.output_box.insert('end', f'\nCRITICAL ERROR: {e}')
 
 
 if __name__ == '__main__':
