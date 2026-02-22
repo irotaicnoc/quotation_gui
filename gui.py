@@ -1,4 +1,5 @@
 import os
+import threading
 from PIL import Image
 from pathlib import Path
 import customtkinter as ctk
@@ -59,6 +60,10 @@ class ExcelCruncherApp(ctk.CTk):
         )
         self.browse_btn.pack(fill='x', pady=5)
 
+        # Progress bar (Hidden by default, shown during loading)
+        self.progress_bar = ctk.CTkProgressBar(self.file_frame, mode='determinate')
+        self.progress_bar.set(0)
+
         self.attachment_frame = ctk.CTkScrollableFrame(self.file_frame, height=80, fg_color='#1e1e1e')
         self.attachment_frame.pack(fill='x', pady=(10, 0))
 
@@ -103,16 +108,46 @@ class ExcelCruncherApp(ctk.CTk):
         )
 
         if new_file_paths:
-            for path in new_file_paths:
-                if path not in self.selected_files:
-                    self.selected_files.append(path)
+            # Filter out files that are already loaded
+            files_to_load = [path for path in new_file_paths if path not in self.selected_files]
 
-                    # Extract and cache the {name: price} dictionary
-                    filename = os.path.basename(path)
-                    extracted_dict = processor.extract_data_from_file(path)
-                    self.file_data[filename] = extracted_dict
+            if not files_to_load:
+                return
 
-            self.update_file_state()
+            # Disable the button and show the progress bar
+            self.browse_btn.configure(state='disabled', text='⏳ Loading Files...')
+            self.progress_bar.pack(fill='x', pady=(0, 5))
+            self.progress_bar.set(0)
+
+            # Run extraction in a separate thread to prevent GUI freezing
+            threading.Thread(target=self._load_files_thread, args=(files_to_load,), daemon=True).start()
+
+    def _load_files_thread(self, files_to_load):
+        total_files = len(files_to_load)
+
+        for i, path in enumerate(files_to_load):
+            filename = os.path.basename(path)
+            # Extract data from the file (This is the blocking operation)
+            extracted_dict = processor.extract_data_from_file(path)
+
+            self.selected_files.append(path)
+            self.file_data[filename] = extracted_dict
+
+            # Update the progress bar safely from the background thread
+            progress = (i + 1) / total_files
+            self.after(0, self._update_progress, progress)
+
+        # Re-enable UI once loading is finished
+        self.after(0, self._on_files_loaded)
+
+    def _update_progress(self, value):
+        self.progress_bar.set(value)
+
+    def _on_files_loaded(self):
+        # Hide the progress bar, restore the button, and refresh the UI state
+        self.progress_bar.pack_forget()
+        self.browse_btn.configure(state='normal', text='📁 Browse for Excel Files')
+        self.update_file_state()
 
     def remove_file(self, file_path_to_remove):
         if file_path_to_remove in self.selected_files:
