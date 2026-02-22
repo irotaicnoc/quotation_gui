@@ -1,6 +1,7 @@
 .idea/
 .venv/
 assets/
+CTkScrollableDropdown/
 pyproject.toml
 uv.lock
 TODO.txt
