@@ -3,6 +3,7 @@ from PIL import Image
 from pathlib import Path
 import customtkinter as ctk
 from tkinter import filedialog
+from CTkScrollableDropdown import CTkScrollableDropdown
 
 import config
 import processor
@@ -197,7 +198,13 @@ class ExcelCruncherApp(ctk.CTk):
             file_dict = self.file_data.get(selected_filename, {})
             available_names = list(file_dict.keys())
 
-            name_combo.configure(values=available_names)
+            if not available_names:
+                available_names = ['']
+
+            # Update the custom dropdown attached to the combobox
+            name_dropdown.configure(values=available_names)
+
+            # Clear out the combobox text when switching files
             name_combo.set('')
 
             price_entry.configure(state='normal')
@@ -213,36 +220,34 @@ class ExcelCruncherApp(ctk.CTk):
 
         # --- CELL 2: Searchable Name ---
         def on_name_selected(choice):
-            # Find the price for the selected name
+            # 1. Visually update the text in the combobox!
+            name_combo.set(choice)
+
+            # 2. Find the price for the selected name
             selected_filename = file_dropdown.get()
             file_dict = self.file_data.get(selected_filename, {})
             price = file_dict.get(choice, 0.0)
 
-            # Push the price to Cell 3
+            # 3. Push the price to Cell 3
             price_entry.configure(state='normal')
             price_entry.delete(0, 'end')
             price_entry.insert(0, str(price))
             price_entry.configure(state='readonly')
 
-            # Automatically calculate the total
+            # 4. Automatically calculate the total
             update_total()
 
-        name_combo = ctk.CTkComboBox(row_frame, values=[''], width=150, command=on_name_selected)
+        # Switch back to CTkComboBox for better Click & Type behavior
+        name_combo = ctk.CTkComboBox(row_frame, width=150)
         name_combo.pack(side='left', padx=5)
 
-        def filter_names(event):
-            typed_text = name_combo.get()
-            selected_filename = file_dropdown.get()
-            file_dict = self.file_data.get(selected_filename, {})
-            all_names = list(file_dict.keys())
-
-            if not typed_text:
-                name_combo.configure(values=all_names)
-            else:
-                filtered = [n for n in all_names if typed_text.lower() in n.lower()]
-                name_combo.configure(values=filtered)
-
-        name_combo.bind('<KeyRelease>', filter_names)
+        # Attach the autocomplete scrollable dropdown directly to the combobox
+        name_dropdown = CTkScrollableDropdown(
+            name_combo,
+            values=[''],
+            command=on_name_selected,
+            autocomplete=True  # Automatically handles the filtering logic!
+        )
 
         # --- CELL 3: Price (Read-Only) ---
         price_entry = ctk.CTkEntry(row_frame, width=80, state='readonly', text_color='gray')
@@ -270,6 +275,7 @@ class ExcelCruncherApp(ctk.CTk):
             'frame': row_frame,
             'dropdown': file_dropdown,
             'name_combo': name_combo,
+            'name_dropdown': name_dropdown,
             'price': price_entry,
             'qty': qty_entry,
             'total': total_entry
@@ -291,8 +297,9 @@ class ExcelCruncherApp(ctk.CTk):
 
         for i, row in enumerate(self.rows):
             selected_target_file = row['dropdown'].get()
-            val1 = row['entry1'].get()
-            val2 = row['entry2'].get()
+
+            val1 = row['price'].get()
+            val2 = row['qty'].get()
 
             if not val1 and not val2:
                 continue
