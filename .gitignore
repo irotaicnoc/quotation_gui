@@ -6,5 +6,7 @@ dist/
 assets/
 pyproject.toml
 uv.lock
+
 TODO.txt
 gui.spec
+Stima Impianti.spec
