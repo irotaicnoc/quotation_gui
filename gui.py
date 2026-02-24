@@ -23,18 +23,28 @@ class ExcelCruncherApp(ctk.CTk):
         self.file_names = ['No files loaded']
         self.file_data = {}  # Maps 'filename.xlsx' -> ['Item 1', 'Item 2', ...]
 
-        # --- Load the Icon (Modern Pathlib approach) ---
+        # --- Load the Icons ---
         try:
-            light_icon_path = Path(config.assets_path) / config.excel_icon_name_light
-            dark_icon_path = Path(config.assets_path) / config.excel_icon_name_dark
-
+            excel_light_icon_path = Path(config.assets_path) / config.excel_icon_name_light
+            excel_dark_icon_path = Path(config.assets_path) / config.excel_icon_name_dark
             self.excel_icon = ctk.CTkImage(
-                light_image=Image.open(light_icon_path),
-                dark_image=Image.open(dark_icon_path),
+                light_image=Image.open(excel_light_icon_path),
+                dark_image=Image.open(excel_dark_icon_path),
                 size=(20, 20)
             )
         except FileNotFoundError:
             self.excel_icon = None
+
+        try:
+            folder_light_icon_path = Path(config.assets_path) / config.folder_icon_name_light
+            folder_dark_icon_path = Path(config.assets_path) / config.folder_icon_name_dark
+            self.folder_icon = ctk.CTkImage(
+                light_image=Image.open(folder_light_icon_path),
+                dark_image=Image.open(folder_dark_icon_path),
+                size=(20, 20)
+            )
+        except FileNotFoundError as e:
+            self.folder_icon = None
 
         # --- UI Layout ---
 
@@ -47,7 +57,9 @@ class ExcelCruncherApp(ctk.CTk):
 
         self.browse_btn = ctk.CTkButton(
             self.file_frame,
-            text='📁 Browse for Excel Files',
+            text=' Browse for Excel Files',
+            image=self.folder_icon,
+            compound='left',
             height=40,
             font=ctk.CTkFont(size=14),
             fg_color='#2b2b2b',
