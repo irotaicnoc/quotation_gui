@@ -54,12 +54,12 @@ class ExcelCruncherApp(ctk.CTk):
 
         # --- UI Layout ---
 
-        self.title_label = ctk.CTkLabel(
-            self,
-            text='Stima Impianti',
-            font=ctk.CTkFont(size=20, weight='bold'),
-        )
-        self.title_label.pack(pady=(20, 10))
+        # self.title_label = ctk.CTkLabel(
+        #     self,
+        #     text='Stima Impianti',
+        #     font=ctk.CTkFont(size=20, weight='bold'),
+        # )
+        # self.title_label.pack(pady=(20, 10))
 
         # 1. The File Browser Section
         self.file_frame = ctk.CTkFrame(self, fg_color='transparent')
