@@ -18,7 +18,10 @@ class ExcelCruncherApp(ctk.CTk):
 
         self.title(config.window_title)
         self.geometry(config.window_geometry)
-
+        
+        icon_path = Path(config.assets_path) / config.app_icon_name
+        self.iconbitmap(icon_path)
+        
         self.rows = []
         self.selected_files = []
         self.file_names = ['No files loaded']

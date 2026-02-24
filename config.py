@@ -7,6 +7,7 @@ if hasattr(sys, '_MEIPASS'):
     # Path when running as a compiled PyInstaller executable
     assets_path = os.path.join(sys._MEIPASS, assets_path)
 
+app_icon_name = 'app_icon.ico'
 excel_icon_name_light = 'excel_icon_light.png'
 excel_icon_name_dark = 'excel_icon_light.png'
 folder_icon_name_light = 'folder_icon_light.png'
