@@ -63,16 +63,16 @@ class ExcelCruncherApp(ctk.CTk):
             compound='left',
             height=40,
             font=ctk.CTkFont(size=14),
-            fg_color=("#e0e0e0", "#2b2b2b"),
-            hover_color=("#c8c8c8", "#3b3b3b"),
+            fg_color=('#e0e0e0', '#2b2b2b'),
+            hover_color=('#c8c8c8', '#3b3b3b'),
             border_width=2,
-            border_color=("#a8a8a8", "#555555"),
-            text_color=("black", "white"),
+            border_color=('#a8a8a8', '#555555'),
+            text_color=('black', 'white'),
             command=self.select_files
         )
         self.browse_btn.pack(fill='x', pady=5)
 
-        self.attachment_frame = ctk.CTkScrollableFrame(self.file_frame, height=80, fg_color=("#f0f0f0", "#1e1e1e"))
+        self.attachment_frame = ctk.CTkScrollableFrame(self.file_frame, height=80, fg_color=('#f0f0f0', '#1e1e1e'))
         self.attachment_frame.pack(fill='x', pady=(10, 0))
 
         self.empty_label = ctk.CTkLabel(self.attachment_frame, text='No files attached yet.', text_color='gray')
@@ -82,11 +82,11 @@ class ExcelCruncherApp(ctk.CTk):
         header_frame = ctk.CTkFrame(self, fg_color='transparent')
         header_frame.pack(fill='x', padx=40, pady=(10, 0))
 
-        ctk.CTkLabel(header_frame, text="Source File", width=150, anchor="w").pack(side='left', padx=(5, 5))
-        ctk.CTkLabel(header_frame, text="Item Name", width=150, anchor="w").pack(side='left', padx=5)
-        ctk.CTkLabel(header_frame, text="Price", width=80, anchor="w").pack(side='left', padx=5)
-        ctk.CTkLabel(header_frame, text="Qty", width=60, anchor="w").pack(side='left', padx=5)
-        ctk.CTkLabel(header_frame, text="Total", width=90, anchor="w").pack(side='left', padx=5)
+        ctk.CTkLabel(header_frame, text='Source File', width=150, anchor='w').pack(side='left', padx=(5, 5))
+        ctk.CTkLabel(header_frame, text='Item Name', width=150, anchor='w').pack(side='left', padx=5)
+        ctk.CTkLabel(header_frame, text='Price', width=80, anchor='w').pack(side='left', padx=5)
+        ctk.CTkLabel(header_frame, text='Qty', width=60, anchor='w').pack(side='left', padx=5)
+        ctk.CTkLabel(header_frame, text='Total', width=90, anchor='w').pack(side='left', padx=5)
 
         # 2. The Scrollable Frame (For manual data entry)
         self.scroll_frame = ctk.CTkScrollableFrame(self, height=250)
@@ -102,9 +102,9 @@ class ExcelCruncherApp(ctk.CTk):
             command=self.add_row,
             fg_color='transparent',
             border_width=2,
-            text_color=("#333333", "gray"),           # Dark text for light mode
-            border_color=("#a8a8a8", "#4a4a4a"),      # Lighter border for light mode
-            hover_color=("#e0e0e0", "#2b2b2b"),       # Light gray hover for light mode
+            text_color=('#333333', 'gray'),           # Dark text for light mode
+            border_color=('#a8a8a8', '#4a4a4a'),      # Lighter border for light mode
+            hover_color=('#e0e0e0', '#2b2b2b'),       # Light gray hover for light mode
         )
         self.add_btn.pack(pady=10, fill='x', padx=5)
 
@@ -195,7 +195,7 @@ class ExcelCruncherApp(ctk.CTk):
             for file_path in self.selected_files:
                 filename = os.path.basename(file_path)
 
-                item_frame = ctk.CTkFrame(self.attachment_frame, fg_color=("#e8e8e8", "#2b2b2b"), corner_radius=5)
+                item_frame = ctk.CTkFrame(self.attachment_frame, fg_color=('#e8e8e8', '#2b2b2b'), corner_radius=5)
                 item_frame.pack(fill='x', pady=2, padx=5)
 
                 if self.excel_icon:
@@ -328,7 +328,7 @@ class ExcelCruncherApp(ctk.CTk):
             row_frame,
             width=90,
             state='readonly',
-            text_color=("darkgreen", "lightgreen")  # Dark green for light mode
+            text_color=('darkgreen', 'lightgreen')  # Dark green for light mode
         )
         total_entry.pack(side='left', padx=5)
 
