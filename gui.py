@@ -64,6 +64,16 @@ class ExcelCruncherApp(ctk.CTk):
         self.empty_label = ctk.CTkLabel(self.attachment_frame, text='No files attached yet.', text_color='gray')
         self.empty_label.pack(pady=20)
 
+        # --- Column Headers ---
+        header_frame = ctk.CTkFrame(self, fg_color='transparent')
+        header_frame.pack(fill='x', padx=40, pady=(10, 0))
+
+        ctk.CTkLabel(header_frame, text="Source File", width=150, anchor="w").pack(side='left', padx=(5, 5))
+        ctk.CTkLabel(header_frame, text="Item Name", width=150, anchor="w").pack(side='left', padx=5)
+        ctk.CTkLabel(header_frame, text="Price", width=80, anchor="w").pack(side='left', padx=5)
+        ctk.CTkLabel(header_frame, text="Qty", width=60, anchor="w").pack(side='left', padx=5)
+        ctk.CTkLabel(header_frame, text="Total", width=90, anchor="w").pack(side='left', padx=5)
+
         # 2. The Scrollable Frame (For manual data entry)
         self.scroll_frame = ctk.CTkScrollableFrame(self, height=250)
         self.scroll_frame.pack(pady=10, padx=20, fill='both', expand=True)
