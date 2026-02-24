@@ -5,8 +5,8 @@ folder_icon_name_light = 'folder_icon_light.png'
 folder_icon_name_dark = 'folder_icon_light.png'
 
 # Options: 'System', 'Light', 'Dark'
-# ui_theme = 'System'
-ui_theme = 'Light'
+ui_theme = 'System'
+# ui_theme = 'Light'
 # Options: blue, dark-blue, green, dark-green, purple, dark-purple, orange, dark-orange
 color_theme = 'blue'
 
