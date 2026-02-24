@@ -25,7 +25,7 @@ class ExcelCruncherApp(ctk.CTk):
         self.rows = []
         self.selected_files = []
         # Placeholder for when no file is chosen or loaded
-        self.placeholder = "Select file..."
+        self.placeholder = 'Select file...'
         self.file_names = [self.placeholder]
         self.file_data = {}  # Maps 'filename.xlsx' -> ['Item 1', 'Item 2', ...]
 
@@ -36,7 +36,7 @@ class ExcelCruncherApp(ctk.CTk):
             self.excel_icon = ctk.CTkImage(
                 light_image=Image.open(excel_light_icon_path),
                 dark_image=Image.open(excel_dark_icon_path),
-                size=(20, 20)
+                size=(20, 20),
             )
         except FileNotFoundError:
             self.excel_icon = None
@@ -47,7 +47,7 @@ class ExcelCruncherApp(ctk.CTk):
             self.folder_icon = ctk.CTkImage(
                 light_image=Image.open(folder_light_icon_path),
                 dark_image=Image.open(folder_dark_icon_path),
-                size=(20, 20)
+                size=(20, 20),
             )
         except FileNotFoundError:
             self.folder_icon = None
@@ -73,7 +73,7 @@ class ExcelCruncherApp(ctk.CTk):
             border_width=2,
             border_color=('#a8a8a8', '#555555'),
             text_color=('black', 'white'),
-            command=self.select_files
+            command=self.select_files,
         )
         self.browse_btn.pack(fill='x', pady=5)
 
@@ -131,7 +131,7 @@ class ExcelCruncherApp(ctk.CTk):
         self.add_row()
 
     # --- File Management Functions ---
-    def select_files(self):
+    def select_files(self) -> None:
         new_file_paths = filedialog.askopenfilenames(
             title='Select Excel Files',
             filetypes=[('Excel files', '*.xlsx *.xls')]
@@ -160,7 +160,7 @@ class ExcelCruncherApp(ctk.CTk):
             # 2. Start the background thread
             threading.Thread(target=self._load_files_thread, args=(files_to_load,), daemon=True).start()
 
-    def _load_files_thread(self, file_paths):
+    def _load_files_thread(self, file_paths) -> None:
         # This runs in the background so the UI doesn't freeze
         for path in file_paths:
             filename = os.path.basename(path)
@@ -172,19 +172,19 @@ class ExcelCruncherApp(ctk.CTk):
         # 3. Safely tell the main Tkinter thread to update the UI now that data is ready
         self.after(0, self._on_files_loaded)
 
-    def _on_files_loaded(self):
+    def _on_files_loaded(self) -> None:
         # Restore the browse button
         self.browse_btn.configure(state='normal', text=' Browse for Excel Files')
 
         # Refresh the visual list and dropdowns
         self.update_file_state()
 
-    def remove_file(self, file_path_to_remove):
+    def remove_file(self, file_path_to_remove) -> None:
         if file_path_to_remove in self.selected_files:
             self.selected_files.remove(file_path_to_remove)
             self.update_file_state()
 
-    def update_file_state(self):
+    def update_file_state(self) -> None:
         # Maintain the placeholder at the top of the list
         if self.selected_files:
             self.file_names = [self.placeholder] + [os.path.basename(f) for f in self.selected_files]
@@ -224,7 +224,7 @@ class ExcelCruncherApp(ctk.CTk):
                     height=24,
                     fg_color='#d9534f',
                     hover_color='#c9302c',
-                    command=lambda f=file_path: self.remove_file(f)
+                    command=lambda f=file_path: self.remove_file(f),
                 )
                 remove_btn.pack(side='right', padx=10, pady=5)
 
@@ -253,12 +253,12 @@ class ExcelCruncherApp(ctk.CTk):
                 row['total'].configure(state='readonly')
 
     # --- Row Management Functions ---
-    def add_row(self):
+    def add_row(self) -> None:
         row_frame = ctk.CTkFrame(self.rows_container, fg_color='transparent')
         row_frame.pack(fill='x', pady=5)
 
         # --- Helper: Auto-Calculate Total ---
-        def update_total(*args):
+        def update_total(*args) -> None:
             try:
                 # Grab the current price and quantity
                 price_str = price_entry.get()
@@ -282,7 +282,7 @@ class ExcelCruncherApp(ctk.CTk):
                 total_entry.configure(state='readonly')
 
         # --- CELL 1: Target File ---
-        def on_target_file_changed(selected_filename):
+        def on_target_file_changed(selected_filename) -> None:
             if selected_filename == self.placeholder:
                 available_names = ['']
             else:
@@ -296,14 +296,17 @@ class ExcelCruncherApp(ctk.CTk):
             update_total()
 
         file_dropdown = ctk.CTkOptionMenu(
-            row_frame, values=self.file_names, width=150,
-            dynamic_resizing=False, command=on_target_file_changed
+            row_frame,
+            values=self.file_names,
+            width=150,
+            dynamic_resizing=False,
+            command=on_target_file_changed,
         )
         file_dropdown.set(self.placeholder)
         file_dropdown.pack(side='left', padx=(5, 5))
 
         # --- CELL 2: Searchable Name ---
-        def on_name_selected(choice):
+        def on_name_selected(choice) -> None:
             # Find the price for the selected name
             selected_filename = file_dropdown.get()
             if selected_filename == self.placeholder:
@@ -323,7 +326,7 @@ class ExcelCruncherApp(ctk.CTk):
         name_combo.set('')
         name_combo.pack(side='left', padx=5)
 
-        def filter_names(event):
+        def filter_names(event) -> None:
             selected_filename = file_dropdown.get()
             if selected_filename == self.placeholder:
                 name_combo.configure(values=[''])
@@ -366,14 +369,18 @@ class ExcelCruncherApp(ctk.CTk):
             row_frame,
             width=90,
             state='readonly',
-            text_color=('darkgreen', 'lightgreen')  # Dark green for light mode
+            text_color=('darkgreen', 'lightgreen'),  # Dark green for light mode
         )
         total_entry.pack(side='left', padx=5)
 
         # --- Delete Button ---
         del_btn = ctk.CTkButton(
-            row_frame, text='X', width=30, fg_color='#d9534f', hover_color='#c9302c',
-            command=lambda f=row_frame: self.delete_row(f)
+            row_frame,
+            text='X',
+            width=30,
+            fg_color='#d9534f',
+            hover_color='#c9302c',
+            command=lambda f=row_frame: self.delete_row(f),
         )
         del_btn.pack(side='right', padx=10)
 
@@ -388,12 +395,12 @@ class ExcelCruncherApp(ctk.CTk):
         }
         self.rows.append(new_row)
 
-    def delete_row(self, frame_to_delete):
+    def delete_row(self, frame_to_delete) -> None:
         self.rows = [row for row in self.rows if row['frame'] != frame_to_delete]
         frame_to_delete.destroy()
 
     # --- Processing Function ---
-    def process_data(self):
+    def process_data(self) -> None:
         self.output_box.delete('0.0', 'end')
 
         totals_to_sum = []

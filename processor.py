@@ -3,7 +3,7 @@ import openpyxl
 import config
 
 
-def extract_data_from_file(file_path):
+def extract_data_from_file(file_path) -> dict:
     """
     Reads the Excel file and extracts a dictionary mapping 'name' to 'price'.
     Uses openpyxl in read-only mode for maximum performance and lower memory usage.
@@ -14,7 +14,7 @@ def extract_data_from_file(file_path):
         ws = wb.active
 
         # Extract headers from the first row
-        headers = [str(cell.value).lower().strip() if cell.value is not None else "" for cell in ws[1]]
+        headers = [str(cell.value).lower().strip() if cell.value is not None else '' for cell in ws[1]]
 
         try:
             name_idx = headers.index(config.name_column_header)
@@ -45,19 +45,12 @@ def extract_data_from_file(file_path):
         return {}
 
 
-def run_pipeline(totals):
+def run_pipeline(totals: list) -> str:
     """
     Receives a list of calculated totals from the UI.
     Returns a formatted string containing the grand total.
     """
     grand_total = sum(totals)
-
-    results = [
-        # f'Summing {len(totals)} rows...\n',
-        # '-' * 30 + '\n',
-        f'Total: {grand_total:.2f}\n',
-        '-' * 30 + '\n',
-        '✅ Processing complete!'
-    ]
+    results = [f'Total: {grand_total:.2f}\n']
 
     return ''.join(results)
