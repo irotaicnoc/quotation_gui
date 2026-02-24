@@ -1,0 +1,7 @@
+https://github.com/irotaicnoc/quotation_gui
+
+Hello! This project is about a GUI interface for some relatively simple calculations.
+
+
+PyInstaller command to create a standalone executable for the GUI application:
+    pyinstaller --noconsole --onefile --icon="assets/app_icon.ico" --add-data "assets;assets" --name "Stima Impianti" gui.py
