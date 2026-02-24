@@ -1,4 +1,5 @@
 import os
+import threading
 from PIL import Image
 from pathlib import Path
 import customtkinter as ctk
@@ -132,16 +133,42 @@ class ExcelCruncherApp(ctk.CTk):
         )
 
         if new_file_paths:
-            for path in new_file_paths:
-                if path not in self.selected_files:
-                    self.selected_files.append(path)
+            # Filter out files we already have
+            files_to_load = [p for p in new_file_paths if p not in self.selected_files]
 
-                    # Extract and cache the {name: price} dictionary
-                    filename = os.path.basename(path)
-                    extracted_dict = processor.extract_data_from_file(path)
-                    self.file_data[filename] = extracted_dict
+            if not files_to_load:
+                return
 
-            self.update_file_state()
+            # 1. Update UI to show loading state
+            self.browse_btn.configure(state='disabled', text=' Loading...')
+
+            # Clear current attachments to show loading text
+            for widget in self.attachment_frame.winfo_children():
+                widget.destroy()
+            self.empty_label = ctk.CTkLabel(self.attachment_frame, text='Loading files, please wait...', text_color='orange')
+            self.empty_label.pack(pady=20)
+
+            # 2. Start the background thread
+            threading.Thread(target=self._load_files_thread, args=(files_to_load,), daemon=True).start()
+
+    def _load_files_thread(self, file_paths):
+        # This runs in the background so the UI doesn't freeze
+        for path in file_paths:
+            filename = os.path.basename(path)
+            extracted_dict = processor.extract_data_from_file(path)
+
+            self.selected_files.append(path)
+            self.file_data[filename] = extracted_dict
+
+        # 3. Safely tell the main Tkinter thread to update the UI now that data is ready
+        self.after(0, self._on_files_loaded)
+
+    def _on_files_loaded(self):
+        # Restore the browse button
+        self.browse_btn.configure(state='normal', text=' Browse for Excel Files')
+
+        # Refresh the visual list and dropdowns
+        self.update_file_state()
 
     def remove_file(self, file_path_to_remove):
         if file_path_to_remove in self.selected_files:
