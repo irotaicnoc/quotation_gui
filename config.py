@@ -1,6 +1,6 @@
 assets_path = 'assets/'
-excel_icon_name_light = 'excel_icon_light_1.png'
-excel_icon_name_dark = 'excel_icon_light_1.png'
+excel_icon_name_light = 'excel_icon_light.png'
+excel_icon_name_dark = 'excel_icon_light.png'
 
 # Options: 'System', 'Light', 'Dark'
 # ui_theme = 'System'
