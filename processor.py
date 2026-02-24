@@ -5,7 +5,7 @@ import config
 
 def extract_data_from_file(file_path) -> dict:
     """
-    Reads the Excel file and extracts a dictionary mapping 'name' to 'price'.
+    Reads the Excel file and extracts a dictionary mapping 'nome' to 'prezzo'.
     Uses openpyxl in read-only mode for maximum performance and lower memory usage.
     """
     try:
@@ -41,7 +41,7 @@ def extract_data_from_file(file_path) -> dict:
         return extracted_data
 
     except Exception as e:
-        print(f'Failed to read {file_path}: {e}')
+        print(f'Impossibile leggere {file_path}: {e}')
         return {}
 
 
@@ -51,6 +51,6 @@ def run_pipeline(totals: list) -> str:
     Returns a formatted string containing the grand total.
     """
     grand_total = sum(totals)
-    results = [f'Total: {grand_total:.2f}\n']
+    results = [f'Totale: {grand_total:.2f}\n']
 
     return ''.join(results)

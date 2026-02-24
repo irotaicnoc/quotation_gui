@@ -19,7 +19,7 @@ ui_theme = 'System'
 # Options: blue, dark-blue, green, dark-green, purple, dark-purple, orange, dark-orange
 color_theme = 'blue'
 
-window_title = 'Quotation Tool'
+window_title = 'Stima Impianti'
 window_geometry = '800x800'
 
 name_column_header = 'nome'

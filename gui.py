@@ -25,7 +25,7 @@ class ExcelCruncherApp(ctk.CTk):
         self.rows = []
         self.selected_files = []
         # Placeholder for when no file is chosen or loaded
-        self.placeholder = 'Select file...'
+        self.placeholder = 'Seleziona file...'
         self.file_names = [self.placeholder]
         self.file_data = {}  # Maps 'filename.xlsx' -> ['Item 1', 'Item 2', ...]
 
@@ -54,7 +54,11 @@ class ExcelCruncherApp(ctk.CTk):
 
         # --- UI Layout ---
 
-        self.title_label = ctk.CTkLabel(self, text='Data Entry Workflow', font=ctk.CTkFont(size=20, weight='bold'))
+        self.title_label = ctk.CTkLabel(
+            self,
+            text='Stima Impianti',
+            font=ctk.CTkFont(size=20, weight='bold'),
+        )
         self.title_label.pack(pady=(20, 10))
 
         # 1. The File Browser Section
@@ -63,7 +67,7 @@ class ExcelCruncherApp(ctk.CTk):
 
         self.browse_btn = ctk.CTkButton(
             self.file_frame,
-            text=' Browse for Excel Files',
+            text=' Carica file Excel',
             image=self.folder_icon,
             compound='left',
             height=40,
@@ -80,18 +84,18 @@ class ExcelCruncherApp(ctk.CTk):
         self.attachment_frame = ctk.CTkScrollableFrame(self.file_frame, height=80, fg_color=('#f0f0f0', '#1e1e1e'))
         self.attachment_frame.pack(fill='x', pady=(10, 0))
 
-        self.empty_label = ctk.CTkLabel(self.attachment_frame, text='No files attached yet.', text_color='gray')
+        self.empty_label = ctk.CTkLabel(self.attachment_frame, text='Nessun file caricato.', text_color='gray')
         self.empty_label.pack(pady=20)
 
         # --- Column Headers ---
         header_frame = ctk.CTkFrame(self, fg_color='transparent')
         header_frame.pack(fill='x', padx=40, pady=(10, 0))
 
-        ctk.CTkLabel(header_frame, text='Source File', width=150, anchor='w').pack(side='left', padx=(5, 5))
-        ctk.CTkLabel(header_frame, text='Item Name', width=150, anchor='w').pack(side='left', padx=5)
-        ctk.CTkLabel(header_frame, text='Price', width=80, anchor='w').pack(side='left', padx=5)
-        ctk.CTkLabel(header_frame, text='Qty', width=60, anchor='w').pack(side='left', padx=5)
-        ctk.CTkLabel(header_frame, text='Total', width=90, anchor='w').pack(side='left', padx=5)
+        ctk.CTkLabel(header_frame, text='File listino prezzi', width=150, anchor='w').pack(side='left', padx=(5, 5))
+        ctk.CTkLabel(header_frame, text='Nome prodotto', width=150, anchor='w').pack(side='left', padx=5)
+        ctk.CTkLabel(header_frame, text='Prezzo', width=80, anchor='w').pack(side='left', padx=5)
+        ctk.CTkLabel(header_frame, text='Quantità', width=60, anchor='w').pack(side='left', padx=5)
+        ctk.CTkLabel(header_frame, text='Totale parziale', width=90, anchor='w').pack(side='left', padx=5)
 
         # 2. The Scrollable Frame (For manual data entry)
         self.scroll_frame = ctk.CTkScrollableFrame(self, height=250)
@@ -103,7 +107,7 @@ class ExcelCruncherApp(ctk.CTk):
 
         self.add_btn = ctk.CTkButton(
             self.scroll_frame,
-            text='+ Add New Row',
+            text='+ Aggiungi Riga',
             command=self.add_row,
             fg_color='transparent',
             border_width=2,
@@ -116,7 +120,7 @@ class ExcelCruncherApp(ctk.CTk):
         # 3. Action Button
         self.run_btn = ctk.CTkButton(
             self,
-            text='Process Data',
+            text='Calcola Totale',
             command=self.process_data,
             fg_color='green',
             hover_color='darkgreen',
@@ -133,26 +137,25 @@ class ExcelCruncherApp(ctk.CTk):
     # --- File Management Functions ---
     def select_files(self) -> None:
         new_file_paths = filedialog.askopenfilenames(
-            title='Select Excel Files',
+            title='Seleziona File Excel',
             filetypes=[('Excel files', '*.xlsx *.xls')]
         )
 
         if new_file_paths:
             # Filter out files we already have
             files_to_load = [p for p in new_file_paths if p not in self.selected_files]
-
             if not files_to_load:
                 return
 
             # 1. Update UI to show loading state
-            self.browse_btn.configure(state='disabled', text=' Loading...')
+            self.browse_btn.configure(state='disabled', text=' Caricamento...')
 
             # Clear current attachments to show loading text
             for widget in self.attachment_frame.winfo_children():
                 widget.destroy()
             self.empty_label = ctk.CTkLabel(
                 self.attachment_frame,
-                text='Loading files, please wait...',
+                text='Caricamento file in corso, attendi...',
                 text_color='orange',
             )
             self.empty_label.pack(pady=20)
@@ -174,7 +177,7 @@ class ExcelCruncherApp(ctk.CTk):
 
     def _on_files_loaded(self) -> None:
         # Restore the browse button
-        self.browse_btn.configure(state='normal', text=' Browse for Excel Files')
+        self.browse_btn.configure(state='normal', text=' Seleziona File Excel')
 
         # Refresh the visual list and dropdowns
         self.update_file_state()
@@ -195,7 +198,7 @@ class ExcelCruncherApp(ctk.CTk):
             widget.destroy()
 
         if not self.selected_files:
-            self.empty_label = ctk.CTkLabel(self.attachment_frame, text='No files attached yet.', text_color='gray')
+            self.empty_label = ctk.CTkLabel(self.attachment_frame, text='Nessun file caricato.', text_color='gray')
             self.empty_label.pack(pady=20)
         else:
             for file_path in self.selected_files:
@@ -219,7 +222,7 @@ class ExcelCruncherApp(ctk.CTk):
 
                 remove_btn = ctk.CTkButton(
                     item_frame,
-                    text='Remove',
+                    text='Rimuovi',
                     width=50,
                     height=24,
                     fg_color='#d9534f',
@@ -359,7 +362,7 @@ class ExcelCruncherApp(ctk.CTk):
         price_entry.bind('<KeyRelease>', update_total)
 
         # --- CELL 4: Quantity ---
-        qty_entry = ctk.CTkEntry(row_frame, placeholder_text='Qty', width=60)
+        qty_entry = ctk.CTkEntry(row_frame, width=60)
         qty_entry.pack(side='left', padx=5)
         # Bind typing in the quantity box to trigger the total calculation
         qty_entry.bind('<KeyRelease>', update_total)
@@ -415,15 +418,15 @@ class ExcelCruncherApp(ctk.CTk):
             try:
                 totals_to_sum.append(float(total_str))
             except ValueError:
-                self.output_box.insert('end', f'Error in Row {i+1}: Invalid total.\n')
+                self.output_box.insert('end', f'Errore nella Riga {i+1}: Totale invalido.\n')
                 return
 
         if not totals_to_sum:
-            self.output_box.insert('0.0', 'Error: No valid totals to sum.\n')
+            self.output_box.insert('0.0', 'Errore: nessun totale parziale da sommare.\n')
             return
 
         try:
-            self.output_box.insert('end', 'Calculating...\n')
+            self.output_box.insert('end', 'Elaborazione in corso...\n')
 
             # Pass the list of totals to the processor
             final_output = processor.run_pipeline(totals_to_sum)
@@ -432,7 +435,7 @@ class ExcelCruncherApp(ctk.CTk):
             self.output_box.insert('end', final_output)
 
         except Exception as e:
-            self.output_box.insert('end', f'\nCRITICAL ERROR: {e}')
+            self.output_box.insert('end', f'\nERRORE CRITICO: {e}')
 
 
 if __name__ == '__main__':
