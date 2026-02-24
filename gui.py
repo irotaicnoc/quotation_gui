@@ -318,38 +318,31 @@ class ExcelCruncherApp(ctk.CTk):
     def process_data(self):
         self.output_box.delete('0.0', 'end')
 
-        if not self.selected_files:
-            self.output_box.insert('end', 'Error: Please attach at least one Excel file first.\n')
-            return
-
-        extracted_data = []
+        totals_to_sum = []
 
         for i, row in enumerate(self.rows):
-            selected_target_file = row['dropdown'].get()
-            val1 = row['entry1'].get()
-            val2 = row['entry2'].get()
+            total_str = row['total'].get()
 
-            if not val1 and not val2:
+            # Skip empty rows
+            if not total_str:
                 continue
 
             try:
-                extracted_data.append((selected_target_file, float(val1), float(val2)))
+                totals_to_sum.append(float(total_str))
             except ValueError:
-                self.output_box.insert('end', f'Error in Row {i+1}: Please enter valid numbers.\n')
+                self.output_box.insert('end', f'Error in Row {i+1}: Invalid total.\n')
                 return
 
-        if not extracted_data:
-            self.output_box.insert('0.0', 'Error: No valid manual data to process.\n')
+        if not totals_to_sum:
+            self.output_box.insert('0.0', 'Error: No valid totals to sum.\n')
             return
 
-        # NEW: Hand off to processor.py
         try:
-            self.output_box.insert('end', 'Processing...\n')
+            self.output_box.insert('end', 'Calculating...\n')
 
-            # Call the pipeline and get the formatted result string
-            final_output = processor.run_pipeline(extracted_data)
+            # Pass the list of totals to the processor
+            final_output = processor.run_pipeline(totals_to_sum)
 
-            # Print the results back to the UI
             self.output_box.delete('0.0', 'end')
             self.output_box.insert('end', final_output)
 
