@@ -68,14 +68,18 @@ class ExcelCruncherApp(ctk.CTk):
         self.scroll_frame = ctk.CTkScrollableFrame(self, height=250)
         self.scroll_frame.pack(pady=10, padx=20, fill='both', expand=True)
 
+        # Container specifically for the rows to keep them above the button
+        self.rows_container = ctk.CTkFrame(self.scroll_frame, fg_color='transparent')
+        self.rows_container.pack(fill='x', expand=True)
+
         self.add_btn = ctk.CTkButton(
-            self,
+            self.scroll_frame,  # Changed parent to scroll_frame
             text='+ Add New Row',
             command=self.add_row,
             fg_color='#4a4a4a',
             hover_color='#5a5a5a',
         )
-        self.add_btn.pack(pady=5)
+        self.add_btn.pack(pady=10)
 
         # 3. Action Button
         self.run_btn = ctk.CTkButton(
@@ -170,7 +174,7 @@ class ExcelCruncherApp(ctk.CTk):
 
     # --- Row Management Functions ---
     def add_row(self):
-        row_frame = ctk.CTkFrame(self.scroll_frame, fg_color='transparent')
+        row_frame = ctk.CTkFrame(self.rows_container, fg_color='transparent')
         row_frame.pack(fill='x', pady=5)
 
         # --- Helper: Auto-Calculate Total ---
