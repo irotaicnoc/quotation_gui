@@ -145,7 +145,11 @@ class ExcelCruncherApp(ctk.CTk):
             # Clear current attachments to show loading text
             for widget in self.attachment_frame.winfo_children():
                 widget.destroy()
-            self.empty_label = ctk.CTkLabel(self.attachment_frame, text='Loading files, please wait...', text_color='orange')
+            self.empty_label = ctk.CTkLabel(
+                self.attachment_frame,
+                text='Loading files, please wait...',
+                text_color='orange',
+            )
             self.empty_label.pack(pady=20)
 
             # 2. Start the background thread
