@@ -47,8 +47,8 @@ class ExcelCruncherApp(ctk.CTk):
 
         self.browse_btn = ctk.CTkButton(
             self.file_frame,
-            text='📁 Click to Browse for Excel Files\n(You can select multiple files)',
-            height=70,
+            text='📁 Browse for Excel Files',
+            height=40,
             font=ctk.CTkFont(size=14),
             fg_color='#2b2b2b',
             hover_color='#3b3b3b',
@@ -56,7 +56,7 @@ class ExcelCruncherApp(ctk.CTk):
             border_color='#555555',
             command=self.select_files
         )
-        self.browse_btn.pack(fill='x', expand=True)
+        self.browse_btn.pack(fill='x', pady=5)
 
         self.attachment_frame = ctk.CTkScrollableFrame(self.file_frame, height=80, fg_color='#1e1e1e')
         self.attachment_frame.pack(fill='x', pady=(10, 0))
