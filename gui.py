@@ -267,9 +267,17 @@ class ExcelCruncherApp(ctk.CTk):
             all_names = list(file_dict.keys())
 
             if not typed_text:
-                name_combo.configure(values=all_names)
+                # Cap the default empty list to cap_search_results to prevent huge dropdowns
+                name_combo.configure(values=all_names[:config.cap_search_results])
             else:
-                filtered = [n for n in all_names if typed_text.lower() in n.lower()]
+                typed_lower = typed_text.lower()
+                # Generator expression with a cap of 50 results
+                filtered = []
+                for n in all_names:
+                    if typed_lower in n.lower():
+                        filtered.append(n)
+                        if len(filtered) >= config.cap_search_results:
+                            break
                 name_combo.configure(values=filtered)
 
         name_combo.bind('<KeyRelease>', filter_names)

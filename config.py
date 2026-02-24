@@ -15,3 +15,5 @@ window_geometry = '800x800'
 
 name_column_header = 'nome'
 price_column_header = 'prezzo'
+
+cap_search_results = 15
