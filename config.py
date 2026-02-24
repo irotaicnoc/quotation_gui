@@ -1,6 +1,12 @@
 import sys
 import os
 
+# Options: 'System', 'Light', 'Dark'
+ui_theme = 'System'
+# ui_theme = 'Light'
+# Options: blue, dark-blue, green, dark-green, purple, dark-purple, orange, dark-orange
+color_theme = 'blue'
+
 # Path when running as a normal Python script
 assets_path = 'assets'
 if hasattr(sys, '_MEIPASS'):
@@ -8,16 +14,10 @@ if hasattr(sys, '_MEIPASS'):
     assets_path = os.path.join(sys._MEIPASS, assets_path)
 
 app_icon_name = 'app_icon.ico'
-excel_icon_name_light = 'excel_icon_light.png'
-excel_icon_name_dark = 'excel_icon_light.png'
-folder_icon_name_light = 'folder_icon_light.png'
-folder_icon_name_dark = 'folder_icon_light.png'
-
-# Options: 'System', 'Light', 'Dark'
-ui_theme = 'System'
-# ui_theme = 'Light'
-# Options: blue, dark-blue, green, dark-green, purple, dark-purple, orange, dark-orange
-color_theme = 'blue'
+excel_icon_name_light = 'excel_icon_no_bg.png'
+excel_icon_name_dark = 'excel_icon_no_bg.png'
+folder_icon_name_light = 'folder_icon_no_bg.png'
+folder_icon_name_dark = 'folder_icon_no_bg.png'
 
 window_title = 'Stima Impianti'
 window_geometry = '800x800'
