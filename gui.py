@@ -242,9 +242,7 @@ class ExcelCruncherApp(ctk.CTk):
                 row['name_combo'].set('')
 
                 # Clear Price
-                row['price'].configure(state='normal')
                 row['price'].delete(0, 'end')
-                row['price'].configure(state='readonly')
 
                 # Clear Quantity
                 row['qty'].delete(0, 'end')
@@ -263,8 +261,8 @@ class ExcelCruncherApp(ctk.CTk):
         def update_total(*args):
             try:
                 # Grab the current price and quantity
-                price_str = row['price'].get()
-                qty_str = row['qty'].get()
+                price_str = price_entry.get()
+                qty_str = qty_entry.get()
                 if not price_str or not qty_str:
                     raise ValueError
 
@@ -273,15 +271,15 @@ class ExcelCruncherApp(ctk.CTk):
                 total = price * qty
 
                 # Update the Total cell
-                row['total'].configure(state='normal')
-                row['total'].delete(0, 'end')
-                row['total'].insert(0, f'{total:.2f}')
-                row['total'].configure(state='readonly')
+                total_entry.configure(state='normal')
+                total_entry.delete(0, 'end')
+                total_entry.insert(0, f'{total:.2f}')
+                total_entry.configure(state='readonly')
             except ValueError:
-                # If quantity is empty or invalid, clear the total
-                row['total'].configure(state='normal')
-                row['total'].delete(0, 'end')
-                row['total'].configure(state='readonly')
+                # If quantity or price is empty/invalid, clear the total
+                total_entry.configure(state='normal')
+                total_entry.delete(0, 'end')
+                total_entry.configure(state='readonly')
 
         # --- CELL 1: Target File ---
         def on_target_file_changed(selected_filename):
@@ -291,12 +289,10 @@ class ExcelCruncherApp(ctk.CTk):
                 file_dict = self.file_data.get(selected_filename, {})
                 available_names = list(file_dict.keys())
 
-            row['name_combo'].configure(values=available_names)
-            row['name_combo'].set('')
+            name_combo.configure(values=available_names)
+            name_combo.set('')
 
-            row['price'].configure(state='normal')
-            row['price'].delete(0, 'end')
-            row['price'].configure(state='readonly')
+            price_entry.delete(0, 'end')
             update_total()
 
         file_dropdown = ctk.CTkOptionMenu(
@@ -317,10 +313,8 @@ class ExcelCruncherApp(ctk.CTk):
             price = file_dict.get(choice, 0.0)
 
             # Push the price to Cell 3
-            row['price'].configure(state='normal')
-            row['price'].delete(0, 'end')
-            row['price'].insert(0, str(price))
-            row['price'].configure(state='readonly')
+            price_entry.delete(0, 'end')
+            price_entry.insert(0, str(price))
 
             # Automatically calculate the total
             update_total()
@@ -344,7 +338,7 @@ class ExcelCruncherApp(ctk.CTk):
                 name_combo.configure(values=all_names[:config.cap_search_results])
             else:
                 typed_lower = typed_text.lower()
-                # Generator expression with a cap of 50 results
+                # Generator expression with a cap of results
                 filtered = []
                 for n in all_names:
                     if typed_lower in n.lower():
@@ -355,9 +349,11 @@ class ExcelCruncherApp(ctk.CTk):
 
         name_combo.bind('<KeyRelease>', filter_names)
 
-        # --- CELL 3: Price (Read-Only) ---
-        price_entry = ctk.CTkEntry(row_frame, width=80, state='readonly', text_color='gray')
+        # --- CELL 3: Price (Now Editable) ---
+        price_entry = ctk.CTkEntry(row_frame, width=80)
         price_entry.pack(side='left', padx=5)
+        # Bind manual typing in the price box to trigger the total calculation
+        price_entry.bind('<KeyRelease>', update_total)
 
         # --- CELL 4: Quantity ---
         qty_entry = ctk.CTkEntry(row_frame, placeholder_text='Qty', width=60)
@@ -381,7 +377,7 @@ class ExcelCruncherApp(ctk.CTk):
         )
         del_btn.pack(side='right', padx=10)
 
-        # Store references in a dictionary first to avoid scoping issues with 'row'
+        # Store references in a dictionary
         new_row = {
             'frame': row_frame,
             'dropdown': file_dropdown,
@@ -391,8 +387,6 @@ class ExcelCruncherApp(ctk.CTk):
             'total': total_entry
         }
         self.rows.append(new_row)
-        # Define 'row' for the inner helper functions
-        row = new_row
 
     def delete_row(self, frame_to_delete):
         self.rows = [row for row in self.rows if row['frame'] != frame_to_delete]
