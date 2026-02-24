@@ -83,13 +83,16 @@ class ExcelCruncherApp(ctk.CTk):
         self.rows_container.pack(fill='x', expand=True)
 
         self.add_btn = ctk.CTkButton(
-            self.scroll_frame,  # Changed parent to scroll_frame
+            self.scroll_frame,
             text='+ Add New Row',
             command=self.add_row,
-            fg_color='#4a4a4a',
-            hover_color='#5a5a5a',
+            fg_color='transparent',
+            border_width=2,
+            text_color='gray',
+            border_color='#4a4a4a',
+            hover_color='#2b2b2b',
         )
-        self.add_btn.pack(pady=10)
+        self.add_btn.pack(pady=10, fill='x', padx=5)
 
         # 3. Action Button
         self.run_btn = ctk.CTkButton(
