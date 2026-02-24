@@ -24,7 +24,9 @@ class ExcelCruncherApp(ctk.CTk):
         
         self.rows = []
         self.selected_files = []
-        self.file_names = ['No files loaded']
+        # Placeholder for when no file is chosen or loaded
+        self.placeholder = "Select file..."
+        self.file_names = [self.placeholder]
         self.file_data = {}  # Maps 'filename.xlsx' -> ['Item 1', 'Item 2', ...]
 
         # --- Load the Icons ---
@@ -183,10 +185,11 @@ class ExcelCruncherApp(ctk.CTk):
             self.update_file_state()
 
     def update_file_state(self):
+        # Maintain the placeholder at the top of the list
         if self.selected_files:
-            self.file_names = [os.path.basename(f) for f in self.selected_files]
+            self.file_names = [self.placeholder] + [os.path.basename(f) for f in self.selected_files]
         else:
-            self.file_names = ['No files loaded']
+            self.file_names = [self.placeholder]
 
         for widget in self.attachment_frame.winfo_children():
             widget.destroy()
@@ -229,8 +232,12 @@ class ExcelCruncherApp(ctk.CTk):
             dropdown = row['dropdown']
             current_selection = dropdown.get()
             dropdown.configure(values=self.file_names)
+            # If the currently selected file was removed, revert to placeholder
             if current_selection not in self.file_names:
-                dropdown.set(self.file_names[0])
+                dropdown.set(self.placeholder)
+                # Manually trigger reset of child combos
+                row['name_combo'].configure(values=[''])
+                row['name_combo'].set('')
 
     # --- Row Management Functions ---
     def add_row(self):
@@ -241,8 +248,13 @@ class ExcelCruncherApp(ctk.CTk):
         def update_total(*args):
             try:
                 # Grab the current price and quantity
-                price = float(price_entry.get())
-                qty = float(qty_entry.get())
+                price_str = price_entry.get()
+                qty_str = qty_entry.get()
+                if not price_str or not qty_str:
+                    raise ValueError
+
+                price = float(price_str)
+                qty = float(qty_str)
                 total = price * qty
 
                 # Update the Total cell
@@ -258,8 +270,11 @@ class ExcelCruncherApp(ctk.CTk):
 
         # --- CELL 1: Target File ---
         def on_target_file_changed(selected_filename):
-            file_dict = self.file_data.get(selected_filename, {})
-            available_names = list(file_dict.keys())
+            if selected_filename == self.placeholder:
+                available_names = ['']
+            else:
+                file_dict = self.file_data.get(selected_filename, {})
+                available_names = list(file_dict.keys())
 
             name_combo.configure(values=available_names)
             name_combo.set('')
@@ -273,12 +288,16 @@ class ExcelCruncherApp(ctk.CTk):
             row_frame, values=self.file_names, width=150,
             dynamic_resizing=False, command=on_target_file_changed
         )
+        file_dropdown.set(self.placeholder)
         file_dropdown.pack(side='left', padx=(5, 5))
 
         # --- CELL 2: Searchable Name ---
         def on_name_selected(choice):
             # Find the price for the selected name
             selected_filename = file_dropdown.get()
+            if selected_filename == self.placeholder:
+                return
+
             file_dict = self.file_data.get(selected_filename, {})
             price = file_dict.get(choice, 0.0)
 
@@ -292,11 +311,16 @@ class ExcelCruncherApp(ctk.CTk):
             update_total()
 
         name_combo = ctk.CTkComboBox(row_frame, values=[''], width=150, command=on_name_selected)
+        name_combo.set('')
         name_combo.pack(side='left', padx=5)
 
         def filter_names(event):
-            typed_text = name_combo.get()
             selected_filename = file_dropdown.get()
+            if selected_filename == self.placeholder:
+                name_combo.configure(values=[''])
+                return
+
+            typed_text = name_combo.get()
             file_dict = self.file_data.get(selected_filename, {})
             all_names = list(file_dict.keys())
 
