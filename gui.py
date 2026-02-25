@@ -3,7 +3,7 @@ from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
                              QHBoxLayout, QPushButton, QScrollArea,
                              QLabel, QFrame, QMessageBox, QToolButton,
                              QTabBar, QStackedWidget, QSizePolicy,
-                             QLineEdit, QSpinBox, QDoubleSpinBox)
+                             QLineEdit, QSpinBox, QDoubleSpinBox, QComboBox)
 from PyQt6.QtCore import Qt
 
 class CollapsibleBox(QWidget):
@@ -36,7 +36,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("App UI Schema")
-        self.resize(1000, 600)
+        self.resize(1100, 600)
         self.tab_counter = 1
 
         central_widget = QWidget()
@@ -138,15 +138,18 @@ class MainWindow(QMainWindow):
                     row_layout.addWidget(QLineEdit())
 
                     row_layout.addWidget(QLabel("Spec 1:"))
-                    row_layout.addWidget(QLineEdit())
+                    spec1_combo = QComboBox()
+                    spec1_combo.addItems(["Type A", "Type B", "Type C"])
+                    row_layout.addWidget(spec1_combo)
 
                     row_layout.addWidget(QLabel("Spec 2:"))
-                    row_layout.addWidget(QLineEdit())
+                    spec2_combo = QComboBox()
+                    spec2_combo.addItems(["Material X", "Material Y", "Material Z"])
+                    row_layout.addWidget(spec2_combo)
 
                     row_layout.addWidget(QLabel("Price:"))
                     price_box = QDoubleSpinBox()
                     price_box.setMaximum(999999.99)
-                    # Removes up and down arrows
                     price_box.setButtonSymbols(QDoubleSpinBox.ButtonSymbols.NoButtons)
                     row_layout.addWidget(price_box)
 
@@ -158,11 +161,9 @@ class MainWindow(QMainWindow):
                     row_layout.addWidget(QLabel("Sub-total:"))
                     subtotal_box = QLineEdit("0.00")
                     subtotal_box.setReadOnly(True)
-                    # Grays out the box
                     subtotal_box.setStyleSheet("background-color: #e0e0e0; color: #555555;")
                     row_layout.addWidget(subtotal_box)
 
-                    # Sub-total calculation logic
                     def update_subtotal(val, p=price_box, q=qty_box, s=subtotal_box):
                         total = p.value() * q.value()
                         s.setText(f"{total:.2f}")
