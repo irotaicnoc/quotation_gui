@@ -5,3 +5,6 @@ Hello! This project is about a GUI interface for some relatively simple calculat
 
 PyInstaller command to create a standalone executable for the GUI application:
     pyinstaller --noconsole --onefile --icon="assets/app_icon.ico" --add-data "assets;assets" --name "Stima Impianti" gui.py
+
+    use it with PyQt6
+    --windowed

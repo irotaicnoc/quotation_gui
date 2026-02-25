@@ -5,8 +5,5 @@ description = "Simple quotation software with a graphical user interface."
 authors = [{ name = "Marco Conciatori", email = "conciatori.marco91@gmail.com" }]
 requires-python = ">=3.13"
 dependencies = [
-    "customtkinter",
-    "openpyxl",
-    "Pillow",
-    "pyinstaller",
+    "PyQt6",
 ]

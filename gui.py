@@ -1,443 +1,72 @@
-import os
-import threading
-from PIL import Image
-from pathlib import Path
-import customtkinter as ctk
-from tkinter import filedialog
-
-import config
-import processor
-
-ctk.set_appearance_mode(config.ui_theme)
-ctk.set_default_color_theme(config.color_theme)
+import sys
+from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
+                             QHBoxLayout, QTabWidget, QPushButton, QScrollArea,
+                             QLabel, QFrame)
 
 
-class ExcelCruncherApp(ctk.CTk):
+class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-
-        self.title(config.window_title)
-        self.geometry(config.window_geometry)
-
-        icon_path = Path(config.assets_path) / config.app_icon_name
-        self.iconbitmap(icon_path)
-
-        self.rows = []
-        self.selected_files = []
-        # Placeholder for when no file is chosen or loaded
-        self.placeholder = 'Seleziona file...'
-        self.file_names = [self.placeholder]
-        self.file_data = {}  # Maps 'filename.xlsx' -> ['Item 1', 'Item 2', ...]
-
-        # --- Load the Icons ---
-        try:
-            excel_light_icon_path = Path(config.assets_path) / config.excel_icon_name_light
-            excel_dark_icon_path = Path(config.assets_path) / config.excel_icon_name_dark
-            self.excel_icon = ctk.CTkImage(
-                light_image=Image.open(excel_light_icon_path),
-                dark_image=Image.open(excel_dark_icon_path),
-                size=(20, 20),
-            )
-        except FileNotFoundError:
-            self.excel_icon = None
-
-        try:
-            folder_light_icon_path = Path(config.assets_path) / config.folder_icon_name_light
-            folder_dark_icon_path = Path(config.assets_path) / config.folder_icon_name_dark
-            self.folder_icon = ctk.CTkImage(
-                light_image=Image.open(folder_light_icon_path),
-                dark_image=Image.open(folder_dark_icon_path),
-                size=(20, 20),
-            )
-        except FileNotFoundError:
-            self.folder_icon = None
-
-        # --- UI Layout ---
-
-        # self.title_label = ctk.CTkLabel(
-        #     self,
-        #     text='Stima Impianti',
-        #     font=ctk.CTkFont(size=20, weight='bold'),
-        # )
-        # self.title_label.pack(pady=(20, 10))
-
-        # 1. The File Browser Section
-        self.file_frame = ctk.CTkFrame(self, fg_color='transparent')
-        self.file_frame.pack(pady=5, padx=20, fill='x')
-
-        self.browse_btn = ctk.CTkButton(
-            self.file_frame,
-            text=' Carica file Excel',
-            image=self.folder_icon,
-            compound='left',
-            height=40,
-            font=ctk.CTkFont(size=14),
-            fg_color=('#e0e0e0', '#2b2b2b'),
-            hover_color=('#c8c8c8', '#3b3b3b'),
-            border_width=2,
-            border_color=('#a8a8a8', '#555555'),
-            text_color=('black', 'white'),
-            command=self.select_files,
-        )
-        self.browse_btn.pack(fill='x', pady=5)
-
-        self.attachment_frame = ctk.CTkScrollableFrame(self.file_frame, height=80, fg_color=('#f0f0f0', '#1e1e1e'))
-        self.attachment_frame.pack(fill='x', pady=(10, 0))
-
-        self.empty_label = ctk.CTkLabel(self.attachment_frame, text='Nessun file caricato.', text_color='gray')
-        self.empty_label.pack(pady=20)
-
-        # --- Column Headers ---
-        header_frame = ctk.CTkFrame(self, fg_color='transparent')
-        header_frame.pack(fill='x', padx=40, pady=(10, 0))
-
-        ctk.CTkLabel(header_frame, text='File listino prezzi', width=150, anchor='w').pack(side='left', padx=(5, 5))
-        ctk.CTkLabel(header_frame, text='Nome prodotto', width=150, anchor='w').pack(side='left', padx=5)
-        ctk.CTkLabel(header_frame, text='Prezzo', width=80, anchor='w').pack(side='left', padx=5)
-        ctk.CTkLabel(header_frame, text='Quantità', width=60, anchor='w').pack(side='left', padx=5)
-        ctk.CTkLabel(header_frame, text='Totale parziale', width=90, anchor='w').pack(side='left', padx=5)
-
-        # 2. The Scrollable Frame (For manual data entry)
-        self.scroll_frame = ctk.CTkScrollableFrame(self, height=250)
-        self.scroll_frame.pack(pady=10, padx=20, fill='both', expand=True)
-
-        # Container specifically for the rows to keep them above the button
-        self.rows_container = ctk.CTkFrame(self.scroll_frame, fg_color='transparent')
-        self.rows_container.pack(fill='x', expand=True)
-
-        self.add_btn = ctk.CTkButton(
-            self.scroll_frame,
-            text='+ Aggiungi Riga',
-            command=self.add_row,
-            fg_color='transparent',
-            border_width=2,
-            text_color=('#333333', 'gray'),           # Dark text for light mode
-            border_color=('#a8a8a8', '#4a4a4a'),      # Lighter border for light mode
-            hover_color=('#e0e0e0', '#2b2b2b'),       # Light gray hover for light mode
-        )
-        self.add_btn.pack(pady=10, fill='x', padx=5)
-
-        # 3. Action Button
-        self.run_btn = ctk.CTkButton(
-            self,
-            text='Calcola Totale',
-            command=self.process_data,
-            fg_color='green',
-            hover_color='darkgreen',
-            height=40,
-        )
-        self.run_btn.pack(pady=10)
-
-        # 4. Output Text Box
-        self.output_box = ctk.CTkTextbox(self, height=120)
-        self.output_box.pack(pady=(0, 20), padx=20, fill='x')
-
-        self.add_row()
-
-    # --- File Management Functions ---
-    def select_files(self) -> None:
-        new_file_paths = filedialog.askopenfilenames(
-            title='Seleziona File Excel',
-            filetypes=[('Excel files', '*.xlsx *.xls')]
-        )
-
-        if new_file_paths:
-            # Filter out files we already have
-            files_to_load = [p for p in new_file_paths if p not in self.selected_files]
-            if not files_to_load:
-                return
-
-            # 1. Update UI to show loading state
-            self.browse_btn.configure(state='disabled', text=' Caricamento...')
-
-            # Clear current attachments to show loading text
-            for widget in self.attachment_frame.winfo_children():
-                widget.destroy()
-            self.empty_label = ctk.CTkLabel(
-                self.attachment_frame,
-                text='Caricamento file in corso, attendi...',
-                text_color='orange',
-            )
-            self.empty_label.pack(pady=20)
-
-            # 2. Start the background thread
-            threading.Thread(target=self._load_files_thread, args=(files_to_load,), daemon=True).start()
-
-    def _load_files_thread(self, file_paths) -> None:
-        # This runs in the background so the UI doesn't freeze
-        for path in file_paths:
-            filename = os.path.basename(path)
-            extracted_dict = processor.extract_data_from_file(path)
-
-            self.selected_files.append(path)
-            self.file_data[filename] = extracted_dict
-
-        # 3. Safely tell the main Tkinter thread to update the UI now that data is ready
-        self.after(0, self._on_files_loaded)
-
-    def _on_files_loaded(self) -> None:
-        # Restore the browse button
-        self.browse_btn.configure(state='normal', text=' Seleziona File Excel')
-
-        # Refresh the visual list and dropdowns
-        self.update_file_state()
-
-    def remove_file(self, file_path_to_remove) -> None:
-        if file_path_to_remove in self.selected_files:
-            self.selected_files.remove(file_path_to_remove)
-            self.update_file_state()
-
-    def update_file_state(self) -> None:
-        # Maintain the placeholder at the top of the list
-        if self.selected_files:
-            self.file_names = [self.placeholder] + [os.path.basename(f) for f in self.selected_files]
-        else:
-            self.file_names = [self.placeholder]
-
-        for widget in self.attachment_frame.winfo_children():
-            widget.destroy()
-
-        if not self.selected_files:
-            self.empty_label = ctk.CTkLabel(self.attachment_frame, text='Nessun file caricato.', text_color='gray')
-            self.empty_label.pack(pady=20)
-        else:
-            for file_path in self.selected_files:
-                filename = os.path.basename(file_path)
-
-                item_frame = ctk.CTkFrame(self.attachment_frame, fg_color=('#e8e8e8', '#2b2b2b'), corner_radius=5)
-                item_frame.pack(fill='x', pady=2, padx=5)
-
-                if self.excel_icon:
-                    lbl = ctk.CTkLabel(
-                        item_frame,
-                        text=f'  {filename}',
-                        image=self.excel_icon,
-                        compound='left',
-                        anchor='w',
-                    )
-                else:
-                    lbl = ctk.CTkLabel(item_frame, text=f'📄 {filename}', anchor='w')
-
-                lbl.pack(side='left', padx=10, pady=5)
-
-                remove_btn = ctk.CTkButton(
-                    item_frame,
-                    text='Rimuovi',
-                    width=50,
-                    height=24,
-                    fg_color='#d9534f',
-                    hover_color='#c9302c',
-                    command=lambda f=file_path: self.remove_file(f),
-                )
-                remove_btn.pack(side='right', padx=10, pady=5)
-
-        for row in self.rows:
-            dropdown = row['dropdown']
-            current_selection = dropdown.get()
-            dropdown.configure(values=self.file_names)
-
-            # If the currently selected file was removed, revert to placeholder and clear all cells
-            if current_selection not in self.file_names:
-                dropdown.set(self.placeholder)
-
-                # Clear Item Name
-                row['name_combo'].configure(values=[''])
-                row['name_combo'].set('')
-
-                # Clear Price
-                row['price'].delete(0, 'end')
-
-                # Clear Quantity
-                row['qty'].delete(0, 'end')
-
-                # Clear Total
-                row['total'].configure(state='normal')
-                row['total'].delete(0, 'end')
-                row['total'].configure(state='readonly')
-
-    # --- Row Management Functions ---
-    def add_row(self) -> None:
-        row_frame = ctk.CTkFrame(self.rows_container, fg_color='transparent')
-        row_frame.pack(fill='x', pady=5)
-
-        # --- Helper: Auto-Calculate Total ---
-        def update_total(*args) -> None:
-            try:
-                # Grab the current price and quantity
-                price_str = price_entry.get()
-                qty_str = qty_entry.get()
-                if not price_str or not qty_str:
-                    raise ValueError
-
-                price = float(price_str)
-                qty = float(qty_str)
-                total = price * qty
-
-                # Update the Total cell
-                total_entry.configure(state='normal')
-                total_entry.delete(0, 'end')
-                total_entry.insert(0, f'{total:.2f}')
-                total_entry.configure(state='readonly')
-            except ValueError:
-                # If quantity or price is empty/invalid, clear the total
-                total_entry.configure(state='normal')
-                total_entry.delete(0, 'end')
-                total_entry.configure(state='readonly')
-
-        # --- CELL 1: Target File ---
-        def on_target_file_changed(selected_filename) -> None:
-            if selected_filename == self.placeholder:
-                available_names = ['']
-            else:
-                file_dict = self.file_data.get(selected_filename, {})
-                available_names = list(file_dict.keys())
-
-            name_combo.configure(values=available_names)
-            name_combo.set('')
-
-            price_entry.delete(0, 'end')
-            update_total()
-
-        file_dropdown = ctk.CTkOptionMenu(
-            row_frame,
-            values=self.file_names,
-            width=150,
-            dynamic_resizing=False,
-            command=on_target_file_changed,
-        )
-        file_dropdown.set(self.placeholder)
-        file_dropdown.pack(side='left', padx=(5, 5))
-
-        # --- CELL 2: Searchable Name ---
-        def on_name_selected(choice) -> None:
-            # Find the price for the selected name
-            selected_filename = file_dropdown.get()
-            if selected_filename == self.placeholder:
-                return
-
-            file_dict = self.file_data.get(selected_filename, {})
-            price = file_dict.get(choice, 0.0)
-
-            # Push the price to Cell 3
-            price_entry.delete(0, 'end')
-            price_entry.insert(0, str(price))
-
-            # Automatically calculate the total
-            update_total()
-
-        name_combo = ctk.CTkComboBox(row_frame, values=[''], width=150, command=on_name_selected)
-        name_combo.set('')
-        name_combo.pack(side='left', padx=5)
-
-        def filter_names(event) -> None:
-            selected_filename = file_dropdown.get()
-            if selected_filename == self.placeholder:
-                name_combo.configure(values=[''])
-                return
-
-            typed_text = name_combo.get()
-            file_dict = self.file_data.get(selected_filename, {})
-            all_names = list(file_dict.keys())
-
-            if not typed_text:
-                # Cap the default empty list to cap_search_results to prevent huge dropdowns
-                name_combo.configure(values=all_names[:config.cap_search_results])
-            else:
-                typed_lower = typed_text.lower()
-                # Generator expression with a cap of results
-                filtered = []
-                for n in all_names:
-                    if typed_lower in n.lower():
-                        filtered.append(n)
-                        if len(filtered) >= config.cap_search_results:
-                            break
-                name_combo.configure(values=filtered)
-
-        name_combo.bind('<KeyRelease>', filter_names)
-
-        # --- CELL 3: Price (Now Editable) ---
-        price_entry = ctk.CTkEntry(row_frame, width=80)
-        price_entry.pack(side='left', padx=5)
-        # Bind manual typing in the price box to trigger the total calculation
-        price_entry.bind('<KeyRelease>', update_total)
-
-        # --- CELL 4: Quantity ---
-        qty_entry = ctk.CTkEntry(row_frame, width=60)
-        qty_entry.pack(side='left', padx=5)
-        # Bind typing in the quantity box to trigger the total calculation
-        qty_entry.bind('<KeyRelease>', update_total)
-
-        # --- CELL 5: Total (Read-Only) ---
-        total_entry = ctk.CTkEntry(
-            row_frame,
-            width=90,
-            state='readonly',
-            text_color=('darkgreen', 'lightgreen'),  # Dark green for light mode
-        )
-        total_entry.pack(side='left', padx=5)
-
-        # --- Delete Button ---
-        del_btn = ctk.CTkButton(
-            row_frame,
-            text='X',
-            width=30,
-            fg_color='#d9534f',
-            hover_color='#c9302c',
-            command=lambda f=row_frame: self.delete_row(f),
-        )
-        del_btn.pack(side='right', padx=10)
-
-        # Store references in a dictionary
-        new_row = {
-            'frame': row_frame,
-            'dropdown': file_dropdown,
-            'name_combo': name_combo,
-            'price': price_entry,
-            'qty': qty_entry,
-            'total': total_entry
-        }
-        self.rows.append(new_row)
-
-    def delete_row(self, frame_to_delete) -> None:
-        self.rows = [row for row in self.rows if row['frame'] != frame_to_delete]
-        frame_to_delete.destroy()
-
-    # --- Processing Function ---
-    def process_data(self) -> None:
-        self.output_box.delete('0.0', 'end')
-
-        totals_to_sum = []
-
-        for i, row in enumerate(self.rows):
-            total_str = row['total'].get()
-
-            # Skip empty rows
-            if not total_str:
-                continue
-
-            try:
-                totals_to_sum.append(float(total_str))
-            except ValueError:
-                self.output_box.insert('end', f'Errore nella Riga {i+1}: Totale invalido.\n')
-                return
-
-        if not totals_to_sum:
-            self.output_box.insert('0.0', 'Errore: nessun totale parziale da sommare.\n')
-            return
-
-        try:
-            self.output_box.insert('end', 'Elaborazione in corso...\n')
-
-            # Pass the list of totals to the processor
-            final_output = processor.run_pipeline(totals_to_sum)
-
-            self.output_box.delete('0.0', 'end')
-            self.output_box.insert('end', final_output)
-
-        except Exception as e:
-            self.output_box.insert('end', f'\nERRORE CRITICO: {e}')
-
-
-if __name__ == '__main__':
-    app = ExcelCruncherApp()
-    app.mainloop()
+        self.setWindowTitle("App UI Schema")
+        self.resize(800, 600)
+
+        # Main container
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        main_layout = QVBoxLayout(central_widget)
+
+        # 1. Tab Widget
+        self.tabs = QTabWidget()
+        self.tabs.addTab(self.create_tab_content(), "Tab 1")
+        self.tabs.addTab(QWidget(), "Tab 2")
+        self.tabs.addTab(QWidget(), "Tab 3")
+        self.tabs.addTab(QWidget(), "+")  # The add tab button
+        main_layout.addWidget(self.tabs)
+
+        # 2. Bottom Button Bar
+        bottom_layout = QHBoxLayout()
+        btn1 = QPushButton("Button 1")
+        btn2 = QPushButton("Button 2")
+        btn3 = QPushButton("Button 3")
+
+        bottom_layout.addWidget(btn1)
+        bottom_layout.addWidget(btn2)
+        bottom_layout.addStretch()  # Pushes Button 3 to the far right
+        bottom_layout.addWidget(btn3)
+
+        main_layout.addLayout(bottom_layout)
+
+    @staticmethod
+    def create_tab_content():
+        """Creates the scrollable area containing categories and rows."""
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+
+        content_widget = QWidget()
+        content_layout = QVBoxLayout(content_widget)
+
+        # Generate Mock Categories and Rows
+        for cat in range(1, 4):  # Example: 3 Categories
+            cat_label = QLabel(f"<br><b>Category {cat}</b>")
+            content_layout.addWidget(cat_label)
+
+            for row in range(1, 6):  # Example: 5 Rows per category
+                row_frame = QFrame()
+                row_frame.setFrameShape(QFrame.Shape.Box)  # Creates the box outline
+
+                row_layout = QHBoxLayout(row_frame)
+                row_layout.setContentsMargins(5, 5, 5, 5)
+                row_layout.addWidget(QLabel(f"Row {row}, with many fields"))
+
+                content_layout.addWidget(row_frame)
+
+        content_layout.addStretch()  # Pushes all content to the top
+        scroll.setWidget(content_widget)
+        return scroll
+
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    sys.exit(app.exec())
