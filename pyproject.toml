@@ -6,4 +6,5 @@ authors = [{ name = "Marco Conciatori", email = "conciatori.marco91@gmail.com" }
 requires-python = ">=3.13"
 dependencies = [
     "PyQt6",
+    "pyqtdarktheme",
 ]

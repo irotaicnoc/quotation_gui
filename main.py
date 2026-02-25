@@ -1,4 +1,5 @@
 import sys
+import qdarktheme
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QScrollArea,
                              QLabel, QFrame, QMessageBox, QToolButton, QTabBar, QStackedWidget, QLineEdit, QSpinBox,
@@ -91,11 +92,10 @@ class ManufacturerGrid(QFrame):
         qty_box.setMaximum(9999)
         subtotal_box = QLineEdit("0.00")
         subtotal_box.setReadOnly(True)
-        subtotal_box.setStyleSheet("background-color: #e0e0e0; color: #555555;")
 
         del_btn = QPushButton("X")
         del_btn.setFixedWidth(30)
-        del_btn.setStyleSheet("color: red; font-weight: bold;")
+        del_btn.setStyleSheet("color: #ff5555; font-weight: bold;")
 
         if data:
             name_edit.setText(data.get("name", ""))
@@ -270,7 +270,7 @@ class MainWindow(QMainWindow):
                 man_name = f"Manufacturer {prod}.{man}"
                 man_box = CollapsibleBox(man_name)
                 man_box.toggle_button.setStyleSheet("QToolButton { border: none; background: transparent; text-align: "
-                                                    "left; font-size: 14px; font-weight: bold; color: #333333; }")
+                                                    "left; font-size: 14px; font-weight: bold; }")
                 prod_box.add_widget(man_box)
 
                 grid = ManufacturerGrid(man_name)
@@ -333,7 +333,6 @@ class MainWindow(QMainWindow):
                         grid.add_row(row_data)
 
     def run_calculations(self):
-        # 1. Extract current data (reusing the logic from handle_save)
         app_data = []
         for index in range(self.tab_bar.count()):
             tab_data = {"tab_name": self.tab_bar.tabText(index), "products": {}}
@@ -345,10 +344,8 @@ class MainWindow(QMainWindow):
                     tab_data["products"][prod_name].update(grid.get_data())
             app_data.append(tab_data)
 
-        # 2. Run the math
         plant_totals, grand_total = calculator.calculate_totals(app_data)
 
-        # 3. Format and display the results
         result_text = "<b>Industrial Plant Totals:</b><br>"
         for plant, total in plant_totals.items():
             result_text += f"{plant}: ${total:,.2f}<br>"
@@ -363,6 +360,7 @@ class MainWindow(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+    qdarktheme.setup_theme()
     window = MainWindow()
     window.show()
     sys.exit(app.exec())
