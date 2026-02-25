@@ -6,7 +6,7 @@ from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
                              QLineEdit, QSpinBox, QDoubleSpinBox, QComboBox,
                              QGridLayout, QFileDialog)
 from PyQt6.QtCore import Qt
-import data_manager # Imports your new file
+import data_manager
 
 class CollapsibleBox(QWidget):
     def __init__(self, title="", parent=None, with_browse=False):
@@ -80,9 +80,9 @@ class ManufacturerGrid(QFrame):
     def add_row(self, data=None):
         name_edit = QLineEdit()
         spec1_combo = QComboBox()
-        spec1_combo.addItems(["Type A", "Type B", "Type C"])
+        spec1_combo.addItems(["", "Type A", "Type B", "Type C"])
         spec2_combo = QComboBox()
-        spec2_combo.addItems(["Material X", "Material Y", "Material Z"])
+        spec2_combo.addItems(["", "Material X", "Material Y", "Material Z"])
         price_box = QDoubleSpinBox()
         price_box.setMaximum(999999.99)
         price_box.setButtonSymbols(QDoubleSpinBox.ButtonSymbols.NoButtons)
@@ -96,11 +96,10 @@ class ManufacturerGrid(QFrame):
         del_btn.setFixedWidth(30)
         del_btn.setStyleSheet("color: red; font-weight: bold;")
 
-        # Populate with data if loading
         if data:
             name_edit.setText(data.get("name", ""))
-            spec1_combo.setCurrentText(data.get("spec1", "Type A"))
-            spec2_combo.setCurrentText(data.get("spec2", "Material X"))
+            spec1_combo.setCurrentText(data.get("spec1", ""))
+            spec2_combo.setCurrentText(data.get("spec2", ""))
             price_box.setValue(data.get("price", 0.0))
             qty_box.setValue(data.get("qty", 0))
 
@@ -133,10 +132,10 @@ class ManufacturerGrid(QFrame):
         qty_box.valueChanged.connect(update_subtotal)
         del_btn.clicked.connect(delete_this_row)
 
-        update_subtotal() # Initialize subtotal
+        update_subtotal()
+        return row_dict
 
     def get_data(self):
-        """Extracts data from the grid for saving."""
         rows_data = []
         for row in self.active_rows:
             rows_data.append({
@@ -158,7 +157,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("App UI Schema")
         self.resize(950, 600)
         self.tab_counter = 1
-        self.tab_grids = {} # Format: {tab_index: {"Product Name": [ManufacturerGrid1, ...]}}
+        self.tab_grids = {}
 
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
@@ -230,7 +229,6 @@ class MainWindow(QMainWindow):
             self.stack.removeWidget(widget_to_remove)
             widget_to_remove.deleteLater()
 
-            # Reindex tab_grids tracking
             new_tab_grids = {}
             for i in range(self.tab_bar.count()):
                 new_tab_grids[i] = self.tab_grids[i if i < index else i + 1]
@@ -259,7 +257,7 @@ class MainWindow(QMainWindow):
                 prod_box.add_widget(man_box)
 
                 grid = ManufacturerGrid(man_name)
-                grid.add_row() # Add one default empty row
+                grid.add_row()
                 man_box.add_widget(grid)
                 grids_dict[prod_name].append(grid)
 
@@ -296,7 +294,6 @@ class MainWindow(QMainWindow):
             QMessageBox.critical(self, "Error", f"Could not load file:\n{e}")
             return
 
-        # Clear existing tabs
         while self.tab_bar.count() > 0:
             self.tab_bar.removeTab(0)
             widget = self.stack.widget(0)
@@ -304,7 +301,6 @@ class MainWindow(QMainWindow):
             widget.deleteLater()
         self.tab_grids.clear()
 
-        # Rebuild UI from JSON
         for tab_info in app_data:
             self.add_new_tab(name=tab_info["tab_name"])
             current_index = self.tab_bar.count() - 1
