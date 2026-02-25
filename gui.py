@@ -3,7 +3,8 @@ from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
                              QHBoxLayout, QPushButton, QScrollArea,
                              QLabel, QFrame, QMessageBox, QToolButton,
                              QTabBar, QStackedWidget, QSizePolicy,
-                             QLineEdit, QSpinBox, QDoubleSpinBox, QComboBox)
+                             QLineEdit, QSpinBox, QDoubleSpinBox, QComboBox,
+                             QGridLayout)
 from PyQt6.QtCore import Qt
 
 class CollapsibleBox(QWidget):
@@ -128,41 +129,45 @@ class MainWindow(QMainWindow):
                 man_box.toggle_button.setStyleSheet("QToolButton { border: none; text-align: left; font-size: 14px; font-weight: bold; }")
                 prod_box.add_widget(man_box)
 
+                # Use a single frame and grid layout for the manufacturer's items
+                grid_frame = QFrame()
+                grid_frame.setFrameShape(QFrame.Shape.Box)
+                grid_layout = QGridLayout(grid_frame)
+                grid_layout.setContentsMargins(5, 5, 5, 5)
+
+                # Header Row
+                headers = ["Name", "Spec 1", "Spec 2", "Price", "Quantity", "Sub-total"]
+                for col, header in enumerate(headers):
+                    header_label = QLabel(f"<b>{header}</b>")
+                    grid_layout.addWidget(header_label, 0, col)
+
+                # Data Rows
                 for row in range(1, 4):
-                    row_frame = QFrame()
-                    row_frame.setFrameShape(QFrame.Shape.Box)
-                    row_layout = QHBoxLayout(row_frame)
-                    row_layout.setContentsMargins(5, 5, 5, 5)
+                    name_edit = QLineEdit()
 
-                    row_layout.addWidget(QLabel("Name:"))
-                    row_layout.addWidget(QLineEdit())
-
-                    row_layout.addWidget(QLabel("Spec 1:"))
                     spec1_combo = QComboBox()
                     spec1_combo.addItems(["Type A", "Type B", "Type C"])
-                    row_layout.addWidget(spec1_combo)
 
-                    row_layout.addWidget(QLabel("Spec 2:"))
                     spec2_combo = QComboBox()
                     spec2_combo.addItems(["Material X", "Material Y", "Material Z"])
-                    row_layout.addWidget(spec2_combo)
 
-                    row_layout.addWidget(QLabel("Price:"))
                     price_box = QDoubleSpinBox()
                     price_box.setMaximum(999999.99)
                     price_box.setButtonSymbols(QDoubleSpinBox.ButtonSymbols.NoButtons)
-                    row_layout.addWidget(price_box)
 
-                    row_layout.addWidget(QLabel("Quantity:"))
                     qty_box = QSpinBox()
                     qty_box.setMaximum(9999)
-                    row_layout.addWidget(qty_box)
 
-                    row_layout.addWidget(QLabel("Sub-total:"))
                     subtotal_box = QLineEdit("0.00")
                     subtotal_box.setReadOnly(True)
                     subtotal_box.setStyleSheet("background-color: #e0e0e0; color: #555555;")
-                    row_layout.addWidget(subtotal_box)
+
+                    grid_layout.addWidget(name_edit, row, 0)
+                    grid_layout.addWidget(spec1_combo, row, 1)
+                    grid_layout.addWidget(spec2_combo, row, 2)
+                    grid_layout.addWidget(price_box, row, 3)
+                    grid_layout.addWidget(qty_box, row, 4)
+                    grid_layout.addWidget(subtotal_box, row, 5)
 
                     def update_subtotal(val, p=price_box, q=qty_box, s=subtotal_box):
                         total = p.value() * q.value()
@@ -171,7 +176,8 @@ class MainWindow(QMainWindow):
                     price_box.valueChanged.connect(update_subtotal)
                     qty_box.valueChanged.connect(update_subtotal)
 
-                    man_box.add_widget(row_frame)
+                # Add the compiled grid frame to the manufacturer box
+                man_box.add_widget(grid_frame)
 
         content_layout.addStretch()
         scroll.setWidget(content_widget)
