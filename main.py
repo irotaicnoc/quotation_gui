@@ -1,12 +1,15 @@
 import sys
+from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
                              QHBoxLayout, QPushButton, QScrollArea,
                              QLabel, QFrame, QMessageBox, QToolButton,
                              QTabBar, QStackedWidget, QSizePolicy,
                              QLineEdit, QSpinBox, QDoubleSpinBox, QComboBox,
                              QGridLayout, QFileDialog)
-from PyQt6.QtCore import Qt
+
 import data_manager
+import calculator
+
 
 class CollapsibleBox(QWidget):
     def __init__(self, title="", parent=None, with_browse=False):
@@ -186,14 +189,16 @@ class MainWindow(QMainWindow):
         main_layout.addWidget(self.stack)
 
         self.add_new_tab(name="Industrial Plant 1")
-
         bottom_layout = QHBoxLayout()
-        btn_load = QPushButton("Load Configuration")
-        btn_save = QPushButton("Save Data")
-        btn_calc = QPushButton("Run Calculations")
 
-        btn_save.clicked.connect(self.handle_save)
+        btn_load = QPushButton("Load Configuration")
         btn_load.clicked.connect(self.handle_load)
+
+        btn_save = QPushButton("Save Data")
+        btn_save.clicked.connect(self.handle_save)
+
+        btn_calc = QPushButton("Run Calculations")
+        btn_calc.clicked.connect(self.run_calculations)
 
         bottom_layout.addWidget(btn_load)
         bottom_layout.addWidget(btn_save)
@@ -314,6 +319,35 @@ class MainWindow(QMainWindow):
                     man_data = manufacturers.get(grid.manufacturer_name, [])
                     for row_data in man_data:
                         grid.add_row(row_data)
+
+    def run_calculations(self):
+        # 1. Extract current data (reusing the logic from handle_save)
+        app_data = []
+        for index in range(self.tab_bar.count()):
+            tab_data = {"tab_name": self.tab_bar.tabText(index), "products": {}}
+            grids_dict = self.tab_grids[index]
+
+            for prod_name, grid_list in grids_dict.items():
+                tab_data["products"][prod_name] = {}
+                for grid in grid_list:
+                    tab_data["products"][prod_name].update(grid.get_data())
+            app_data.append(tab_data)
+
+        # 2. Run the math
+        plant_totals, grand_total = calculator.calculate_totals(app_data)
+
+        # 3. Format and display the results
+        result_text = "<b>Industrial Plant Totals:</b><br>"
+        for plant, total in plant_totals.items():
+            result_text += f"{plant}: ${total:,.2f}<br>"
+
+        result_text += f"<br><b>Grand Total: ${grand_total:,.2f}</b>"
+
+        msg = QMessageBox(self)
+        msg.setWindowTitle("Calculation Results")
+        msg.setText(result_text)
+        msg.exec()
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
