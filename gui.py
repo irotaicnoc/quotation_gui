@@ -36,7 +36,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("App UI Schema")
-        self.resize(1000, 600) # Widened slightly to fit the 6 fields comfortably
+        self.resize(1000, 600)
         self.tab_counter = 1
 
         central_widget = QWidget()
@@ -134,7 +134,6 @@ class MainWindow(QMainWindow):
                     row_layout = QHBoxLayout(row_frame)
                     row_layout.setContentsMargins(5, 5, 5, 5)
 
-                    # 6 Fields added here
                     row_layout.addWidget(QLabel("Name:"))
                     row_layout.addWidget(QLineEdit())
 
@@ -147,6 +146,8 @@ class MainWindow(QMainWindow):
                     row_layout.addWidget(QLabel("Price:"))
                     price_box = QDoubleSpinBox()
                     price_box.setMaximum(999999.99)
+                    # Removes up and down arrows
+                    price_box.setButtonSymbols(QDoubleSpinBox.ButtonSymbols.NoButtons)
                     row_layout.addWidget(price_box)
 
                     row_layout.addWidget(QLabel("Quantity:"))
@@ -157,7 +158,17 @@ class MainWindow(QMainWindow):
                     row_layout.addWidget(QLabel("Sub-total:"))
                     subtotal_box = QLineEdit("0.00")
                     subtotal_box.setReadOnly(True)
+                    # Grays out the box
+                    subtotal_box.setStyleSheet("background-color: #e0e0e0; color: #555555;")
                     row_layout.addWidget(subtotal_box)
+
+                    # Sub-total calculation logic
+                    def update_subtotal(val, p=price_box, q=qty_box, s=subtotal_box):
+                        total = p.value() * q.value()
+                        s.setText(f"{total:.2f}")
+
+                    price_box.valueChanged.connect(update_subtotal)
+                    qty_box.valueChanged.connect(update_subtotal)
 
                     man_box.add_widget(row_frame)
 
