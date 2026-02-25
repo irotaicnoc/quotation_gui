@@ -8,3 +8,7 @@ PyInstaller command to create a standalone executable for the GUI application:
 
     use it with PyQt6
     --windowed
+
+CHIEDI
+    la ricerca di casi simili va fatta per parte di impianto o per tutto l'impianto?
+        cioè per singola tab di Excel o per tutto l'Excel?
