@@ -5,18 +5,20 @@ from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QH
                              QLabel, QFrame, QMessageBox, QToolButton, QTabBar, QStackedWidget, QLineEdit, QSpinBox,
                              QDoubleSpinBox, QComboBox, QGridLayout, QFileDialog)
 
-import data_manager
 import calculator
+import data_manager
+from localization import tr, set_language
 
 
 class CollapsibleBox(QWidget):
-    def __init__(self, title="", parent=None, with_browse=False):
+    def __init__(self, title_key="", title_args=None, parent=None, with_browse=False):
         super().__init__(parent)
-        self.title = title
+        self.title_key = title_key
+        self.title_args = title_args or []
         header_layout = QHBoxLayout()
         header_layout.setContentsMargins(0, 0, 0, 0)
 
-        self.toggle_button = QToolButton(text=title, checkable=True, checked=True)
+        self.toggle_button = QToolButton(checkable=True, checked=True)
         self.toggle_button.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
         self.toggle_button.setArrowType(Qt.ArrowType.DownArrow)
         self.toggle_button.setStyleSheet("""
@@ -34,8 +36,9 @@ class CollapsibleBox(QWidget):
         self.toggle_button.toggled.connect(self.on_toggled)
         header_layout.addWidget(self.toggle_button)
 
+        self.browse_btn = None
         if with_browse:
-            self.browse_btn = QPushButton("Browse")
+            self.browse_btn = QPushButton()
             header_layout.addWidget(self.browse_btn)
 
         header_layout.addStretch()
@@ -49,12 +52,26 @@ class CollapsibleBox(QWidget):
         layout.addLayout(header_layout)
         layout.addWidget(self.content_area)
 
+        self.retranslate_ui()
+
     def on_toggled(self, checked):
         self.toggle_button.setArrowType(Qt.ArrowType.DownArrow if checked else Qt.ArrowType.RightArrow)
         self.content_area.setVisible(checked)
 
     def add_widget(self, widget):
         self.content_layout.addWidget(widget)
+
+    def retranslate_ui(self):
+        title_text = f"{tr(self.title_key)} {' '.join(self.title_args)}" if self.title_args else tr(self.title_key)
+        self.toggle_button.setText(title_text)
+        if self.browse_btn:
+            self.browse_btn.setText(tr("browse"))
+
+        # Retranslate children
+        for i in range(self.content_layout.count()):
+            widget = self.content_layout.itemAt(i).widget()
+            if hasattr(widget, "retranslate_ui"):
+                widget.retranslate_ui()
 
 
 class ManufacturerGrid(QFrame):
@@ -63,7 +80,6 @@ class ManufacturerGrid(QFrame):
         self.manufacturer_name = manufacturer_name
         self.setFrameShape(QFrame.Shape.StyledPanel)
 
-        # Apply a subtle card-style background that works on both Light and Dark themes
         self.setStyleSheet("""
             ManufacturerGrid {
                 background-color: rgba(150, 150, 150, 0.08);
@@ -88,16 +104,20 @@ class ManufacturerGrid(QFrame):
 
         self.row_counter = 1
         self.active_rows = []
+        self.header_labels = []
 
-        headers = ["Name", "Spec 1", "Spec 2", "Price", "Quantity", "Sub-total", ""]
-        for col, header in enumerate(headers):
-            lbl = QLabel(f"<b>{header}</b>")
+        header_keys = ["name", "spec1", "spec2", "price", "quantity", "subtotal", "empty"]
+        for col, key in enumerate(header_keys):
+            lbl = QLabel()
             lbl.setAlignment(Qt.AlignmentFlag.AlignCenter if col > 2 else Qt.AlignmentFlag.AlignLeft)
             self.grid_layout.addWidget(lbl, 0, col)
+            self.header_labels.append((lbl, key))
 
-        self.add_btn = QPushButton("+ Add Row")
+        self.add_btn = QPushButton()
         self.main_layout.addWidget(self.add_btn, alignment=Qt.AlignmentFlag.AlignLeft)
         self.add_btn.clicked.connect(self.add_row)
+
+        self.retranslate_ui()
 
     def add_row(self, data=None):
         name_edit = QLineEdit()
@@ -177,14 +197,19 @@ class ManufacturerGrid(QFrame):
         for row in list(self.active_rows):
             row['del_btn'].click()
 
+    def retranslate_ui(self):
+        for lbl, key in self.header_labels:
+            if key != "empty":
+                lbl.setText(f"<b>{tr(key)}</b>")
+        self.add_btn.setText(tr("add_row"))
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("App UI Schema")
-        self.resize(1000, 650)
         self.tab_counter = 1
         self.tab_grids = {}
+        self.tab_base_names = {}
 
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
@@ -203,64 +228,88 @@ class MainWindow(QMainWindow):
 
         self.add_btn = QToolButton()
         self.add_btn.setText("+")
-        self.add_btn.clicked.connect(self.add_new_tab)
+        self.add_btn.clicked.connect(lambda checked: self.add_new_tab())
 
         tab_layout.addWidget(self.tab_bar)
         tab_layout.addWidget(self.add_btn)
         tab_layout.addStretch()
 
         # --- Theme Switcher ---
-        tab_layout.addWidget(QLabel("Theme:"))
-        theme_combo = QComboBox()
-        theme_combo.addItems(["System", "Light", "Dark"])
+        self.lbl_theme = QLabel()
+        tab_layout.addWidget(self.lbl_theme)
 
-        def apply_theme(t):
-            theme_name = "auto" if t == "System" else t.lower()
-            qdarktheme.setup_theme(
-                theme_name,
-                corner_shape="rounded",
-                custom_colors={"primary": "#3B82F6"}
-            )
+        self.theme_combo = QComboBox()
+        self.theme_combo.currentTextChanged.connect(self.apply_theme)
+        tab_layout.addWidget(self.theme_combo)
 
-        theme_combo.currentTextChanged.connect(apply_theme)
-        tab_layout.addWidget(theme_combo)
+        # --- Language Switcher ---
+        self.lbl_lang = QLabel()
+        tab_layout.addWidget(self.lbl_lang)
+
+        self.lang_combo = QComboBox()
+        self.lang_combo.addItems(["English", "Italiano"])
+        self.lang_combo.currentIndexChanged.connect(self.change_language)
+        tab_layout.addWidget(self.lang_combo)
 
         main_layout.addLayout(tab_layout)
 
         self.stack = QStackedWidget()
         main_layout.addWidget(self.stack)
 
-        self.add_new_tab(name="Industrial Plant 1")
+        self.add_new_tab(base_key="industrial_plant", number=1)
         bottom_layout = QHBoxLayout()
         bottom_layout.setContentsMargins(0, 5, 0, 0)
 
-        btn_load = QPushButton("Load Configuration")
-        btn_load.clicked.connect(self.handle_load)
+        self.btn_load = QPushButton()
+        self.btn_load.clicked.connect(self.handle_load)
 
-        btn_save = QPushButton("Save Data")
-        btn_save.clicked.connect(self.handle_save)
+        self.btn_save = QPushButton()
+        self.btn_save.clicked.connect(self.handle_save)
 
-        btn_calc = QPushButton("Run Calculations")
-        btn_calc.clicked.connect(self.run_calculations)
-        # Give primary action button more emphasis
-        btn_calc.setStyleSheet("font-weight: bold; padding: 6px 12px;")
+        self.btn_calc = QPushButton()
+        self.btn_calc.clicked.connect(self.run_calculations)
+        self.btn_calc.setStyleSheet("font-weight: bold; padding: 6px 12px;")
 
-        bottom_layout.addWidget(btn_load)
-        bottom_layout.addWidget(btn_save)
+        bottom_layout.addWidget(self.btn_load)
+        bottom_layout.addWidget(self.btn_save)
         bottom_layout.addStretch()
-        bottom_layout.addWidget(btn_calc)
+        bottom_layout.addWidget(self.btn_calc)
 
         main_layout.addLayout(bottom_layout)
 
-    def add_new_tab(self, name=None):
-        if not isinstance(name, str):
-            name = f"Industrial Plant {self.tab_counter}"
+        self.resize(1000, 650)
+        self.retranslate_ui()
+
+    @staticmethod
+    def apply_theme(t):
+        # Map localized text back to English keys for qdarktheme
+        theme_map = {tr("system"): "auto", tr("light"): "light", tr("dark"): "dark"}
+        theme_name = theme_map.get(t, "auto")
+        qdarktheme.setup_theme(
+            theme_name,
+            corner_shape="rounded",
+            custom_colors={"primary": "#3B82F6"}
+        )
+
+    def change_language(self, index):
+        lang_code = "en" if index == 0 else "it"
+        set_language(lang_code)
+        self.retranslate_ui()
+
+    def add_new_tab(self, base_key="industrial_plant", number=None):
+        if number is None:
+            number = self.tab_counter
 
         new_content, grids_dict = self.create_tab_content()
         self.stack.addWidget(new_content)
 
-        index = self.tab_bar.addTab(name)
+        # Store base key and number for dynamic translation of tabs
+        tab_name = f"{tr(base_key)} {number}"
+        index = self.tab_bar.addTab(tab_name)
+
         self.tab_grids[index] = grids_dict
+        self.tab_base_names[index] = (base_key, number)
+
         self.tab_bar.setCurrentIndex(index)
         self.tab_counter += 1
 
@@ -270,10 +319,12 @@ class MainWindow(QMainWindow):
 
     def close_tab(self, index):
         tab_name = self.tab_bar.tabText(index)
+        msg_text = tr("close_prompt").replace("{tab_name}", tab_name)
+
         reply = QMessageBox.question(
             self,
-            'Confirm',
-            f"Close {tab_name}?",
+            tr("confirm"),
+            msg_text,
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
             )
 
@@ -284,15 +335,19 @@ class MainWindow(QMainWindow):
             widget_to_remove.deleteLater()
 
             new_tab_grids = {}
+            new_tab_base_names = {}
             for i in range(self.tab_bar.count()):
-                new_tab_grids[i] = self.tab_grids[i if i < index else i + 1]
+                new_idx = i if i < index else i + 1
+                new_tab_grids[i] = self.tab_grids[new_idx]
+                new_tab_base_names[i] = self.tab_base_names[new_idx]
+
             self.tab_grids = new_tab_grids
+            self.tab_base_names = new_tab_base_names
 
     @staticmethod
     def create_tab_content():
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
-        # Ensure scroll area blends smoothly
         scroll.setStyleSheet("QScrollArea { border: none; }")
 
         content_widget = QWidget()
@@ -303,8 +358,8 @@ class MainWindow(QMainWindow):
         grids_dict = {}
 
         for prod in range(1, 4):
-            prod_name = f"Product {prod}"
-            prod_box = CollapsibleBox(prod_name, with_browse=True)
+            prod_name = f"Product {prod}"  # Internal key
+            prod_box = CollapsibleBox("product", [str(prod)], with_browse=True)
             prod_box.toggle_button.setStyleSheet("""
                 QToolButton { 
                     border: none; 
@@ -324,8 +379,8 @@ class MainWindow(QMainWindow):
             grids_dict[prod_name] = []
 
             for man in range(1, 3):
-                man_name = f"Manufacturer {prod}.{man}"
-                man_box = CollapsibleBox(man_name)
+                man_name = f"Manufacturer {prod}.{man}"  # Internal key
+                man_box = CollapsibleBox("manufacturer", [f"{prod}.{man}"])
                 man_box.toggle_button.setStyleSheet("""
                     QToolButton { 
                         border: none; 
@@ -352,7 +407,7 @@ class MainWindow(QMainWindow):
         return scroll, grids_dict
 
     def handle_save(self):
-        file_path, _ = QFileDialog.getSaveFileName(self, "Save Data", "", "JSON Files (*.json)")
+        file_path, _ = QFileDialog.getSaveFileName(self, tr("save_dialog"), "", "JSON Files (*.json)")
         if not file_path:
             return
 
@@ -370,14 +425,14 @@ class MainWindow(QMainWindow):
         data_manager.save_to_json(file_path, app_data)
 
     def handle_load(self):
-        file_path, _ = QFileDialog.getOpenFileName(self, "Load Data", "", "JSON Files (*.json)")
+        file_path, _ = QFileDialog.getOpenFileName(self, tr("load_dialog"), "", "JSON Files (*.json)")
         if not file_path:
             return
 
         try:
             app_data = data_manager.load_from_json(file_path)
         except Exception as e:
-            QMessageBox.critical(self, "Error", f"Could not load file:\n{e}")
+            QMessageBox.critical(self, tr("error"), f"{tr('could_not_load')}{e}")
             return
 
         while self.tab_bar.count() > 0:
@@ -386,9 +441,11 @@ class MainWindow(QMainWindow):
             self.stack.removeWidget(widget)
             widget.deleteLater()
         self.tab_grids.clear()
+        self.tab_base_names.clear()
 
         for tab_info in app_data:
-            self.add_new_tab(name=tab_info["tab_name"])
+            # Basic fallback for loaded names, you might need a more complex parser if names are heavily custom
+            self.add_new_tab(base_key="industrial_plant", number=self.tab_counter)
             current_index = self.tab_bar.count() - 1
             grids_dict = self.tab_grids[current_index]
 
@@ -415,21 +472,52 @@ class MainWindow(QMainWindow):
 
         plant_totals, grand_total = calculator.calculate_totals(app_data)
 
-        result_text = "<b>Industrial Plant Totals:</b><br>"
+        result_text = f"<b>{tr('plant_totals')}</b><br>"
         for plant, total in plant_totals.items():
             result_text += f"{plant}: ${total:,.2f}<br>"
 
-        result_text += f"<br><b>Grand Total: ${grand_total:,.2f}</b>"
+        result_text += f"<br><b>{tr('grand_total')} ${grand_total:,.2f}</b>"
 
         msg = QMessageBox(self)
-        msg.setWindowTitle("Calculation Results")
+        msg.setWindowTitle(tr("calc_results"))
         msg.setText(result_text)
         msg.exec()
+
+    def retranslate_ui(self):
+        self.setWindowTitle(tr("app_title"))
+        self.lbl_theme.setText(tr("theme"))
+        self.lbl_lang.setText(tr("language"))
+
+        # Update theme combo items without triggering the index change signal
+        current_theme_idx = self.theme_combo.currentIndex()
+        self.theme_combo.blockSignals(True)
+        self.theme_combo.clear()
+        self.theme_combo.addItems([tr("system"), tr("light"), tr("dark")])
+        self.theme_combo.setCurrentIndex(current_theme_idx if current_theme_idx >= 0 else 0)
+        self.theme_combo.blockSignals(False)
+
+        self.btn_load.setText(tr("load_config"))
+        self.btn_save.setText(tr("save_data"))
+        self.btn_calc.setText(tr("run_calc"))
+
+        # Update Tab Names
+        for i in range(self.tab_bar.count()):
+            base_key, number = self.tab_base_names.get(i, ("industrial_plant", i+1))
+            self.tab_bar.setTabText(i, f"{tr(base_key)} {number}")
+
+        # Trigger retranslate on all dynamic widgets inside the stack
+        for i in range(self.stack.count()):
+            scroll_area = self.stack.widget(i)
+            content_widget = scroll_area.widget()
+            layout = content_widget.layout()
+            for j in range(layout.count()):
+                item = layout.itemAt(j)
+                if item.widget() and hasattr(item.widget(), "retranslate_ui"):
+                    item.widget().retranslate_ui()
 
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    # Starts with system default theme, utilizing rounded shapes and a custom blue accent
     qdarktheme.setup_theme("auto", corner_shape="rounded", custom_colors={"primary": "#3B82F6"})
     window = MainWindow()
     window.show()
