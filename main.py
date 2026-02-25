@@ -19,7 +19,18 @@ class CollapsibleBox(QWidget):
         self.toggle_button = QToolButton(text=title, checkable=True, checked=True)
         self.toggle_button.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
         self.toggle_button.setArrowType(Qt.ArrowType.DownArrow)
-        self.toggle_button.setStyleSheet("QToolButton { border: none; background: transparent; text-align: left; }")
+        self.toggle_button.setStyleSheet("""
+            QToolButton { 
+                border: none; 
+                background: transparent; 
+                text-align: left; 
+                padding: 4px;
+                border-radius: 4px;
+            }
+            QToolButton:hover {
+                background: rgba(150, 150, 150, 0.1);
+            }
+        """)
         self.toggle_button.toggled.connect(self.on_toggled)
         header_layout.addWidget(self.toggle_button)
 
@@ -31,7 +42,7 @@ class CollapsibleBox(QWidget):
 
         self.content_area = QWidget()
         self.content_layout = QVBoxLayout(self.content_area)
-        self.content_layout.setContentsMargins(20, 5, 0, 15)
+        self.content_layout.setContentsMargins(20, 10, 0, 15)
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -52,8 +63,17 @@ class ManufacturerGrid(QFrame):
         self.manufacturer_name = manufacturer_name
         self.setFrameShape(QFrame.Shape.StyledPanel)
 
+        # Apply a subtle card-style background that works on both Light and Dark themes
+        self.setStyleSheet("""
+            ManufacturerGrid {
+                background-color: rgba(150, 150, 150, 0.08);
+                border: 1px solid rgba(150, 150, 150, 0.15);
+                border-radius: 8px;
+            }
+        """)
+
         self.main_layout = QVBoxLayout(self)
-        self.main_layout.setContentsMargins(5, 5, 5, 5)
+        self.main_layout.setContentsMargins(15, 15, 15, 15)
 
         self.grid_layout = QGridLayout()
         self.main_layout.addLayout(self.grid_layout)
@@ -95,7 +115,7 @@ class ManufacturerGrid(QFrame):
 
         del_btn = QPushButton("X")
         del_btn.setFixedWidth(30)
-        del_btn.setStyleSheet("color: #ff5555; font-weight: bold;")
+        del_btn.setStyleSheet("color: #ef4444; font-weight: bold; border-radius: 4px;")
 
         if data:
             name_edit.setText(data.get("name", ""))
@@ -162,17 +182,19 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("App UI Schema")
-        self.resize(950, 600)
+        self.resize(1000, 650)
         self.tab_counter = 1
         self.tab_grids = {}
 
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
         main_layout = QVBoxLayout(central_widget)
+        main_layout.setContentsMargins(15, 15, 15, 15)
+        main_layout.setSpacing(10)
 
         tab_layout = QHBoxLayout()
         tab_layout.setContentsMargins(0, 0, 0, 0)
-        tab_layout.setSpacing(2)
+        tab_layout.setSpacing(5)
 
         self.tab_bar = QTabBar()
         self.tab_bar.setTabsClosable(True)
@@ -191,9 +213,16 @@ class MainWindow(QMainWindow):
         tab_layout.addWidget(QLabel("Theme:"))
         theme_combo = QComboBox()
         theme_combo.addItems(["System", "Light", "Dark"])
-        theme_combo.currentTextChanged.connect(
-            lambda t: qdarktheme.setup_theme("auto" if t == "System" else t.lower())
-        )
+
+        def apply_theme(t):
+            theme_name = "auto" if t == "System" else t.lower()
+            qdarktheme.setup_theme(
+                theme_name,
+                corner_shape="rounded",
+                custom_colors={"primary": "#3B82F6"}
+            )
+
+        theme_combo.currentTextChanged.connect(apply_theme)
         tab_layout.addWidget(theme_combo)
 
         main_layout.addLayout(tab_layout)
@@ -203,6 +232,7 @@ class MainWindow(QMainWindow):
 
         self.add_new_tab(name="Industrial Plant 1")
         bottom_layout = QHBoxLayout()
+        bottom_layout.setContentsMargins(0, 5, 0, 0)
 
         btn_load = QPushButton("Load Configuration")
         btn_load.clicked.connect(self.handle_load)
@@ -212,6 +242,8 @@ class MainWindow(QMainWindow):
 
         btn_calc = QPushButton("Run Calculations")
         btn_calc.clicked.connect(self.run_calculations)
+        # Give primary action button more emphasis
+        btn_calc.setStyleSheet("font-weight: bold; padding: 6px 12px;")
 
         bottom_layout.addWidget(btn_load)
         bottom_layout.addWidget(btn_save)
@@ -243,7 +275,7 @@ class MainWindow(QMainWindow):
             'Confirm',
             f"Close {tab_name}?",
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-        )
+            )
 
         if reply == QMessageBox.StandardButton.Yes:
             self.tab_bar.removeTab(index)
@@ -260,16 +292,33 @@ class MainWindow(QMainWindow):
     def create_tab_content():
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
+        # Ensure scroll area blends smoothly
+        scroll.setStyleSheet("QScrollArea { border: none; }")
+
         content_widget = QWidget()
         content_layout = QVBoxLayout(content_widget)
+        content_layout.setContentsMargins(5, 10, 15, 10)
+        content_layout.setSpacing(15)
 
         grids_dict = {}
 
         for prod in range(1, 4):
             prod_name = f"Product {prod}"
             prod_box = CollapsibleBox(prod_name, with_browse=True)
-            prod_box.toggle_button.setStyleSheet("QToolButton { border: none; background: transparent; "
-                                                 "text-align: left; font-size: 16px; font-weight: bold; }")
+            prod_box.toggle_button.setStyleSheet("""
+                QToolButton { 
+                    border: none; 
+                    background: rgba(150, 150, 150, 0.1); 
+                    text-align: left; 
+                    font-size: 16px; 
+                    font-weight: bold; 
+                    padding: 8px;
+                    border-radius: 6px;
+                }
+                QToolButton:hover {
+                    background: rgba(150, 150, 150, 0.15);
+                }
+            """)
             content_layout.addWidget(prod_box)
 
             grids_dict[prod_name] = []
@@ -277,8 +326,20 @@ class MainWindow(QMainWindow):
             for man in range(1, 3):
                 man_name = f"Manufacturer {prod}.{man}"
                 man_box = CollapsibleBox(man_name)
-                man_box.toggle_button.setStyleSheet("QToolButton { border: none; background: transparent; text-align: "
-                                                    "left; font-size: 14px; font-weight: bold; }")
+                man_box.toggle_button.setStyleSheet("""
+                    QToolButton { 
+                        border: none; 
+                        background: transparent; 
+                        text-align: left; 
+                        font-size: 14px; 
+                        font-weight: bold; 
+                        padding: 6px;
+                        border-radius: 4px;
+                    }
+                    QToolButton:hover {
+                        background: rgba(150, 150, 150, 0.1);
+                    }
+                """)
                 prod_box.add_widget(man_box)
 
                 grid = ManufacturerGrid(man_name)
@@ -368,7 +429,8 @@ class MainWindow(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    qdarktheme.setup_theme("auto")  # Starts with the system default theme
+    # Starts with system default theme, utilizing rounded shapes and a custom blue accent
+    qdarktheme.setup_theme("auto", corner_shape="rounded", custom_colors={"primary": "#3B82F6"})
     window = MainWindow()
     window.show()
     sys.exit(app.exec())
