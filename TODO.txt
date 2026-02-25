@@ -1,14 +1,19 @@
-https://github.com/irotaicnoc/quotation_gui
+https://github.com/irotaicnoc/quotation_gui/tree/pyqt6
 
-Hello! This project is about a GUI interface for some relatively simple calculations.
 
+metti modo per cambiare tema nella GUI
 
 PyInstaller command to create a standalone executable for the GUI application:
     pyinstaller --noconsole --onefile --icon="assets/app_icon.ico" --add-data "assets;assets" --name "Stima Impianti" gui.py
 
     use it with PyQt6
-    --windowed
+        --windowed
 
 CHIEDI
     la ricerca di casi simili va fatta per parte di impianto o per tutto l'impianto?
         cioè per singola tab di Excel o per tutto l'Excel?
+
+
+
+Hello! This is the GUI of an application I am creating. Can you help me switch it to use pyqtdarktheme without changing its functionalities? Is it free right?
+
