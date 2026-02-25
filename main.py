@@ -187,6 +187,15 @@ class MainWindow(QMainWindow):
         tab_layout.addWidget(self.add_btn)
         tab_layout.addStretch()
 
+        # --- Theme Switcher ---
+        tab_layout.addWidget(QLabel("Theme:"))
+        theme_combo = QComboBox()
+        theme_combo.addItems(["System", "Light", "Dark"])
+        theme_combo.currentTextChanged.connect(
+            lambda t: qdarktheme.setup_theme("auto" if t == "System" else t.lower())
+        )
+        tab_layout.addWidget(theme_combo)
+
         main_layout.addLayout(tab_layout)
 
         self.stack = QStackedWidget()
@@ -359,7 +368,7 @@ class MainWindow(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    qdarktheme.setup_theme()
+    qdarktheme.setup_theme("auto")  # Starts with the system default theme
     window = MainWindow()
     window.show()
     sys.exit(app.exec())
