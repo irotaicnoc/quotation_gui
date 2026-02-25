@@ -1,11 +1,8 @@
 import sys
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
-                             QHBoxLayout, QPushButton, QScrollArea,
-                             QLabel, QFrame, QMessageBox, QToolButton,
-                             QTabBar, QStackedWidget, QSizePolicy,
-                             QLineEdit, QSpinBox, QDoubleSpinBox, QComboBox,
-                             QGridLayout, QFileDialog)
+from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QScrollArea,
+                             QLabel, QFrame, QMessageBox, QToolButton, QTabBar, QStackedWidget, QLineEdit, QSpinBox,
+                             QDoubleSpinBox, QComboBox, QGridLayout, QFileDialog)
 
 import data_manager
 import calculator
@@ -46,6 +43,7 @@ class CollapsibleBox(QWidget):
 
     def add_widget(self, widget):
         self.content_layout.addWidget(widget)
+
 
 class ManufacturerGrid(QFrame):
     def __init__(self, manufacturer_name):
@@ -115,8 +113,13 @@ class ManufacturerGrid(QFrame):
             self.grid_layout.addWidget(widget, current_row_idx, col)
 
         row_dict = {
-            'name': name_edit, 'spec1': spec1_combo, 'spec2': spec2_combo,
-            'price': price_box, 'qty': qty_box, 'widgets': row_widgets, 'del_btn': del_btn
+            'name': name_edit,
+            'spec1': spec1_combo,
+            'spec2': spec2_combo,
+            'price': price_box,
+            'qty': qty_box,
+            'widgets': row_widgets,
+            'del_btn': del_btn,
         }
         self.active_rows.append(row_dict)
 
@@ -153,6 +156,7 @@ class ManufacturerGrid(QFrame):
     def clear_rows(self):
         for row in list(self.active_rows):
             row['del_btn'].click()
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -207,7 +211,7 @@ class MainWindow(QMainWindow):
 
         main_layout.addLayout(bottom_layout)
 
-    def add_new_tab(self, checked=False, name=None):
+    def add_new_tab(self, name=None):
         if not isinstance(name, str):
             name = f"Industrial Plant {self.tab_counter}"
 
@@ -225,8 +229,13 @@ class MainWindow(QMainWindow):
 
     def close_tab(self, index):
         tab_name = self.tab_bar.tabText(index)
-        reply = QMessageBox.question(self, 'Confirm', f"Close {tab_name}?",
-                                     QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, QMessageBox.StandardButton.No)
+        reply = QMessageBox.question(
+            self,
+            title='Confirm',
+            text=f"Close {tab_name}?",
+            buttons=QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            defaultButton=QMessageBox.StandardButton.No,
+        )
 
         if reply == QMessageBox.StandardButton.Yes:
             self.tab_bar.removeTab(index)
@@ -239,7 +248,8 @@ class MainWindow(QMainWindow):
                 new_tab_grids[i] = self.tab_grids[i if i < index else i + 1]
             self.tab_grids = new_tab_grids
 
-    def create_tab_content(self):
+    @staticmethod
+    def create_tab_content():
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         content_widget = QWidget()
@@ -250,7 +260,8 @@ class MainWindow(QMainWindow):
         for prod in range(1, 4):
             prod_name = f"Product {prod}"
             prod_box = CollapsibleBox(prod_name, with_browse=True)
-            prod_box.toggle_button.setStyleSheet("QToolButton { border: none; background: transparent; text-align: left; font-size: 16px; font-weight: bold; }")
+            prod_box.toggle_button.setStyleSheet("QToolButton { border: none; background: transparent; "
+                                                 "text-align: left; font-size: 16px; font-weight: bold; }")
             content_layout.addWidget(prod_box)
 
             grids_dict[prod_name] = []
@@ -258,7 +269,8 @@ class MainWindow(QMainWindow):
             for man in range(1, 3):
                 man_name = f"Manufacturer {prod}.{man}"
                 man_box = CollapsibleBox(man_name)
-                man_box.toggle_button.setStyleSheet("QToolButton { border: none; background: transparent; text-align: left; font-size: 14px; font-weight: bold; color: #333333; }")
+                man_box.toggle_button.setStyleSheet("QToolButton { border: none; background: transparent; text-align: "
+                                                    "left; font-size: 14px; font-weight: bold; color: #333333; }")
                 prod_box.add_widget(man_box)
 
                 grid = ManufacturerGrid(man_name)
