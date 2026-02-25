@@ -3,5 +3,4 @@
 build/
 dist/
 
-gui.spec
-Stima Impianti.spec
+data_dump.json

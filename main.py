@@ -4,13 +4,14 @@ from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
                              QLabel, QFrame, QMessageBox, QToolButton,
                              QTabBar, QStackedWidget, QSizePolicy,
                              QLineEdit, QSpinBox, QDoubleSpinBox, QComboBox,
-                             QGridLayout)
+                             QGridLayout, QFileDialog)
 from PyQt6.QtCore import Qt
+import data_manager # Imports your new file
 
 class CollapsibleBox(QWidget):
     def __init__(self, title="", parent=None, with_browse=False):
         super().__init__(parent)
-
+        self.title = title
         header_layout = QHBoxLayout()
         header_layout.setContentsMargins(0, 0, 0, 0)
 
@@ -44,8 +45,9 @@ class CollapsibleBox(QWidget):
         self.content_layout.addWidget(widget)
 
 class ManufacturerGrid(QFrame):
-    def __init__(self):
+    def __init__(self, manufacturer_name):
         super().__init__()
+        self.manufacturer_name = manufacturer_name
         self.setFrameShape(QFrame.Shape.StyledPanel)
 
         self.main_layout = QVBoxLayout(self)
@@ -63,6 +65,7 @@ class ManufacturerGrid(QFrame):
         self.grid_layout.setColumnStretch(6, 0)
 
         self.row_counter = 1
+        self.active_rows = []
 
         headers = ["Name", "Spec 1", "Spec 2", "Price", "Quantity", "Sub-total", ""]
         for col, header in enumerate(headers):
@@ -70,13 +73,11 @@ class ManufacturerGrid(QFrame):
             lbl.setAlignment(Qt.AlignmentFlag.AlignCenter if col > 2 else Qt.AlignmentFlag.AlignLeft)
             self.grid_layout.addWidget(lbl, 0, col)
 
-        self.add_row()
-
         self.add_btn = QPushButton("+ Add Row")
         self.main_layout.addWidget(self.add_btn, alignment=Qt.AlignmentFlag.AlignLeft)
         self.add_btn.clicked.connect(self.add_row)
 
-    def add_row(self):
+    def add_row(self, data=None):
         name_edit = QLineEdit()
         spec1_combo = QComboBox()
         spec1_combo.addItems(["Type A", "Type B", "Type C"])
@@ -95,6 +96,14 @@ class ManufacturerGrid(QFrame):
         del_btn.setFixedWidth(30)
         del_btn.setStyleSheet("color: red; font-weight: bold;")
 
+        # Populate with data if loading
+        if data:
+            name_edit.setText(data.get("name", ""))
+            spec1_combo.setCurrentText(data.get("spec1", "Type A"))
+            spec2_combo.setCurrentText(data.get("spec2", "Material X"))
+            price_box.setValue(data.get("price", 0.0))
+            qty_box.setValue(data.get("qty", 0))
+
         row_widgets = [name_edit, spec1_combo, spec2_combo, price_box, qty_box, subtotal_box, del_btn]
 
         current_row_idx = self.row_counter
@@ -103,25 +112,53 @@ class ManufacturerGrid(QFrame):
         for col, widget in enumerate(row_widgets):
             self.grid_layout.addWidget(widget, current_row_idx, col)
 
-        def update_subtotal(val, p=price_box, q=qty_box, s=subtotal_box):
-            total = p.value() * q.value()
-            s.setText(f"{total:.2f}")
+        row_dict = {
+            'name': name_edit, 'spec1': spec1_combo, 'spec2': spec2_combo,
+            'price': price_box, 'qty': qty_box, 'widgets': row_widgets, 'del_btn': del_btn
+        }
+        self.active_rows.append(row_dict)
+
+        def update_subtotal(*args):
+            s = price_box.value() * qty_box.value()
+            subtotal_box.setText(f"{s:.2f}")
 
         def delete_this_row():
             for widget in row_widgets:
                 self.grid_layout.removeWidget(widget)
                 widget.deleteLater()
+            if row_dict in self.active_rows:
+                self.active_rows.remove(row_dict)
 
         price_box.valueChanged.connect(update_subtotal)
         qty_box.valueChanged.connect(update_subtotal)
         del_btn.clicked.connect(delete_this_row)
 
+        update_subtotal() # Initialize subtotal
+
+    def get_data(self):
+        """Extracts data from the grid for saving."""
+        rows_data = []
+        for row in self.active_rows:
+            rows_data.append({
+                "name": row['name'].text(),
+                "spec1": row['spec1'].currentText(),
+                "spec2": row['spec2'].currentText(),
+                "price": row['price'].value(),
+                "qty": row['qty'].value()
+            })
+        return {self.manufacturer_name: rows_data}
+
+    def clear_rows(self):
+        for row in list(self.active_rows):
+            row['del_btn'].click()
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("App UI Schema")
-        self.resize(950, 600) # Reduced width from 1100 to 950
+        self.resize(950, 600)
         self.tab_counter = 1
+        self.tab_grids = {} # Format: {tab_index: {"Product Name": [ManufacturerGrid1, ...]}}
 
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
@@ -152,14 +189,17 @@ class MainWindow(QMainWindow):
         self.add_new_tab(name="Industrial Plant 1")
 
         bottom_layout = QHBoxLayout()
-        btn1 = QPushButton("Load Configuration")
-        btn2 = QPushButton("Save Data")
-        btn3 = QPushButton("Run Calculations")
+        btn_load = QPushButton("Load Configuration")
+        btn_save = QPushButton("Save Data")
+        btn_calc = QPushButton("Run Calculations")
 
-        bottom_layout.addWidget(btn1)
-        bottom_layout.addWidget(btn2)
+        btn_save.clicked.connect(self.handle_save)
+        btn_load.clicked.connect(self.handle_load)
+
+        bottom_layout.addWidget(btn_load)
+        bottom_layout.addWidget(btn_save)
         bottom_layout.addStretch()
-        bottom_layout.addWidget(btn3)
+        bottom_layout.addWidget(btn_calc)
 
         main_layout.addLayout(bottom_layout)
 
@@ -167,10 +207,11 @@ class MainWindow(QMainWindow):
         if not isinstance(name, str):
             name = f"Industrial Plant {self.tab_counter}"
 
-        new_content = self.create_tab_content()
+        new_content, grids_dict = self.create_tab_content()
         self.stack.addWidget(new_content)
 
         index = self.tab_bar.addTab(name)
+        self.tab_grids[index] = grids_dict
         self.tab_bar.setCurrentIndex(index)
         self.tab_counter += 1
 
@@ -180,40 +221,103 @@ class MainWindow(QMainWindow):
 
     def close_tab(self, index):
         tab_name = self.tab_bar.tabText(index)
-        reply = QMessageBox.question(
-            self, 'Confirm Close', f"Are you sure you want to close {tab_name}?",
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-            QMessageBox.StandardButton.No
-        )
+        reply = QMessageBox.question(self, 'Confirm', f"Close {tab_name}?",
+                                     QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, QMessageBox.StandardButton.No)
+
         if reply == QMessageBox.StandardButton.Yes:
             self.tab_bar.removeTab(index)
             widget_to_remove = self.stack.widget(index)
             self.stack.removeWidget(widget_to_remove)
             widget_to_remove.deleteLater()
 
+            # Reindex tab_grids tracking
+            new_tab_grids = {}
+            for i in range(self.tab_bar.count()):
+                new_tab_grids[i] = self.tab_grids[i if i < index else i + 1]
+            self.tab_grids = new_tab_grids
+
     def create_tab_content(self):
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
-
         content_widget = QWidget()
         content_layout = QVBoxLayout(content_widget)
 
+        grids_dict = {}
+
         for prod in range(1, 4):
-            prod_box = CollapsibleBox(f"Product {prod}", with_browse=True)
+            prod_name = f"Product {prod}"
+            prod_box = CollapsibleBox(prod_name, with_browse=True)
             prod_box.toggle_button.setStyleSheet("QToolButton { border: none; background: transparent; text-align: left; font-size: 16px; font-weight: bold; }")
             content_layout.addWidget(prod_box)
 
+            grids_dict[prod_name] = []
+
             for man in range(1, 3):
-                man_box = CollapsibleBox(f"Manufacturer {prod}.{man}")
+                man_name = f"Manufacturer {prod}.{man}"
+                man_box = CollapsibleBox(man_name)
                 man_box.toggle_button.setStyleSheet("QToolButton { border: none; background: transparent; text-align: left; font-size: 14px; font-weight: bold; color: #333333; }")
                 prod_box.add_widget(man_box)
 
-                grid = ManufacturerGrid()
+                grid = ManufacturerGrid(man_name)
+                grid.add_row() # Add one default empty row
                 man_box.add_widget(grid)
+                grids_dict[prod_name].append(grid)
 
         content_layout.addStretch()
         scroll.setWidget(content_widget)
-        return scroll
+        return scroll, grids_dict
+
+    def handle_save(self):
+        file_path, _ = QFileDialog.getSaveFileName(self, "Save Data", "", "JSON Files (*.json)")
+        if not file_path:
+            return
+
+        app_data = []
+        for index in range(self.tab_bar.count()):
+            tab_data = {"tab_name": self.tab_bar.tabText(index), "products": {}}
+            grids_dict = self.tab_grids[index]
+
+            for prod_name, grid_list in grids_dict.items():
+                tab_data["products"][prod_name] = {}
+                for grid in grid_list:
+                    tab_data["products"][prod_name].update(grid.get_data())
+            app_data.append(tab_data)
+
+        data_manager.save_to_json(file_path, app_data)
+
+    def handle_load(self):
+        file_path, _ = QFileDialog.getOpenFileName(self, "Load Data", "", "JSON Files (*.json)")
+        if not file_path:
+            return
+
+        try:
+            app_data = data_manager.load_from_json(file_path)
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Could not load file:\n{e}")
+            return
+
+        # Clear existing tabs
+        while self.tab_bar.count() > 0:
+            self.tab_bar.removeTab(0)
+            widget = self.stack.widget(0)
+            self.stack.removeWidget(widget)
+            widget.deleteLater()
+        self.tab_grids.clear()
+
+        # Rebuild UI from JSON
+        for tab_info in app_data:
+            self.add_new_tab(name=tab_info["tab_name"])
+            current_index = self.tab_bar.count() - 1
+            grids_dict = self.tab_grids[current_index]
+
+            for prod_name, manufacturers in tab_info["products"].items():
+                grid_list = grids_dict.get(prod_name, [])
+
+                for grid in grid_list:
+                    grid.clear_rows()
+                    man_data = manufacturers.get(grid.manufacturer_name, [])
+                    for row_data in man_data:
+                        grid.add_row(row_data)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
