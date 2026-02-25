@@ -17,7 +17,6 @@ class CollapsibleBox(QWidget):
         self.toggle_button = QToolButton(text=title, checkable=True, checked=True)
         self.toggle_button.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
         self.toggle_button.setArrowType(Qt.ArrowType.DownArrow)
-        # Fixed azure background by forcing transparent background and removing borders
         self.toggle_button.setStyleSheet("QToolButton { border: none; background: transparent; text-align: left; }")
         self.toggle_button.toggled.connect(self.on_toggled)
         header_layout.addWidget(self.toggle_button)
@@ -30,7 +29,7 @@ class CollapsibleBox(QWidget):
 
         self.content_area = QWidget()
         self.content_layout = QVBoxLayout(self.content_area)
-        self.content_layout.setContentsMargins(20, 0, 0, 0)
+        self.content_layout.setContentsMargins(20, 5, 0, 15)
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -47,7 +46,7 @@ class CollapsibleBox(QWidget):
 class ManufacturerGrid(QFrame):
     def __init__(self):
         super().__init__()
-        self.setFrameShape(QFrame.Shape.Box)
+        self.setFrameShape(QFrame.Shape.StyledPanel)
 
         self.main_layout = QVBoxLayout(self)
         self.main_layout.setContentsMargins(5, 5, 5, 5)
@@ -55,18 +54,27 @@ class ManufacturerGrid(QFrame):
         self.grid_layout = QGridLayout()
         self.main_layout.addLayout(self.grid_layout)
 
+        self.grid_layout.setColumnStretch(0, 3)
+        self.grid_layout.setColumnStretch(1, 2)
+        self.grid_layout.setColumnStretch(2, 2)
+        self.grid_layout.setColumnStretch(3, 1)
+        self.grid_layout.setColumnStretch(4, 1)
+        self.grid_layout.setColumnStretch(5, 1)
+        self.grid_layout.setColumnStretch(6, 0)
+
         self.row_counter = 1
 
-        # Header Row (added an empty header for the delete button column)
         headers = ["Name", "Spec 1", "Spec 2", "Price", "Quantity", "Sub-total", ""]
         for col, header in enumerate(headers):
-            self.grid_layout.addWidget(QLabel(f"<b>{header}</b>"), 0, col)
+            lbl = QLabel(f"<b>{header}</b>")
+            lbl.setAlignment(Qt.AlignmentFlag.AlignCenter if col > 2 else Qt.AlignmentFlag.AlignLeft)
+            self.grid_layout.addWidget(lbl, 0, col)
 
         self.add_row()
 
         self.add_btn = QPushButton("+ Add Row")
-        self.add_btn.clicked.connect(self.add_row)
         self.main_layout.addWidget(self.add_btn, alignment=Qt.AlignmentFlag.AlignLeft)
+        self.add_btn.clicked.connect(self.add_row)
 
     def add_row(self):
         name_edit = QLineEdit()
@@ -83,12 +91,10 @@ class ManufacturerGrid(QFrame):
         subtotal_box.setReadOnly(True)
         subtotal_box.setStyleSheet("background-color: #e0e0e0; color: #555555;")
 
-        # Delete Button
         del_btn = QPushButton("X")
         del_btn.setFixedWidth(30)
         del_btn.setStyleSheet("color: red; font-weight: bold;")
 
-        # Group widgets to manage them easily
         row_widgets = [name_edit, spec1_combo, spec2_combo, price_box, qty_box, subtotal_box, del_btn]
 
         current_row_idx = self.row_counter
@@ -114,7 +120,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("App UI Schema")
-        self.resize(1100, 600)
+        self.resize(950, 600) # Reduced width from 1100 to 950
         self.tab_counter = 1
 
         central_widget = QWidget()
@@ -144,12 +150,11 @@ class MainWindow(QMainWindow):
         main_layout.addWidget(self.stack)
 
         self.add_new_tab(name="Industrial Plant 1")
-        self.add_new_tab(name="Industrial Plant 2")
 
         bottom_layout = QHBoxLayout()
-        btn1 = QPushButton("Button 1")
-        btn2 = QPushButton("Button 2")
-        btn3 = QPushButton("Button 3")
+        btn1 = QPushButton("Load Configuration")
+        btn2 = QPushButton("Save Data")
+        btn3 = QPushButton("Run Calculations")
 
         bottom_layout.addWidget(btn1)
         bottom_layout.addWidget(btn2)
@@ -200,7 +205,7 @@ class MainWindow(QMainWindow):
 
             for man in range(1, 3):
                 man_box = CollapsibleBox(f"Manufacturer {prod}.{man}")
-                man_box.toggle_button.setStyleSheet("QToolButton { border: none; background: transparent; text-align: left; font-size: 14px; font-weight: bold; }")
+                man_box.toggle_button.setStyleSheet("QToolButton { border: none; background: transparent; text-align: left; font-size: 14px; font-weight: bold; color: #333333; }")
                 prod_box.add_widget(man_box)
 
                 grid = ManufacturerGrid()
