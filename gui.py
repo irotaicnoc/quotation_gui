@@ -8,14 +8,25 @@ from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
 from PyQt6.QtCore import Qt
 
 class CollapsibleBox(QWidget):
-    def __init__(self, title="", parent=None):
+    def __init__(self, title="", parent=None, with_browse=False):
         super().__init__(parent)
+
+        # Header Layout
+        header_layout = QHBoxLayout()
+        header_layout.setContentsMargins(0, 0, 0, 0)
+
         self.toggle_button = QToolButton(text=title, checkable=True, checked=True)
         self.toggle_button.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
         self.toggle_button.setArrowType(Qt.ArrowType.DownArrow)
-        self.toggle_button.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-        self.toggle_button.setStyleSheet("QToolButton { border: none; text-align: left; font-size: 14px; }")
+        self.toggle_button.setStyleSheet("QToolButton { border: none; text-align: left; }")
         self.toggle_button.toggled.connect(self.on_toggled)
+        header_layout.addWidget(self.toggle_button)
+
+        if with_browse:
+            self.browse_btn = QPushButton("Browse")
+            header_layout.addWidget(self.browse_btn)
+
+        header_layout.addStretch()
 
         self.content_area = QWidget()
         self.content_layout = QVBoxLayout(self.content_area)
@@ -23,7 +34,7 @@ class CollapsibleBox(QWidget):
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
-        layout.addWidget(self.toggle_button)
+        layout.addLayout(header_layout)
         layout.addWidget(self.content_area)
 
     def on_toggled(self, checked):
@@ -32,6 +43,68 @@ class CollapsibleBox(QWidget):
 
     def add_widget(self, widget):
         self.content_layout.addWidget(widget)
+
+class ManufacturerGrid(QFrame):
+    def __init__(self):
+        super().__init__()
+        self.setFrameShape(QFrame.Shape.Box)
+
+        self.main_layout = QVBoxLayout(self)
+        self.main_layout.setContentsMargins(5, 5, 5, 5)
+
+        self.grid_layout = QGridLayout()
+        self.main_layout.addLayout(self.grid_layout)
+
+        self.row_count = 1
+
+        # Header Row
+        headers = ["Name", "Spec 1", "Spec 2", "Price", "Quantity", "Sub-total"]
+        for col, header in enumerate(headers):
+            self.grid_layout.addWidget(QLabel(f"<b>{header}</b>"), 0, col)
+
+        # Initialize with 1 row
+        self.add_row()
+
+        # Add Row Button
+        self.add_btn = QPushButton("+ Add Row")
+        self.add_btn.clicked.connect(self.add_row)
+        self.main_layout.addWidget(self.add_btn, alignment=Qt.AlignmentFlag.AlignLeft)
+
+    def add_row(self):
+        name_edit = QLineEdit()
+
+        spec1_combo = QComboBox()
+        spec1_combo.addItems(["Type A", "Type B", "Type C"])
+
+        spec2_combo = QComboBox()
+        spec2_combo.addItems(["Material X", "Material Y", "Material Z"])
+
+        price_box = QDoubleSpinBox()
+        price_box.setMaximum(999999.99)
+        price_box.setButtonSymbols(QDoubleSpinBox.ButtonSymbols.NoButtons)
+
+        qty_box = QSpinBox()
+        qty_box.setMaximum(9999)
+
+        subtotal_box = QLineEdit("0.00")
+        subtotal_box.setReadOnly(True)
+        subtotal_box.setStyleSheet("background-color: #e0e0e0; color: #555555;")
+
+        self.grid_layout.addWidget(name_edit, self.row_count, 0)
+        self.grid_layout.addWidget(spec1_combo, self.row_count, 1)
+        self.grid_layout.addWidget(spec2_combo, self.row_count, 2)
+        self.grid_layout.addWidget(price_box, self.row_count, 3)
+        self.grid_layout.addWidget(qty_box, self.row_count, 4)
+        self.grid_layout.addWidget(subtotal_box, self.row_count, 5)
+
+        def update_subtotal(val, p=price_box, q=qty_box, s=subtotal_box):
+            total = p.value() * q.value()
+            s.setText(f"{total:.2f}")
+
+        price_box.valueChanged.connect(update_subtotal)
+        qty_box.valueChanged.connect(update_subtotal)
+
+        self.row_count += 1
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -44,7 +117,6 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(central_widget)
         main_layout = QVBoxLayout(central_widget)
 
-        # 1. Custom Tab Bar Area
         tab_layout = QHBoxLayout()
         tab_layout.setContentsMargins(0, 0, 0, 0)
         tab_layout.setSpacing(2)
@@ -64,14 +136,12 @@ class MainWindow(QMainWindow):
 
         main_layout.addLayout(tab_layout)
 
-        # 2. Content Area
         self.stack = QStackedWidget()
         main_layout.addWidget(self.stack)
 
         self.add_new_tab(name="Industrial Plant 1")
         self.add_new_tab(name="Industrial Plant 2")
 
-        # 3. Bottom Button Bar
         bottom_layout = QHBoxLayout()
         btn1 = QPushButton("Button 1")
         btn2 = QPushButton("Button 2")
@@ -120,64 +190,19 @@ class MainWindow(QMainWindow):
         content_layout = QVBoxLayout(content_widget)
 
         for prod in range(1, 4):
-            prod_box = CollapsibleBox(f"Product {prod}")
-            prod_box.toggle_button.setStyleSheet("QToolButton { border: none; text-align: left; font-size: 16px; font-weight: bold; }")
+            # Added with_browse=True
+            prod_box = CollapsibleBox(f"Product {prod}", with_browse=True)
+            prod_box.toggle_button.setStyleSheet("QToolButton { font-size: 16px; font-weight: bold; }")
             content_layout.addWidget(prod_box)
 
             for man in range(1, 3):
                 man_box = CollapsibleBox(f"Manufacturer {prod}.{man}")
-                man_box.toggle_button.setStyleSheet("QToolButton { border: none; text-align: left; font-size: 14px; font-weight: bold; }")
+                man_box.toggle_button.setStyleSheet("QToolButton { font-size: 14px; font-weight: bold; }")
                 prod_box.add_widget(man_box)
 
-                # Use a single frame and grid layout for the manufacturer's items
-                grid_frame = QFrame()
-                grid_frame.setFrameShape(QFrame.Shape.Box)
-                grid_layout = QGridLayout(grid_frame)
-                grid_layout.setContentsMargins(5, 5, 5, 5)
-
-                # Header Row
-                headers = ["Name", "Spec 1", "Spec 2", "Price", "Quantity", "Sub-total"]
-                for col, header in enumerate(headers):
-                    header_label = QLabel(f"<b>{header}</b>")
-                    grid_layout.addWidget(header_label, 0, col)
-
-                # Data Rows
-                for row in range(1, 4):
-                    name_edit = QLineEdit()
-
-                    spec1_combo = QComboBox()
-                    spec1_combo.addItems(["Type A", "Type B", "Type C"])
-
-                    spec2_combo = QComboBox()
-                    spec2_combo.addItems(["Material X", "Material Y", "Material Z"])
-
-                    price_box = QDoubleSpinBox()
-                    price_box.setMaximum(999999.99)
-                    price_box.setButtonSymbols(QDoubleSpinBox.ButtonSymbols.NoButtons)
-
-                    qty_box = QSpinBox()
-                    qty_box.setMaximum(9999)
-
-                    subtotal_box = QLineEdit("0.00")
-                    subtotal_box.setReadOnly(True)
-                    subtotal_box.setStyleSheet("background-color: #e0e0e0; color: #555555;")
-
-                    grid_layout.addWidget(name_edit, row, 0)
-                    grid_layout.addWidget(spec1_combo, row, 1)
-                    grid_layout.addWidget(spec2_combo, row, 2)
-                    grid_layout.addWidget(price_box, row, 3)
-                    grid_layout.addWidget(qty_box, row, 4)
-                    grid_layout.addWidget(subtotal_box, row, 5)
-
-                    def update_subtotal(val, p=price_box, q=qty_box, s=subtotal_box):
-                        total = p.value() * q.value()
-                        s.setText(f"{total:.2f}")
-
-                    price_box.valueChanged.connect(update_subtotal)
-                    qty_box.valueChanged.connect(update_subtotal)
-
-                # Add the compiled grid frame to the manufacturer box
-                man_box.add_widget(grid_frame)
+                # Use the new custom grid class
+                grid = ManufacturerGrid()
+                man_box.add_widget(grid)
 
         content_layout.addStretch()
         scroll.setWidget(content_widget)
