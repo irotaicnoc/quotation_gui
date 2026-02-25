@@ -2,15 +2,13 @@ import sys
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
                              QHBoxLayout, QPushButton, QScrollArea,
                              QLabel, QFrame, QMessageBox, QToolButton,
-                             QTabBar, QStackedWidget, QSizePolicy)
+                             QTabBar, QStackedWidget, QSizePolicy,
+                             QLineEdit, QSpinBox, QDoubleSpinBox)
 from PyQt6.QtCore import Qt
 
 class CollapsibleBox(QWidget):
-    """A custom widget that provides a foldable section."""
     def __init__(self, title="", parent=None):
         super().__init__(parent)
-
-        # The toggle button
         self.toggle_button = QToolButton(text=title, checkable=True, checked=True)
         self.toggle_button.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
         self.toggle_button.setArrowType(Qt.ArrowType.DownArrow)
@@ -18,32 +16,27 @@ class CollapsibleBox(QWidget):
         self.toggle_button.setStyleSheet("QToolButton { border: none; text-align: left; font-size: 14px; }")
         self.toggle_button.toggled.connect(self.on_toggled)
 
-        # The content area
         self.content_area = QWidget()
         self.content_layout = QVBoxLayout(self.content_area)
-        self.content_layout.setContentsMargins(20, 0, 0, 0) # Indent children
+        self.content_layout.setContentsMargins(20, 0, 0, 0)
 
-        # Main layout
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(self.toggle_button)
         layout.addWidget(self.content_area)
 
     def on_toggled(self, checked):
-        """Updates the arrow and toggles visibility of the content area."""
         self.toggle_button.setArrowType(Qt.ArrowType.DownArrow if checked else Qt.ArrowType.RightArrow)
         self.content_area.setVisible(checked)
 
     def add_widget(self, widget):
-        """Adds a widget to the collapsible content area."""
         self.content_layout.addWidget(widget)
-
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("App UI Schema")
-        self.resize(800, 600)
+        self.resize(1000, 600) # Widened slightly to fit the 6 fields comfortably
         self.tab_counter = 1
 
         central_widget = QWidget()
@@ -74,9 +67,8 @@ class MainWindow(QMainWindow):
         self.stack = QStackedWidget()
         main_layout.addWidget(self.stack)
 
-        self.add_new_tab(name="Tab 1")
-        self.add_new_tab(name="Tab 2")
-        self.add_new_tab(name="Tab 3")
+        self.add_new_tab(name="Industrial Plant 1")
+        self.add_new_tab(name="Industrial Plant 2")
 
         # 3. Bottom Button Bar
         bottom_layout = QHBoxLayout()
@@ -93,7 +85,7 @@ class MainWindow(QMainWindow):
 
     def add_new_tab(self, checked=False, name=None):
         if not isinstance(name, str):
-            name = f"Tab {self.tab_counter}"
+            name = f"Industrial Plant {self.tab_counter}"
 
         new_content = self.create_tab_content()
         self.stack.addWidget(new_content)
@@ -108,15 +100,11 @@ class MainWindow(QMainWindow):
 
     def close_tab(self, index):
         tab_name = self.tab_bar.tabText(index)
-
         reply = QMessageBox.question(
-            self,
-            'Confirm Close',
-            f"Are you sure you want to close {tab_name}?",
+            self, 'Confirm Close', f"Are you sure you want to close {tab_name}?",
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
             QMessageBox.StandardButton.No
         )
-
         if reply == QMessageBox.StandardButton.Yes:
             self.tab_bar.removeTab(index)
             widget_to_remove = self.stack.widget(index)
@@ -130,25 +118,48 @@ class MainWindow(QMainWindow):
         content_widget = QWidget()
         content_layout = QVBoxLayout(content_widget)
 
-        for cat in range(1, 4):
-            cat_box = CollapsibleBox(f"Category {cat}")
-            cat_box.toggle_button.setStyleSheet("QToolButton { border: none; text-align: left; font-size: 16px; font-weight: bold; }")
-            content_layout.addWidget(cat_box)
+        for prod in range(1, 4):
+            prod_box = CollapsibleBox(f"Product {prod}")
+            prod_box.toggle_button.setStyleSheet("QToolButton { border: none; text-align: left; font-size: 16px; font-weight: bold; }")
+            content_layout.addWidget(prod_box)
 
-            for subcat in range(1, 3):
-                subcat_box = CollapsibleBox(f"Subcategory {cat}.{subcat}")
-                subcat_box.toggle_button.setStyleSheet("QToolButton { border: none; text-align: left; font-size: 14px; font-weight: bold; }")
-                cat_box.add_widget(subcat_box)
+            for man in range(1, 3):
+                man_box = CollapsibleBox(f"Manufacturer {prod}.{man}")
+                man_box.toggle_button.setStyleSheet("QToolButton { border: none; text-align: left; font-size: 14px; font-weight: bold; }")
+                prod_box.add_widget(man_box)
 
                 for row in range(1, 4):
                     row_frame = QFrame()
                     row_frame.setFrameShape(QFrame.Shape.Box)
-
                     row_layout = QHBoxLayout(row_frame)
                     row_layout.setContentsMargins(5, 5, 5, 5)
-                    row_layout.addWidget(QLabel(f"Row {row}, with many fields"))
 
-                    subcat_box.add_widget(row_frame)
+                    # 6 Fields added here
+                    row_layout.addWidget(QLabel("Name:"))
+                    row_layout.addWidget(QLineEdit())
+
+                    row_layout.addWidget(QLabel("Spec 1:"))
+                    row_layout.addWidget(QLineEdit())
+
+                    row_layout.addWidget(QLabel("Spec 2:"))
+                    row_layout.addWidget(QLineEdit())
+
+                    row_layout.addWidget(QLabel("Price:"))
+                    price_box = QDoubleSpinBox()
+                    price_box.setMaximum(999999.99)
+                    row_layout.addWidget(price_box)
+
+                    row_layout.addWidget(QLabel("Quantity:"))
+                    qty_box = QSpinBox()
+                    qty_box.setMaximum(9999)
+                    row_layout.addWidget(qty_box)
+
+                    row_layout.addWidget(QLabel("Sub-total:"))
+                    subtotal_box = QLineEdit("0.00")
+                    subtotal_box.setReadOnly(True)
+                    row_layout.addWidget(subtotal_box)
+
+                    man_box.add_widget(row_frame)
 
         content_layout.addStretch()
         scroll.setWidget(content_widget)
