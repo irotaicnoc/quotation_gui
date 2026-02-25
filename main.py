@@ -231,10 +231,9 @@ class MainWindow(QMainWindow):
         tab_name = self.tab_bar.tabText(index)
         reply = QMessageBox.question(
             self,
-            title='Confirm',
-            text=f"Close {tab_name}?",
-            buttons=QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-            defaultButton=QMessageBox.StandardButton.No,
+            'Confirm',
+            f"Close {tab_name}?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
         )
 
         if reply == QMessageBox.StandardButton.Yes:
