@@ -1,8 +1,5 @@
 https://github.com/irotaicnoc/quotation_gui/tree/pyqt6
 
-
-metti modo per cambiare tema nella GUI
-
 PyInstaller command to create a standalone executable for the GUI application:
     pyinstaller --noconsole --onefile --icon="assets/app_icon.ico" --add-data "assets;assets" --name "Stima Impianti" gui.py
 
