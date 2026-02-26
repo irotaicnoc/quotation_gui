@@ -222,6 +222,25 @@ class MainWindow(QMainWindow):
         tab_layout.setSpacing(5)
 
         self.tab_bar = QTabBar()
+        self.tab_bar.setStyleSheet("""
+            QTabBar::tab {
+                background: rgba(150, 150, 150, 0.15);
+                border: 1px solid rgba(150, 150, 150, 0.3);
+                border-bottom: none;
+                border-top-left-radius: 10px;
+                border-top-right-radius: 10px;
+                min-width: 120px;
+                padding: 6px 15px;
+                margin-right: 2px;
+            }
+            QTabBar::tab:selected {
+                background: transparent; 
+                border-top: 2px solid #3B82F6; 
+            }
+            QTabBar::tab:hover:!selected {
+                background: rgba(150, 150, 150, 0.25);
+            }
+        """)
         self.tab_bar.setTabsClosable(True)
         self.tab_bar.tabCloseRequested.connect(self.close_tab)
         self.tab_bar.currentChanged.connect(self.change_tab)
