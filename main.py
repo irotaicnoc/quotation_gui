@@ -240,6 +240,14 @@ class MainWindow(QMainWindow):
             QTabBar::tab:hover:!selected {
                 background: rgba(150, 150, 150, 0.25);
             }
+            QTabBar::close-button {
+                margin-right: 6px;
+                margin-bottom: -3px; /* Positive value moves it up, negative moves it down relative to center */
+            }
+            QTabBar::close-button:hover {
+                background: rgba(255, 85, 85, 0.5);
+                border-radius: 4px;
+            }
         """)
         self.tab_bar.setTabsClosable(True)
         self.tab_bar.tabCloseRequested.connect(self.close_tab)
@@ -247,7 +255,7 @@ class MainWindow(QMainWindow):
 
         self.add_btn = QToolButton()
         self.add_btn.setText("+")
-        self.add_btn.setStyleSheet("font-size: 20px; font-weight: bold;")
+        self.add_btn.setStyleSheet("font-size: 20px; font-weight: bold")
         self.add_btn.clicked.connect(lambda checked: self.add_new_tab())
 
         tab_layout.addWidget(self.tab_bar)
