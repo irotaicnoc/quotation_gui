@@ -14,23 +14,35 @@ ManufacturerGrid {
 QTabBar::tab {
     background: rgba(150, 150, 150, 0.15);
     border: 1px solid rgba(150, 150, 150, 0.3);
+    border-style: solid; /* Forces Qt to acknowledge the custom border */
     border-bottom: none;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
     min-width: 120px;
-    padding: 6px 15px;
+    padding: 6px 25px 6px 15px; /* 25px right padding ensures permanent space for the 'x' */
     margin-right: 2px;
 }
+
+/* Force corners on the selected state */
 QTabBar::tab:selected {
     background: transparent;
     border-top: 2px solid #3B82F6;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+/* Force corners on unselected and hover states */
+QTabBar::tab:!selected, QTabBar::tab:hover {
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
 }
 QTabBar::tab:hover:!selected {
     background: rgba(150, 150, 150, 0.25);
 }
+/* Strictly anchored Close Button */
 QTabBar::close-button {
-    margin-right: 6px;
-    margin-bottom: -3px;
+    subcontrol-position: right center;
+    subcontrol-origin: padding; /* Anchors inside the 25px padding we defined above */
+    right: 4px; /* Exact distance from the padding edge */
 }
 QTabBar::close-button:hover {
     background: rgba(255, 85, 85, 0.5);

@@ -212,6 +212,7 @@ class MainWindow(QMainWindow):
 
         self.tab_bar = QTabBar()
         self.tab_bar.setTabsClosable(True)
+        self.tab_bar.setExpanding(False)
         self.tab_bar.tabCloseRequested.connect(self.close_tab)
         self.tab_bar.currentChanged.connect(self.change_tab)
 
