@@ -1,0 +1,97 @@
+/* Scroll Area */
+QScrollArea {
+    border: none;
+}
+
+/* Manufacturer Grid Card */
+ManufacturerGrid {
+    background-color: rgba(150, 150, 150, 0.08);
+    border: 1px solid rgba(150, 150, 150, 0.15);
+    border-radius: 8px;
+}
+
+/* Chrome-like Tabs */
+QTabBar::tab {
+    background: rgba(150, 150, 150, 0.15);
+    border: 1px solid rgba(150, 150, 150, 0.3);
+    border-bottom: none;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    min-width: 120px;
+    padding: 6px 15px;
+    margin-right: 2px;
+}
+QTabBar::tab:selected {
+    background: transparent;
+    border-top: 2px solid #3B82F6;
+}
+QTabBar::tab:hover:!selected {
+    background: rgba(150, 150, 150, 0.25);
+}
+QTabBar::close-button {
+    margin-right: 6px;
+    margin-bottom: -3px;
+}
+QTabBar::close-button:hover {
+    background: rgba(255, 85, 85, 0.5);
+    border-radius: 4px;
+}
+
+/* Collapsible Box Generic Header */
+QToolButton#collapsible_header {
+    border: none;
+    background: transparent;
+    text-align: left;
+    padding: 4px;
+    border-radius: 4px;
+}
+QToolButton#collapsible_header:hover {
+    background: rgba(150, 150, 150, 0.1);
+}
+
+/* Product Specific Header */
+QToolButton#product_header {
+    border: none;
+    background: rgba(150, 150, 150, 0.1);
+    text-align: left;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 8px;
+    border-radius: 6px;
+}
+QToolButton#product_header:hover {
+    background: rgba(150, 150, 150, 0.15);
+}
+
+/* Manufacturer Specific Header */
+QToolButton#manufacturer_header {
+    border: none;
+    background: transparent;
+    text-align: left;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 6px;
+    border-radius: 4px;
+}
+QToolButton#manufacturer_header:hover {
+    background: rgba(150, 150, 150, 0.1);
+}
+
+/* Buttons */
+QPushButton#delete_row_btn {
+    color: #ef4444;
+    font-weight: bold;
+    border-radius: 4px;
+}
+QPushButton#add_row_btn {
+    font-size: 14px;
+    font-weight: bold;
+}
+QToolButton#add_tab_btn {
+    font-size: 20px;
+    font-weight: bold;
+}
+QPushButton#calc_btn {
+    font-weight: bold;
+    padding: 6px 12px;
+}

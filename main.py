@@ -10,6 +10,14 @@ import data_manager
 from localization import tr, set_language
 
 
+def load_stylesheet():
+    try:
+        with open("style.qss", "r") as f:
+            return f.read()
+    except FileNotFoundError:
+        return ""
+
+
 class CollapsibleBox(QWidget):
     def __init__(self, title_key="", title_args=None, parent=None, with_browse=False):
         super().__init__(parent)
@@ -21,18 +29,7 @@ class CollapsibleBox(QWidget):
         self.toggle_button = QToolButton(checkable=True, checked=True)
         self.toggle_button.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
         self.toggle_button.setArrowType(Qt.ArrowType.DownArrow)
-        self.toggle_button.setStyleSheet("""
-            QToolButton { 
-                border: none; 
-                background: transparent; 
-                text-align: left; 
-                padding: 4px;
-                border-radius: 4px;
-            }
-            QToolButton:hover {
-                background: rgba(150, 150, 150, 0.1);
-            }
-        """)
+        self.toggle_button.setObjectName("collapsible_header")
         self.toggle_button.toggled.connect(self.on_toggled)
         header_layout.addWidget(self.toggle_button)
 
@@ -67,7 +64,6 @@ class CollapsibleBox(QWidget):
         if self.browse_btn:
             self.browse_btn.setText(tr("browse"))
 
-        # Retranslate children
         for i in range(self.content_layout.count()):
             widget = self.content_layout.itemAt(i).widget()
             if hasattr(widget, "retranslate_ui"):
@@ -79,14 +75,6 @@ class ManufacturerGrid(QFrame):
         super().__init__()
         self.manufacturer_name = manufacturer_name
         self.setFrameShape(QFrame.Shape.StyledPanel)
-
-        self.setStyleSheet("""
-            ManufacturerGrid {
-                background-color: rgba(150, 150, 150, 0.08);
-                border: 1px solid rgba(150, 150, 150, 0.15);
-                border-radius: 8px;
-            }
-        """)
 
         self.main_layout = QVBoxLayout(self)
         self.main_layout.setContentsMargins(15, 15, 15, 15)
@@ -114,6 +102,7 @@ class ManufacturerGrid(QFrame):
             self.header_labels.append((lbl, key))
 
         self.add_btn = QPushButton()
+        self.add_btn.setObjectName("add_row_btn")
         self.main_layout.addWidget(self.add_btn, alignment=Qt.AlignmentFlag.AlignLeft)
         self.add_btn.clicked.connect(self.add_row)
 
@@ -135,7 +124,7 @@ class ManufacturerGrid(QFrame):
 
         del_btn = QPushButton("X")
         del_btn.setFixedWidth(30)
-        del_btn.setStyleSheet("color: #ef4444; font-weight: bold; border-radius: 4px;")
+        del_btn.setObjectName("delete_row_btn")
 
         if data:
             name_edit.setText(data.get("name", ""))
@@ -168,9 +157,9 @@ class ManufacturerGrid(QFrame):
             subtotal_box.setText(f"{s:.2f}")
 
         def delete_this_row():
-            for widget in row_widgets:
-                self.grid_layout.removeWidget(widget)
-                widget.deleteLater()
+            for _widget in row_widgets:
+                self.grid_layout.removeWidget(_widget)
+                _widget.deleteLater()
             if row_dict in self.active_rows:
                 self.active_rows.remove(row_dict)
 
@@ -222,47 +211,19 @@ class MainWindow(QMainWindow):
         tab_layout.setSpacing(5)
 
         self.tab_bar = QTabBar()
-        self.tab_bar.setStyleSheet("""
-            QTabBar::tab {
-                background: rgba(150, 150, 150, 0.15);
-                border: 1px solid rgba(150, 150, 150, 0.3);
-                border-bottom: none;
-                border-top-left-radius: 10px;
-                border-top-right-radius: 10px;
-                min-width: 120px;
-                padding: 6px 15px;
-                margin-right: 2px;
-            }
-            QTabBar::tab:selected {
-                background: transparent; 
-                border-top: 2px solid #3B82F6; 
-            }
-            QTabBar::tab:hover:!selected {
-                background: rgba(150, 150, 150, 0.25);
-            }
-            QTabBar::close-button {
-                margin-right: 6px;
-                margin-bottom: -3px; /* Positive value moves it up, negative moves it down relative to center */
-            }
-            QTabBar::close-button:hover {
-                background: rgba(255, 85, 85, 0.5);
-                border-radius: 4px;
-            }
-        """)
         self.tab_bar.setTabsClosable(True)
         self.tab_bar.tabCloseRequested.connect(self.close_tab)
         self.tab_bar.currentChanged.connect(self.change_tab)
 
         self.add_btn = QToolButton()
         self.add_btn.setText("+")
-        self.add_btn.setStyleSheet("font-size: 20px; font-weight: bold")
+        self.add_btn.setObjectName("add_tab_btn")
         self.add_btn.clicked.connect(lambda checked: self.add_new_tab())
 
         tab_layout.addWidget(self.tab_bar)
         tab_layout.addWidget(self.add_btn)
         tab_layout.addStretch()
 
-        # --- Theme Switcher ---
         self.lbl_theme = QLabel()
         tab_layout.addWidget(self.lbl_theme)
 
@@ -270,7 +231,6 @@ class MainWindow(QMainWindow):
         self.theme_combo.currentTextChanged.connect(self.apply_theme)
         tab_layout.addWidget(self.theme_combo)
 
-        # --- Language Switcher ---
         self.lbl_lang = QLabel()
         tab_layout.addWidget(self.lbl_lang)
 
@@ -295,8 +255,8 @@ class MainWindow(QMainWindow):
         self.btn_save.clicked.connect(self.handle_save)
 
         self.btn_calc = QPushButton()
+        self.btn_calc.setObjectName("calc_btn")
         self.btn_calc.clicked.connect(self.run_calculations)
-        self.btn_calc.setStyleSheet("font-weight: bold; padding: 6px 12px;")
 
         bottom_layout.addWidget(self.btn_load)
         bottom_layout.addWidget(self.btn_save)
@@ -310,13 +270,14 @@ class MainWindow(QMainWindow):
 
     @staticmethod
     def apply_theme(t):
-        # Map localized text back to English keys for qdarktheme
         theme_map = {tr("system"): "auto", tr("light"): "light", tr("dark"): "dark"}
         theme_name = theme_map.get(t, "auto")
+
         qdarktheme.setup_theme(
             theme_name,
             corner_shape="rounded",
-            custom_colors={"primary": "#3B82F6"}
+            custom_colors={"primary": "#3B82F6"},
+            additional_qss=load_stylesheet()
         )
 
     def change_language(self, index):
@@ -331,7 +292,6 @@ class MainWindow(QMainWindow):
         new_content, grids_dict = self.create_tab_content()
         self.stack.addWidget(new_content)
 
-        # Store base key and number for dynamic translation of tabs
         tab_name = f"{tr(base_key)} {number}"
         index = self.tab_bar.addTab(tab_name)
 
@@ -376,7 +336,6 @@ class MainWindow(QMainWindow):
     def create_tab_content():
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
-        scroll.setStyleSheet("QScrollArea { border: none; }")
 
         content_widget = QWidget()
         content_layout = QVBoxLayout(content_widget)
@@ -386,43 +345,17 @@ class MainWindow(QMainWindow):
         grids_dict = {}
 
         for prod in range(1, 4):
-            prod_name = f"Product {prod}"  # Internal key
+            prod_name = f"Product {prod}"
             prod_box = CollapsibleBox("product", [str(prod)], with_browse=True)
-            prod_box.toggle_button.setStyleSheet("""
-                QToolButton { 
-                    border: none; 
-                    background: rgba(150, 150, 150, 0.1); 
-                    text-align: left; 
-                    font-size: 16px; 
-                    font-weight: bold; 
-                    padding: 8px;
-                    border-radius: 6px;
-                }
-                QToolButton:hover {
-                    background: rgba(150, 150, 150, 0.15);
-                }
-            """)
+            prod_box.toggle_button.setObjectName("product_header")
             content_layout.addWidget(prod_box)
 
             grids_dict[prod_name] = []
 
             for man in range(1, 3):
-                man_name = f"Manufacturer {prod}.{man}"  # Internal key
+                man_name = f"Manufacturer {prod}.{man}"
                 man_box = CollapsibleBox("manufacturer", [f"{prod}.{man}"])
-                man_box.toggle_button.setStyleSheet("""
-                    QToolButton { 
-                        border: none; 
-                        background: transparent; 
-                        text-align: left; 
-                        font-size: 14px; 
-                        font-weight: bold; 
-                        padding: 6px;
-                        border-radius: 4px;
-                    }
-                    QToolButton:hover {
-                        background: rgba(150, 150, 150, 0.1);
-                    }
-                """)
+                man_box.toggle_button.setObjectName("manufacturer_header")
                 prod_box.add_widget(man_box)
 
                 grid = ManufacturerGrid(man_name)
@@ -472,7 +405,6 @@ class MainWindow(QMainWindow):
         self.tab_base_names.clear()
 
         for tab_info in app_data:
-            # Basic fallback for loaded names, you might need a more complex parser if names are heavily custom
             self.add_new_tab(base_key="industrial_plant", number=self.tab_counter)
             current_index = self.tab_bar.count() - 1
             grids_dict = self.tab_grids[current_index]
@@ -516,7 +448,6 @@ class MainWindow(QMainWindow):
         self.lbl_theme.setText(tr("theme"))
         self.lbl_lang.setText(tr("language"))
 
-        # Update theme combo items without triggering the index change signal
         current_theme_idx = self.theme_combo.currentIndex()
         self.theme_combo.blockSignals(True)
         self.theme_combo.clear()
@@ -528,12 +459,10 @@ class MainWindow(QMainWindow):
         self.btn_save.setText(tr("save_data"))
         self.btn_calc.setText(tr("run_calc"))
 
-        # Update Tab Names
         for i in range(self.tab_bar.count()):
             base_key, number = self.tab_base_names.get(i, ("industrial_plant", i+1))
             self.tab_bar.setTabText(i, f"{tr(base_key)} {number}")
 
-        # Trigger retranslate on all dynamic widgets inside the stack
         for i in range(self.stack.count()):
             scroll_area = self.stack.widget(i)
             content_widget = scroll_area.widget()
@@ -546,7 +475,12 @@ class MainWindow(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    qdarktheme.setup_theme("auto", corner_shape="rounded", custom_colors={"primary": "#3B82F6"})
+    qdarktheme.setup_theme(
+        "auto",
+        corner_shape="rounded",
+        custom_colors={"primary": "#3B82F6"},
+        additional_qss=load_stylesheet(),
+    )
     window = MainWindow()
     window.show()
     sys.exit(app.exec())
