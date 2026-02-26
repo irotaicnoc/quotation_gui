@@ -228,6 +228,7 @@ class MainWindow(QMainWindow):
 
         self.add_btn = QToolButton()
         self.add_btn.setText("+")
+        self.add_btn.setStyleSheet("font-size: 20px; font-weight: bold;")
         self.add_btn.clicked.connect(lambda checked: self.add_new_tab())
 
         tab_layout.addWidget(self.tab_bar)
