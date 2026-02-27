@@ -8,7 +8,7 @@ from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QH
 import utils
 import calculator
 import data_manager
-from localization import tr, set_language
+from localization import translate, set_language
 
 
 class CollapsibleBox(QWidget):
@@ -52,10 +52,10 @@ class CollapsibleBox(QWidget):
         self.content_layout.addWidget(widget)
 
     def retranslate_ui(self):
-        title_text = f"{tr(self.title_key)} {' '.join(self.title_args)}" if self.title_args else tr(self.title_key)
+        title_text = f"{translate(self.title_key)} {' '.join(self.title_args)}" if self.title_args else translate(self.title_key)
         self.toggle_button.setText(title_text)
         if self.browse_btn:
-            self.browse_btn.setText(tr("browse"))
+            self.browse_btn.setText(translate("browse"))
 
         for i in range(self.content_layout.count()):
             widget = self.content_layout.itemAt(i).widget()
@@ -182,8 +182,8 @@ class ManufacturerGrid(QFrame):
     def retranslate_ui(self):
         for lbl, key in self.header_labels:
             if key != "empty":
-                lbl.setText(f"<b>{tr(key)}</b>")
-        self.add_btn.setText(tr("add_row"))
+                lbl.setText(f"<b>{translate(key)}</b>")
+        self.add_btn.setText(translate("add_row"))
 
 
 class MainWindow(QMainWindow):
@@ -266,7 +266,7 @@ class MainWindow(QMainWindow):
 
     @staticmethod
     def apply_theme(t):
-        theme_map = {tr("system"): "auto", tr("light"): "light", tr("dark"): "dark"}
+        theme_map = {translate("system"): "auto", translate("light"): "light", translate("dark"): "dark"}
         theme_name = theme_map.get(t, "auto")
 
         qdarktheme.setup_theme(
@@ -288,7 +288,7 @@ class MainWindow(QMainWindow):
         new_content, grids_dict = self.create_tab_content()
         self.stack.addWidget(new_content)
 
-        tab_name = f"{tr(base_key)} {number}"
+        tab_name = f"{translate(base_key)} {number}"
         index = self.tab_bar.addTab(tab_name)
 
         self.tab_grids[index] = grids_dict
@@ -303,11 +303,11 @@ class MainWindow(QMainWindow):
 
     def close_tab(self, index):
         tab_name = self.tab_bar.tabText(index)
-        msg_text = tr("close_prompt").replace("{tab_name}", tab_name)
+        msg_text = translate("close_prompt").replace("{tab_name}", tab_name)
 
         reply = QMessageBox.question(
             self,
-            tr("confirm"),
+            translate("confirm"),
             msg_text,
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
             )
@@ -364,7 +364,7 @@ class MainWindow(QMainWindow):
         return scroll, grids_dict
 
     def handle_save(self):
-        file_path, _ = QFileDialog.getSaveFileName(self, tr("save_dialog"), "", "JSON Files (*.json)")
+        file_path, _ = QFileDialog.getSaveFileName(self, translate("save_dialog"), "", "JSON Files (*.json)")
         if not file_path:
             return
 
@@ -382,14 +382,14 @@ class MainWindow(QMainWindow):
         data_manager.save_to_json(file_path, app_data)
 
     def handle_load(self):
-        file_path, _ = QFileDialog.getOpenFileName(self, tr("load_dialog"), "", "JSON Files (*.json)")
+        file_path, _ = QFileDialog.getOpenFileName(self, translate("load_dialog"), "", "JSON Files (*.json)")
         if not file_path:
             return
 
         try:
             app_data = data_manager.load_from_json(file_path)
         except Exception as e:
-            QMessageBox.critical(self, tr("error"), f"{tr('could_not_load')}{e}")
+            QMessageBox.critical(self, translate("error"), f"{translate('could_not_load')}{e}")
             return
 
         while self.tab_bar.count() > 0:
@@ -428,36 +428,36 @@ class MainWindow(QMainWindow):
 
         plant_totals, grand_total = calculator.calculate_totals(app_data)
 
-        result_text = f"<b>{tr('plant_totals')}</b><br>"
+        result_text = f"<b>{translate('plant_totals')}</b><br>"
         for plant, total in plant_totals.items():
             result_text += f"{plant}: ${total:,.2f}<br>"
 
-        result_text += f"<br><b>{tr('grand_total')} ${grand_total:,.2f}</b>"
+        result_text += f"<br><b>{translate('grand_total')} ${grand_total:,.2f}</b>"
 
         msg = QMessageBox(self)
-        msg.setWindowTitle(tr("calc_results"))
+        msg.setWindowTitle(translate("calc_results"))
         msg.setText(result_text)
         msg.exec()
 
     def retranslate_ui(self):
-        self.setWindowTitle(tr("app_title"))
-        self.lbl_theme.setText(tr("theme"))
-        self.lbl_lang.setText(tr("language"))
+        self.setWindowTitle(translate("app_title"))
+        self.lbl_theme.setText(translate("theme"))
+        self.lbl_lang.setText(translate("language"))
 
         current_theme_idx = self.theme_combo.currentIndex()
         self.theme_combo.blockSignals(True)
         self.theme_combo.clear()
-        self.theme_combo.addItems([tr("system"), tr("light"), tr("dark")])
+        self.theme_combo.addItems([translate("system"), translate("light"), translate("dark")])
         self.theme_combo.setCurrentIndex(current_theme_idx if current_theme_idx >= 0 else 0)
         self.theme_combo.blockSignals(False)
 
-        self.btn_load.setText(tr("load_config"))
-        self.btn_save.setText(tr("save_data"))
-        self.btn_calc.setText(tr("run_calc"))
+        self.btn_load.setText(translate("load_config"))
+        self.btn_save.setText(translate("save_data"))
+        self.btn_calc.setText(translate("run_calc"))
 
         for i in range(self.tab_bar.count()):
             base_key, number = self.tab_base_names.get(i, ("industrial_plant", i+1))
-            self.tab_bar.setTabText(i, f"{tr(base_key)} {number}")
+            self.tab_bar.setTabText(i, f"{translate(base_key)} {number}")
 
         for i in range(self.stack.count()):
             scroll_area = self.stack.widget(i)

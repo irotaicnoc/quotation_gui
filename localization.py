@@ -74,5 +74,5 @@ def set_language(lang_code):
         CURRENT_LANG = lang_code
 
 
-def tr(key):
+def translate(key):
     return TRANSLATIONS.get(CURRENT_LANG, {}).get(key, key)
