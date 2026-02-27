@@ -69,7 +69,6 @@ QPushButton#delete_row_btn {
 }
 QPushButton#add_row_btn {
     font-size: 14px;
-    font-weight: bold;
 }
 QToolButton#add_tab_btn {
     font-size: 20px;
