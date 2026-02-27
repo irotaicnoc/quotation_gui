@@ -5,17 +5,10 @@ from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QH
                              QLabel, QFrame, QMessageBox, QToolButton, QTabBar, QStackedWidget, QLineEdit, QSpinBox,
                              QDoubleSpinBox, QComboBox, QGridLayout, QFileDialog)
 
+import utils
 import calculator
 import data_manager
 from localization import tr, set_language
-
-
-def load_stylesheet():
-    try:
-        with open("style.qss", "r") as f:
-            return f.read()
-    except FileNotFoundError:
-        return ""
 
 
 class CollapsibleBox(QWidget):
@@ -213,6 +206,8 @@ class MainWindow(QMainWindow):
         self.tab_bar = QTabBar()
         self.tab_bar.setTabsClosable(True)
         self.tab_bar.setExpanding(False)
+        # Widget-level style overrides app-level qdarktheme styles
+        self.tab_bar.setStyleSheet(utils.load_stylesheet("tab_style.qss"))
         self.tab_bar.tabCloseRequested.connect(self.close_tab)
         self.tab_bar.currentChanged.connect(self.change_tab)
 
@@ -278,7 +273,7 @@ class MainWindow(QMainWindow):
             theme_name,
             corner_shape="rounded",
             custom_colors={"primary": "#3B82F6"},
-            additional_qss=load_stylesheet()
+            additional_qss=utils.load_stylesheet("style.qss"),
         )
 
     def change_language(self, index):
@@ -480,7 +475,7 @@ if __name__ == "__main__":
         "auto",
         corner_shape="rounded",
         custom_colors={"primary": "#3B82F6"},
-        additional_qss=load_stylesheet(),
+        additional_qss=utils.load_stylesheet("style.qss"),
     )
     window = MainWindow()
     window.show()
