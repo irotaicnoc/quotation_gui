@@ -12,5 +12,6 @@ CHIEDI
 
 
 
-Hello! This is the GUI of an application I am creating. Can you help me switch it to use pyqtdarktheme without changing its functionalities? Is it free right?
+Hello! This is the GUI for an application I am creating.
+
 
