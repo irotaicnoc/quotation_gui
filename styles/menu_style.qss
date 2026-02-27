@@ -1,0 +1,7 @@
+/* QComboBox Dropdown Menu */
+QComboBox QAbstractItemView {
+    border: 1px solid rgba(150, 150, 150, 0.6);
+    border-radius: 4px;
+    outline: 0px;
+    padding: 2px;
+}
