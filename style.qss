@@ -78,7 +78,7 @@ QToolButton#product_header:hover {
 /* Manufacturer Specific Header */
 QToolButton#manufacturer_header {
     border: none;
-    background: transparent;
+    background: rgba(150, 150, 150, 0.1);
     text-align: left;
     font-size: 14px;
     font-weight: bold;
@@ -86,7 +86,7 @@ QToolButton#manufacturer_header {
     border-radius: 4px;
 }
 QToolButton#manufacturer_header:hover {
-    background: rgba(150, 150, 150, 0.1);
+    background: rgba(150, 150, 150, 0.15);
 }
 
 /* Buttons */
