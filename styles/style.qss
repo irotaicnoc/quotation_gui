@@ -14,10 +14,10 @@ ManufacturerGrid {
 QTabBar::close-button {
     subcontrol-position: right center;
     subcontrol-origin: padding; /* Anchors inside the 25px padding we defined above */
-    right: 4px; /* Exact distance from the padding edge */
+    margin-right: 4px; /* Exact distance from the padding edge */
 }
 QTabBar::close-button:hover {
-    background: rgba(255, 85, 85, 0.5);
+    background: rgba(255, 85, 85, 0.6);
     border-radius: 4px;
 }
 
@@ -63,7 +63,7 @@ QToolButton#manufacturer_header:hover {
 
 /* Buttons */
 QPushButton#delete_row_btn {
-    color: #ef4444;
+    color: rgba(255, 85, 85, 0.6);
     font-weight: bold;
     border-radius: 4px;
 }
