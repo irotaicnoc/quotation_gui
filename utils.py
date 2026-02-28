@@ -8,8 +8,10 @@ def load_stylesheet(file_name="style.qss"):
 
     # Check if running as a PyInstaller bundle
     if getattr(sys, 'frozen', False):
+        # case PyInstaller
         base_path = sys._MEIPASS
     else:
+        # case non-PyInstaller
         base_path = os.path.abspath(".")
 
     # Build the correct absolute path
