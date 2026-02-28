@@ -3,6 +3,7 @@ https://github.com/irotaicnoc/quotation_gui/tree/pyqt6
 
 import excel? data
 export SAP
+qual è la differenza fra usare e non usare --windowed?
 
 
 PyInstaller command to create a standalone executable for the GUI application:
