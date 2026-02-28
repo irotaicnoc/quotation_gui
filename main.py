@@ -226,6 +226,7 @@ class MainWindow(QMainWindow):
         tab_layout.addWidget(self.lbl_theme)
 
         self.theme_combo = QComboBox()
+        self.theme_combo.setStyleSheet(utils.load_stylesheet("menu_style.qss"))
         self.theme_combo.currentTextChanged.connect(self.apply_theme)
         tab_layout.addWidget(self.theme_combo)
 
@@ -233,6 +234,7 @@ class MainWindow(QMainWindow):
         tab_layout.addWidget(self.lbl_lang)
 
         self.lang_combo = QComboBox()
+        self.lang_combo.setStyleSheet(utils.load_stylesheet("menu_style.qss"))
         self.lang_combo.addItems(["English", "Italiano"])
         self.lang_combo.currentIndexChanged.connect(self.change_language)
         tab_layout.addWidget(self.lang_combo)
