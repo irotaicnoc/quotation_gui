@@ -1,6 +1,5 @@
 https://github.com/irotaicnoc/quotation_gui/tree/pyqt6
 
-
 import excel? data
 export SAP
 
