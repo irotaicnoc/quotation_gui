@@ -104,11 +104,11 @@ class ManufacturerGrid(QFrame):
     def add_row(self, data=None):
         name_edit = QLineEdit()
         spec1_combo = QComboBox()
-        spec1_combo.addItems(["", "Type A", "Type B", "Type C"])
         spec1_combo.setStyleSheet(utils.load_stylesheet("menu_style.qss"))
+        spec1_combo.addItems(["", "Type A", "Type B", "Type C"])
         spec2_combo = QComboBox()
-        spec2_combo.addItems(["", "Material X", "Material Y", "Material Z"])
         spec2_combo.setStyleSheet(utils.load_stylesheet("menu_style.qss"))
+        spec2_combo.addItems(["", "Material X", "Material Y", "Material Z"])
         price_box = QDoubleSpinBox()
         price_box.setMaximum(999999.99)
         price_box.setButtonSymbols(QDoubleSpinBox.ButtonSymbols.NoButtons)
