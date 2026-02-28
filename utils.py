@@ -4,19 +4,18 @@ import sys
 import config
 
 
-def load_stylesheet(file_name="style.qss"):
-
-    # Check if running as a PyInstaller bundle
+def resource_path(relative_path):
+    """Get absolute path to resource, works for dev and for PyInstaller"""
     if getattr(sys, 'frozen', False):
-        # case PyInstaller
         base_path = sys._MEIPASS
     else:
-        # case non-PyInstaller
         base_path = os.path.abspath(".")
 
-    # Build the correct absolute path
-    file_path = os.path.join(base_path, config.style_folder_path, file_name)
+    return os.path.join(base_path, relative_path)
 
+
+def load_stylesheet(file_name="style.qss"):
+    file_path = resource_path(os.path.join(config.styles_folder_path, file_name))
     try:
         with open(file_path, "r") as f:
             return f.read()

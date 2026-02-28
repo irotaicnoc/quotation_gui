@@ -6,6 +6,7 @@ from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QH
                              QLabel, QFrame, QMessageBox, QToolButton, QTabBar, QStackedWidget, QLineEdit, QSpinBox,
                              QDoubleSpinBox, QComboBox, QGridLayout, QFileDialog)
 
+import config
 import utils
 import calculator
 import data_manager
@@ -105,10 +106,10 @@ class ManufacturerGrid(QFrame):
     def add_row(self, data=None):
         name_edit = QLineEdit()
         spec1_combo = QComboBox()
-        spec1_combo.setStyleSheet(utils.load_stylesheet("menu_style.qss"))
+        spec1_combo.setStyleSheet(utils.load_stylesheet(config.menu_custom_style_name))
         spec1_combo.addItems(["", "Type A", "Type B", "Type C"])
         spec2_combo = QComboBox()
-        spec2_combo.setStyleSheet(utils.load_stylesheet("menu_style.qss"))
+        spec2_combo.setStyleSheet(utils.load_stylesheet(config.menu_custom_style_name))
         spec2_combo.addItems(["", "Material X", "Material Y", "Material Z"])
         price_box = QDoubleSpinBox()
         price_box.setMaximum(999999.99)
@@ -192,7 +193,8 @@ class ManufacturerGrid(QFrame):
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowIcon(QIcon("assets/app_icon.ico"))
+        icon_path = utils.resource_path(config.assets_folder_path / config.app_icon_name)
+        self.setWindowIcon(QIcon(icon_path))
         self.tab_counter = 1
         self.tab_grids = {}
         self.tab_base_names = {}
@@ -211,7 +213,7 @@ class MainWindow(QMainWindow):
         self.tab_bar.setTabsClosable(True)
         self.tab_bar.setExpanding(False)
         # Widget-level style overrides app-level qdarktheme styles
-        self.tab_bar.setStyleSheet(utils.load_stylesheet("tab_style.qss"))
+        self.tab_bar.setStyleSheet(utils.load_stylesheet(config.tab_custom_style_name))
         self.tab_bar.tabCloseRequested.connect(self.close_tab)
         self.tab_bar.currentChanged.connect(self.change_tab)
 
@@ -228,7 +230,7 @@ class MainWindow(QMainWindow):
         tab_layout.addWidget(self.lbl_theme)
 
         self.theme_combo = QComboBox()
-        self.theme_combo.setStyleSheet(utils.load_stylesheet("menu_style.qss"))
+        self.theme_combo.setStyleSheet(utils.load_stylesheet(config.menu_custom_style_name))
         self.theme_combo.currentTextChanged.connect(self.apply_theme)
         tab_layout.addWidget(self.theme_combo)
 
@@ -236,7 +238,7 @@ class MainWindow(QMainWindow):
         tab_layout.addWidget(self.lbl_lang)
 
         self.lang_combo = QComboBox()
-        self.lang_combo.setStyleSheet(utils.load_stylesheet("menu_style.qss"))
+        self.lang_combo.setStyleSheet(utils.load_stylesheet(config.menu_custom_style_name))
         self.lang_combo.addItems(["English", "Italiano"])
         self.lang_combo.currentIndexChanged.connect(self.change_language)
         tab_layout.addWidget(self.lang_combo)
@@ -279,7 +281,7 @@ class MainWindow(QMainWindow):
             theme_name,
             corner_shape="rounded",
             custom_colors={"primary": "#3B82F6"},
-            additional_qss=utils.load_stylesheet("style.qss"),
+            additional_qss=utils.load_stylesheet(config.generic_custom_style_name),
         )
 
     def change_language(self, index):
@@ -481,7 +483,7 @@ if __name__ == "__main__":
         "auto",
         corner_shape="rounded",
         custom_colors={"primary": "#3982FA"},
-        additional_qss=utils.load_stylesheet("style.qss"),
+        additional_qss=utils.load_stylesheet(config.generic_custom_style_name),
     )
     window = MainWindow()
     window.show()
