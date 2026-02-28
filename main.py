@@ -1,6 +1,7 @@
 import sys
 import qdarktheme
 from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QScrollArea,
                              QLabel, QFrame, QMessageBox, QToolButton, QTabBar, QStackedWidget, QLineEdit, QSpinBox,
                              QDoubleSpinBox, QComboBox, QGridLayout, QFileDialog)
@@ -191,6 +192,7 @@ class ManufacturerGrid(QFrame):
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.setWindowIcon(QIcon("assets/app_icon.ico"))
         self.tab_counter = 1
         self.tab_grids = {}
         self.tab_base_names = {}
