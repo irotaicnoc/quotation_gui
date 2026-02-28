@@ -73,6 +73,7 @@ QPushButton#add_row_btn {
 QToolButton#add_tab_btn {
     font-size: 20px;
     font-weight: bold;
+    border-radius: 12px;
 }
 QPushButton#calc_btn {
     font-weight: bold;
