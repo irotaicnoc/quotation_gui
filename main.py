@@ -202,7 +202,7 @@ class MainWindow(QMainWindow):
         main_layout.setSpacing(10)
 
         tab_layout = QHBoxLayout()
-        tab_layout.setContentsMargins(0, 0, 0, 0)
+        tab_layout.setContentsMargins(0, 0, 30, 0)
         tab_layout.setSpacing(5)
 
         self.tab_bar = QTabBar()
@@ -478,7 +478,7 @@ if __name__ == "__main__":
     qdarktheme.setup_theme(
         "auto",
         corner_shape="rounded",
-        custom_colors={"primary": "#3B82F6"},
+        custom_colors={"primary": "#3982FA"},
         additional_qss=utils.load_stylesheet("style.qss"),
     )
     window = MainWindow()
