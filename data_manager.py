@@ -3,6 +3,8 @@ import pandas as pd
 from PyQt6.QtWidgets import (QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem,
                              QPushButton, QHBoxLayout, QWidget, QCheckBox, QMessageBox)
 
+from localization import translate
+
 
 def save_to_json(filepath, data):
     with open(filepath, 'w') as f:
@@ -17,7 +19,7 @@ def load_from_json(filepath):
 class ProductSelectionDialog(QDialog):
     def __init__(self, file_path, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Select Products")
+        self.setWindowTitle(translate("select_products"))
         self.resize(700, 500)
         self.selected_data = []
 
@@ -29,8 +31,8 @@ class ProductSelectionDialog(QDialog):
 
         # Setup Buttons
         btn_layout = QHBoxLayout()
-        self.btn_ok = QPushButton("OK")
-        self.btn_cancel = QPushButton("Cancel")
+        self.btn_ok = QPushButton(translate("ok"))
+        self.btn_cancel = QPushButton(translate("cancel"))
         btn_layout.addWidget(self.btn_ok)
         btn_layout.addWidget(self.btn_cancel)
         layout.addLayout(btn_layout)
@@ -46,7 +48,7 @@ class ProductSelectionDialog(QDialog):
             df = pd.read_excel(file_path)
 
             self.table.setColumnCount(len(df.columns) + 1)
-            self.table.setHorizontalHeaderLabels(["Select"] + list(df.columns))
+            self.table.setHorizontalHeaderLabels([translate("select")] + list(df.columns))
             self.table.setRowCount(len(df))
 
             # Populate table
@@ -64,7 +66,9 @@ class ProductSelectionDialog(QDialog):
                     self.table.setItem(row_idx, col_idx + 1, QTableWidgetItem(str(value)))
 
         except Exception as e:
-            QMessageBox.critical(self, "Error Loading File", f"Error loading file {file_path}:\n\n{str(e)}")
+            error_title = translate("error")
+            error_msg = f"{translate('error_loading_file')} {file_path}:\n\n{str(e)}"
+            QMessageBox.critical(self, error_title, error_msg)
 
     def accept_selection(self):
         self.selected_data = []

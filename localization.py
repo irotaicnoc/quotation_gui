@@ -31,7 +31,12 @@ TRANSLATIONS = {
         "plant_totals": "Industrial Plant Totals:",
         "grand_total": "Grand Total:",
         "save_dialog": "Save Data",
-        "load_dialog": "Load Data"
+        "load_dialog": "Load Data",
+        "select_products": "Select Products",
+        "ok": "OK",
+        "cancel": "Cancel",
+        "select": "Select",
+        "error_loading_file": "Error loading file"
     },
     "it": {
         "app_title": "Schema UI dell'App",
@@ -63,7 +68,12 @@ TRANSLATIONS = {
         "plant_totals": "Totali Impianto Industriale:",
         "grand_total": "Totale Generale:",
         "save_dialog": "Salva Dati",
-        "load_dialog": "Carica Dati"
+        "load_dialog": "Carica Dati",
+        "select_products": "Seleziona Prodotti",
+        "ok": "OK",
+        "cancel": "Annulla",
+        "select": "Seleziona",
+        "error_loading_file": "Errore nel caricamento del file"
     }
 }
 
