@@ -1,4 +1,4 @@
-CURRENT_LANG = "en"
+CURRENT_LANG = "it"
 
 TRANSLATIONS = {
     "en": {

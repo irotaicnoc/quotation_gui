@@ -515,7 +515,6 @@ if __name__ == "__main__":
         custom_colors={"primary": "#3982FA"},
         additional_qss=utils.load_stylesheet(config.generic_custom_style_name),
     )
-    set_language("it")
     window = MainWindow()
     window.show()
     sys.exit(app.exec())
