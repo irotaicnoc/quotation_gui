@@ -9,11 +9,13 @@ PyInstaller command to create a standalone executable for the GUI application:
 
 
 CHIEDI
-    la ricerca di casi simili va fatta per parte di impianto o per tutto l'impianto?
+    Quante e quali celle ci vanno nelle righe?
+
+    La ricerca di casi simili va fatta per parte di impianto o per tutto l'impianto?
         cioè per singola tab di Excel o per tutto l'Excel?
 
 
 
-Hello! This is the GUI for an application I am creating.
 
+Hello! This is the GUI for an application I am creating. I am using PyQt6 and PyQtDarkTheme as base with some custom modifications in style.qss.
 
