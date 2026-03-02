@@ -7,6 +7,8 @@ QTabBar::tab {
     min-width: 120px;
     padding: 6px 25px 6px 15px;
     margin-right: 2px;
+    font-size: 14px;
+    font-weight: bold;
 }
 QTabBar::tab:selected {
     background: transparent;
