@@ -239,7 +239,7 @@ class MainWindow(QMainWindow):
 
         self.lang_combo = QComboBox()
         self.lang_combo.setStyleSheet(utils.load_stylesheet(config.menu_custom_style_name))
-        self.lang_combo.addItems(["English", "Italiano"])
+        self.lang_combo.addItems(["Italiano", "English"])
         self.lang_combo.currentIndexChanged.connect(self.change_language)
         tab_layout.addWidget(self.lang_combo)
 
@@ -285,7 +285,7 @@ class MainWindow(QMainWindow):
         )
 
     def change_language(self, index):
-        lang_code = "en" if index == 0 else "it"
+        lang_code = "it" if index == 0 else "en"
         set_language(lang_code)
         self.retranslate_ui()
 
@@ -485,6 +485,7 @@ if __name__ == "__main__":
         custom_colors={"primary": "#3982FA"},
         additional_qss=utils.load_stylesheet(config.generic_custom_style_name),
     )
+    set_language("it")
     window = MainWindow()
     window.show()
     sys.exit(app.exec())
