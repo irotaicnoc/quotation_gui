@@ -54,8 +54,8 @@ class CollapsibleBox(QWidget):
         self.content_layout.addWidget(widget)
 
     def retranslate_ui(self) -> None:
-        title_text = f"{translate(self.title_key)} {' '.join(self.title_args)}"\
-            if self.title_args\
+        title_text = f"{translate(self.title_key)} {' '.join(self.title_args)}" \
+            if self.title_args \
             else translate(self.title_key)
         self.toggle_button.setText(title_text)
         if self.browse_btn:
@@ -100,22 +100,37 @@ class ProductGrid(QFrame):
         self.grid_layout = QGridLayout()
         self.main_layout.addLayout(self.grid_layout)
 
-        self.grid_layout.setColumnStretch(0, 3)
-        self.grid_layout.setColumnStretch(1, 2)
-        self.grid_layout.setColumnStretch(2, 2)
-        self.grid_layout.setColumnStretch(3, 1)
-        self.grid_layout.setColumnStretch(4, 1)
-        self.grid_layout.setColumnStretch(5, 1)
-        self.grid_layout.setColumnStretch(6, 0)
+        # Updated column stretches to accommodate new columns
+        self.grid_layout.setColumnStretch(0, 3)  # Name
+        self.grid_layout.setColumnStretch(1, 3)  # Description
+        self.grid_layout.setColumnStretch(2, 2)  # Part Number
+        self.grid_layout.setColumnStretch(3, 2)  # Dimension
+        self.grid_layout.setColumnStretch(4, 2)  # Spec2
+        self.grid_layout.setColumnStretch(5, 1)  # Price
+        self.grid_layout.setColumnStretch(6, 1)  # Quantity
+        self.grid_layout.setColumnStretch(7, 1)  # Subtotal
+        self.grid_layout.setColumnStretch(8, 0)  # Empty (Delete btn)
 
         self.row_counter = 1
         self.active_rows = []
         self.header_labels = []
 
-        header_keys = ["name", "dimension", "spec2", "price", "quantity", "subtotal", "empty"]
+        # Added description and part_number to headers
+        header_keys = [
+            "name",
+            "description",
+            "part_number",
+            "dimension",
+            "spec2",
+            "price",
+            "quantity",
+            "subtotal",
+            "empty",
+        ]
         for col, key in enumerate(header_keys):
             lbl = QLabel()
-            lbl.setAlignment(Qt.AlignmentFlag.AlignCenter if col > 2 else Qt.AlignmentFlag.AlignLeft)
+            # Changed > 2 to > 4 so that text inputs stay left-aligned and numbers are center-aligned
+            lbl.setAlignment(Qt.AlignmentFlag.AlignCenter if col > 4 else Qt.AlignmentFlag.AlignLeft)
             self.grid_layout.addWidget(lbl, 0, col)
             self.header_labels.append((lbl, key))
 
@@ -128,10 +143,14 @@ class ProductGrid(QFrame):
 
     def add_row(self, data=None):
         name_edit = QLineEdit()
+        desc_edit = QLineEdit()
+        part_num_edit = QLineEdit()
+
         dimension_combo = QComboBox()
         dimension_combo.setStyleSheet(utils.load_stylesheet(config.menu_custom_style_name))
-        dimension_combo.addItems(['', '1/2"', '3/4"', '1"', '1 1/2"', '2"',
-                                  '2 1/2"', '3"', '4"', '6"', '8"', '10"', '12"'])
+        dimension_combo.addItems(
+            ['', '1/2"', '3/4"', '1"', '1 1/2"', '2"', '2 1/2"', '3"', '4"', '6"', '8"', '10"', '12"']
+        )
         spec2_combo = QComboBox()
         spec2_combo.setStyleSheet(utils.load_stylesheet(config.menu_custom_style_name))
         spec2_combo.addItems(['', 'Material X', 'Material Y', 'Material Z'])
@@ -149,12 +168,24 @@ class ProductGrid(QFrame):
 
         if data:
             name_edit.setText(data.get("name", ""))
+            desc_edit.setText(data.get("description", ""))
+            part_num_edit.setText(data.get("part_number", ""))
             dimension_combo.setCurrentText(data.get("dimension", ""))
             spec2_combo.setCurrentText(data.get("spec2", ""))
             price_box.setValue(data.get("price", 0.0))
             qty_box.setValue(data.get("qty", 0))
 
-        row_widgets = [name_edit, dimension_combo, spec2_combo, price_box, qty_box, subtotal_box, del_btn]
+        row_widgets = [
+            name_edit,
+            desc_edit,
+            part_num_edit,
+            dimension_combo,
+            spec2_combo,
+            price_box,
+            qty_box,
+            subtotal_box,
+            del_btn,
+        ]
 
         current_row_idx = self.row_counter
         self.row_counter += 1
@@ -164,6 +195,8 @@ class ProductGrid(QFrame):
 
         row_dict = {
             'name': name_edit,
+            'description': desc_edit,
+            'part_number': part_num_edit,
             'dimension': dimension_combo,
             'spec2': spec2_combo,
             'price': price_box,
@@ -196,6 +229,8 @@ class ProductGrid(QFrame):
         for row in self.active_rows:
             rows_data.append({
                 "name": row['name'].text(),
+                "description": row['description'].text(),
+                "part_number": row['part_number'].text(),
                 "dimension": row['dimension'].currentText(),
                 "spec2": row['spec2'].currentText(),
                 "price": row['price'].value(),
@@ -293,7 +328,7 @@ class MainWindow(QMainWindow):
 
         main_layout.addLayout(bottom_layout)
 
-        self.resize(1000, 650)
+        self.resize(1200, 650)
         self.retranslate_ui()
 
     @staticmethod
