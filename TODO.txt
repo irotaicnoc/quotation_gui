@@ -11,11 +11,14 @@ PyInstaller command to create a standalone executable for the GUI application:
 CHIEDI
     Quante e quali celle ci vanno nelle righe?
 
+    I dati per la "lista della spesa" ce li hai solo in formato excel?
+
     La ricerca di casi simili va fatta per parte di impianto o per tutto l'impianto?
         cioè per singola tab di Excel o per tutto l'Excel?
 
 
 
-
 Hello! This is the GUI for an application I am creating. I am using PyQt6 and PyQtDarkTheme as base with some custom modifications in style.qss.
 
+Can you help me add 2 fields to the rows? They are "Description" and "Part Number", to insert just after "Name".
+Remember to add the necessary translations please.
