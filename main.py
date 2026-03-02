@@ -84,20 +84,14 @@ class CollapsibleBox(QWidget):
         # If the user clicks "OK"
         if dialog.exec() == QDialog.DialogCode.Accepted:
             for product_data in dialog.selected_data:
-                man_name = product_data['DESCRIZIONE']
-                man_box = CollapsibleBox(man_name)
-                man_box.toggle_button.setObjectName("manufacturer_header")
-                self.add_widget(man_box)
-
-                grid = ManufacturerGrid(man_name)
-                man_box.add_widget(grid)
-                grid.add_row(product_data)
+                if hasattr(self, 'target_grid'):
+                    self.target_grid.add_row(product_data)
 
 
-class ManufacturerGrid(QFrame):
-    def __init__(self, manufacturer_name):
+class ProductGrid(QFrame):
+    def __init__(self, product_name):
         super().__init__()
-        self.manufacturer_name = manufacturer_name
+        self.product_name = product_name
         self.setFrameShape(QFrame.Shape.StyledPanel)
 
         self.main_layout = QVBoxLayout(self)
@@ -206,7 +200,7 @@ class ManufacturerGrid(QFrame):
                 "price": row['price'].value(),
                 "qty": row['qty'].value()
             })
-        return {self.manufacturer_name: rows_data}
+        return rows_data
 
     def clear_rows(self):
         for row in list(self.active_rows):
@@ -384,18 +378,13 @@ class MainWindow(QMainWindow):
             prod_box.connect_browse_button(product_name="product_1")
             content_layout.addWidget(prod_box)
 
-            grids_dict[prod_name] = []
+            grid = ProductGrid(prod_name)
+            grid.add_row()
+            prod_box.add_widget(grid)
 
-            for man in range(1, 3):
-                man_name = f"Manufacturer {prod}.{man}"
-                man_box = CollapsibleBox("manufacturer", [f"{prod}.{man}"])
-                man_box.toggle_button.setObjectName("manufacturer_header")
-                prod_box.add_widget(man_box)
-
-                grid = ManufacturerGrid(man_name)
-                grid.add_row()
-                man_box.add_widget(grid)
-                grids_dict[prod_name].append(grid)
+            # Store reference so the browse dialog can access the grid
+            prod_box.target_grid = grid
+            grids_dict[prod_name] = grid
 
         content_layout.addStretch()
         scroll.setWidget(content_widget)
@@ -411,10 +400,8 @@ class MainWindow(QMainWindow):
             tab_data = {"tab_name": self.tab_bar.tabText(index), "products": {}}
             grids_dict = self.tab_grids[index]
 
-            for prod_name, grid_list in grids_dict.items():
-                tab_data["products"][prod_name] = {}
-                for grid in grid_list:
-                    tab_data["products"][prod_name].update(grid.get_data())
+            for prod_name, grid in grids_dict.items():
+                tab_data["products"][prod_name] = grid.get_data()
             app_data.append(tab_data)
 
         data_manager.save_to_json(file_path, app_data)
@@ -443,13 +430,11 @@ class MainWindow(QMainWindow):
             current_index = self.tab_bar.count() - 1
             grids_dict = self.tab_grids[current_index]
 
-            for prod_name, manufacturers in tab_info["products"].items():
-                grid_list = grids_dict.get(prod_name, [])
-
-                for grid in grid_list:
+            for prod_name, rows_data in tab_info["products"].items():
+                grid = grids_dict.get(prod_name)
+                if grid:
                     grid.clear_rows()
-                    man_data = manufacturers.get(grid.manufacturer_name, [])
-                    for row_data in man_data:
+                    for row_data in rows_data:
                         grid.add_row(row_data)
 
     def run_calculations(self):
@@ -458,10 +443,8 @@ class MainWindow(QMainWindow):
             tab_data = {"tab_name": self.tab_bar.tabText(index), "products": {}}
             grids_dict = self.tab_grids[index]
 
-            for prod_name, grid_list in grids_dict.items():
-                tab_data["products"][prod_name] = {}
-                for grid in grid_list:
-                    tab_data["products"][prod_name].update(grid.get_data())
+            for prod_name, grid in grids_dict.items():
+                tab_data["products"][prod_name] = grid.get_data()
             app_data.append(tab_data)
 
         plant_totals, grand_total = calculator.calculate_totals(app_data)

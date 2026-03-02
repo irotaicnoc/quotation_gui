@@ -3,8 +3,7 @@ QScrollArea {
     border: none;
 }
 
-/* Manufacturer Grid Card */
-ManufacturerGrid {
+ProductGrid {
     background-color: rgba(150, 150, 150, 0.08);
     border: 1px solid rgba(150, 150, 150, 0.15);
     border-radius: 8px;
@@ -44,20 +43,6 @@ QToolButton#product_header {
     border-radius: 6px;
 }
 QToolButton#product_header:hover {
-    background: rgba(150, 150, 150, 0.15);
-}
-
-/* Manufacturer Specific Header */
-QToolButton#manufacturer_header {
-    border: none;
-    background: rgba(150, 150, 150, 0.1);
-    text-align: left;
-    font-size: 14px;
-    font-weight: bold;
-    padding: 6px;
-    border-radius: 4px;
-}
-QToolButton#manufacturer_header:hover {
     background: rgba(150, 150, 150, 0.15);
 }
 
