@@ -6,8 +6,8 @@ from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QH
                              QLabel, QFrame, QMessageBox, QToolButton, QTabBar, QStackedWidget, QLineEdit, QSpinBox,
                              QDoubleSpinBox, QComboBox, QGridLayout, QFileDialog)
 
-import config
 import utils
+import config
 import calculator
 import data_manager
 from localization import translate, set_language
@@ -54,7 +54,9 @@ class CollapsibleBox(QWidget):
         self.content_layout.addWidget(widget)
 
     def retranslate_ui(self):
-        title_text = f"{translate(self.title_key)} {' '.join(self.title_args)}" if self.title_args else translate(self.title_key)
+        title_text = f"{translate(self.title_key)} {' '.join(self.title_args)}"\
+            if self.title_args\
+            else translate(self.title_key)
         self.toggle_button.setText(title_text)
         if self.browse_btn:
             self.browse_btn.setText(translate("browse"))
