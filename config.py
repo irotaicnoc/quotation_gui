@@ -4,9 +4,14 @@ from pathlib import Path
 # # Folders
 styles_folder_path = Path("styles")
 assets_folder_path = Path("assets")
+excel_folder_path = Path(".")
 
 # # Files
 app_icon_name = "app_icon.ico"
 generic_custom_style_name = "style.qss"
 menu_custom_style_name = "menu_style.qss"
 tab_custom_style_name = "tab_style.qss"
+product_files = {
+    "product_1": "INTERFACCIA-2025-sez01.2.xlsx",
+    "product_2": "path/to/another_file.xlsx",
+}

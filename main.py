@@ -4,7 +4,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QScrollArea,
                              QLabel, QFrame, QMessageBox, QToolButton, QTabBar, QStackedWidget, QLineEdit, QSpinBox,
-                             QDoubleSpinBox, QComboBox, QGridLayout, QFileDialog)
+                             QDoubleSpinBox, QComboBox, QGridLayout, QFileDialog, QDialog)
 
 import utils
 import config
@@ -50,10 +50,10 @@ class CollapsibleBox(QWidget):
         self.toggle_button.setArrowType(Qt.ArrowType.DownArrow if checked else Qt.ArrowType.RightArrow)
         self.content_area.setVisible(checked)
 
-    def add_widget(self, widget):
+    def add_widget(self, widget) -> None:
         self.content_layout.addWidget(widget)
 
-    def retranslate_ui(self):
+    def retranslate_ui(self) -> None:
         title_text = f"{translate(self.title_key)} {' '.join(self.title_args)}"\
             if self.title_args\
             else translate(self.title_key)
@@ -65,6 +65,33 @@ class CollapsibleBox(QWidget):
             widget = self.content_layout.itemAt(i).widget()
             if hasattr(widget, "retranslate_ui"):
                 widget.retranslate_ui()
+
+    def connect_browse_button(self, product_name: str) -> None:
+        # Connect the button, passing the config key using a lambda
+        if self.browse_btn:
+            self.browse_btn.clicked.connect(lambda: self.open_product_dialog(product_name))
+        else:
+            print("Error: this CollapsibleBox instance doesn't have a browse_button.")
+
+    def open_product_dialog(self, product_name: str) -> None:
+        file_path = config.product_files.get(product_name)
+        if not file_path:
+            print("No file configured for this category.")
+            return
+
+        dialog = data_manager.ProductSelectionDialog(file_path, self)
+
+        # If the user clicks "OK"
+        if dialog.exec() == QDialog.DialogCode.Accepted:
+            for product_data in dialog.selected_data:
+                man_name = product_data['DESCRIZIONE']
+                man_box = CollapsibleBox(man_name)
+                man_box.toggle_button.setObjectName("manufacturer_header")
+                self.add_widget(man_box)
+
+                grid = ManufacturerGrid(man_name)
+                man_box.add_widget(grid)
+                grid.add_row(product_data)
 
 
 class ManufacturerGrid(QFrame):
@@ -354,6 +381,7 @@ class MainWindow(QMainWindow):
             prod_name = f"Product {prod}"
             prod_box = CollapsibleBox("product", [str(prod)], with_browse=True)
             prod_box.toggle_button.setObjectName("product_header")
+            prod_box.connect_browse_button(product_name="product_1")
             content_layout.addWidget(prod_box)
 
             grids_dict[prod_name] = []
