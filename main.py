@@ -112,7 +112,7 @@ class ProductGrid(QFrame):
         self.active_rows = []
         self.header_labels = []
 
-        header_keys = ["name", "spec1", "spec2", "price", "quantity", "subtotal", "empty"]
+        header_keys = ["name", "dimension", "spec2", "price", "quantity", "subtotal", "empty"]
         for col, key in enumerate(header_keys):
             lbl = QLabel()
             lbl.setAlignment(Qt.AlignmentFlag.AlignCenter if col > 2 else Qt.AlignmentFlag.AlignLeft)
@@ -128,12 +128,13 @@ class ProductGrid(QFrame):
 
     def add_row(self, data=None):
         name_edit = QLineEdit()
-        spec1_combo = QComboBox()
-        spec1_combo.setStyleSheet(utils.load_stylesheet(config.menu_custom_style_name))
-        spec1_combo.addItems(["", "Type A", "Type B", "Type C"])
+        dimension_combo = QComboBox()
+        dimension_combo.setStyleSheet(utils.load_stylesheet(config.menu_custom_style_name))
+        dimension_combo.addItems(['', '1/2"', '3/4"', '1"', '1 1/2"', '2"',
+                                  '2 1/2"', '3"', '4"', '6"', '8"', '10"', '12"'])
         spec2_combo = QComboBox()
         spec2_combo.setStyleSheet(utils.load_stylesheet(config.menu_custom_style_name))
-        spec2_combo.addItems(["", "Material X", "Material Y", "Material Z"])
+        spec2_combo.addItems(['', 'Material X', 'Material Y', 'Material Z'])
         price_box = QDoubleSpinBox()
         price_box.setMaximum(999999.99)
         price_box.setButtonSymbols(QDoubleSpinBox.ButtonSymbols.NoButtons)
@@ -148,12 +149,12 @@ class ProductGrid(QFrame):
 
         if data:
             name_edit.setText(data.get("name", ""))
-            spec1_combo.setCurrentText(data.get("spec1", ""))
+            dimension_combo.setCurrentText(data.get("dimension", ""))
             spec2_combo.setCurrentText(data.get("spec2", ""))
             price_box.setValue(data.get("price", 0.0))
             qty_box.setValue(data.get("qty", 0))
 
-        row_widgets = [name_edit, spec1_combo, spec2_combo, price_box, qty_box, subtotal_box, del_btn]
+        row_widgets = [name_edit, dimension_combo, spec2_combo, price_box, qty_box, subtotal_box, del_btn]
 
         current_row_idx = self.row_counter
         self.row_counter += 1
@@ -163,7 +164,7 @@ class ProductGrid(QFrame):
 
         row_dict = {
             'name': name_edit,
-            'spec1': spec1_combo,
+            'dimension': dimension_combo,
             'spec2': spec2_combo,
             'price': price_box,
             'qty': qty_box,
@@ -195,7 +196,7 @@ class ProductGrid(QFrame):
         for row in self.active_rows:
             rows_data.append({
                 "name": row['name'].text(),
-                "spec1": row['spec1'].currentText(),
+                "dimension": row['dimension'].currentText(),
                 "spec2": row['spec2'].currentText(),
                 "price": row['price'].value(),
                 "qty": row['qty'].value()
