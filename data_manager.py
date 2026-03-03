@@ -1,7 +1,12 @@
 import json
+import openpyxl
 import pandas as pd
+from PyQt6.QtCore import Qt
+from PIL.ImageQt import ImageQt
+from PyQt6.QtGui import QPixmap
+from openpyxl_image_loader import SheetImageLoader
 from PyQt6.QtWidgets import (QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem,
-                             QPushButton, QHBoxLayout, QWidget, QCheckBox, QMessageBox)
+                             QPushButton, QHBoxLayout, QWidget, QCheckBox, QMessageBox, QLabel)
 
 from localization import translate
 
@@ -45,15 +50,22 @@ class ProductSelectionDialog(QDialog):
 
     def load_data(self, file_path):
         try:
-            df = pd.read_excel(file_path)
+            # 1. Load data with pandas for text/numbers (header=1 skips the 1st row, using the 2nd as header)
+            df = pd.read_excel(file_path, header=1)
+
+            # 2. Load the workbook with openpyxl to extract images
+            wb = openpyxl.load_workbook(file_path)
+            sheet = wb.active
+            image_loader = SheetImageLoader(sheet)
 
             self.table.setColumnCount(len(df.columns) + 1)
             self.table.setHorizontalHeaderLabels([translate("select")] + list(df.columns))
             self.table.setRowCount(len(df))
 
-            # Populate table
+            schema_col_idx = df.columns.get_loc("SCHEMA") + 1 if "SCHEMA" in df.columns else -1
+
             for row_idx, row in df.iterrows():
-                # Add Checkbox in column 0
+                # Add Checkbox
                 chk_widget = QWidget()
                 chk_layout = QHBoxLayout(chk_widget)
                 chk_box = QCheckBox()
@@ -61,9 +73,37 @@ class ProductSelectionDialog(QDialog):
                 chk_layout.setContentsMargins(0, 0, 0, 0)
                 self.table.setCellWidget(row_idx, 0, chk_widget)
 
-                # Add data
+                # Add data and images
                 for col_idx, value in enumerate(row):
-                    self.table.setItem(row_idx, col_idx + 1, QTableWidgetItem(str(value)))
+                    actual_col = col_idx + 1
+
+                    # If this is the SCHEMA column, try to load the image
+                    if actual_col == schema_col_idx:
+                        # Excel rows are 1-indexed. Header is on row 2, so data starts at row 3
+                        excel_cell = f"{openpyxl.utils.get_column_letter(actual_col)}{row_idx + 3}"
+
+                        if image_loader.image_in(excel_cell):
+                            # Extract image using PIL
+                            pil_img = image_loader.get(excel_cell)
+
+                            # Convert PIL Image to QPixmap
+                            qimage = ImageQt(pil_img)
+                            pixmap = QPixmap.fromImage(qimage)
+
+                            # Scale pixmap if necessary
+                            pixmap = pixmap.scaled(50, 50, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+
+                            # Place inside a QLabel
+                            img_label = QLabel()
+                            img_label.setPixmap(pixmap)
+                            img_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+                            self.table.setCellWidget(row_idx, actual_col, img_label)
+                            self.table.setRowHeight(row_idx, 60) # Adjust row height to fit image
+                        else:
+                            self.table.setItem(row_idx, actual_col, QTableWidgetItem("No Image"))
+                    else:
+                        self.table.setItem(row_idx, actual_col, QTableWidgetItem(str(value)))
 
         except Exception as e:
             error_title = translate("error")
