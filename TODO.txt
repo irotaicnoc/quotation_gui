@@ -2,7 +2,7 @@ https://github.com/irotaicnoc/quotation_gui/tree/pyqt6
 
 import excel? data
 export SAP
-
+if it finds no excel file, it shouldn't open the selection window
 
 PyInstaller command to create a standalone executable for the GUI application:
     pyinstaller --noconsole --onefile --icon="assets/app_icon.ico" --add-data="styles;styles" --add-data="assets;assets" --name "Stima Impianti" main.py
