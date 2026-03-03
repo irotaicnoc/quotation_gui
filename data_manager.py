@@ -88,11 +88,16 @@ class ProductSelectionDialog(QDialog):
                             pil_img = image_loader.get(excel_cell)
 
                             # Convert PIL Image to QPixmap
-                            qimage = ImageQt(pil_img)
-                            pixmap = QPixmap.fromImage(qimage)
+                            q_image = ImageQt(pil_img)
+                            pixmap = QPixmap.fromImage(q_image)
 
                             # Scale pixmap if necessary
-                            pixmap = pixmap.scaled(50, 50, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+                            pixmap = pixmap.scaled(
+                                50,
+                                50,
+                                Qt.AspectRatioMode.KeepAspectRatio,
+                                Qt.TransformationMode.SmoothTransformation,
+                            )
 
                             # Place inside a QLabel
                             img_label = QLabel()
@@ -100,7 +105,7 @@ class ProductSelectionDialog(QDialog):
                             img_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
                             self.table.setCellWidget(row_idx, actual_col, img_label)
-                            self.table.setRowHeight(row_idx, 60) # Adjust row height to fit image
+                            self.table.setRowHeight(row_idx, 60)  # Adjust row height to fit image
                         else:
                             self.table.setItem(row_idx, actual_col, QTableWidgetItem("No Image"))
                     else:
