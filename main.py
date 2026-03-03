@@ -305,6 +305,11 @@ class MainWindow(QMainWindow):
         self.lang_combo.currentIndexChanged.connect(self.change_language)
         tab_layout.addWidget(self.lang_combo)
 
+        # Added About Button
+        self.btn_about = QPushButton()
+        self.btn_about.clicked.connect(self.show_about_dialog)
+        tab_layout.addWidget(self.btn_about)
+
         main_layout.addLayout(tab_layout)
 
         self.stack = QStackedWidget()
@@ -350,6 +355,18 @@ class MainWindow(QMainWindow):
         lang_code = "it" if index == 0 else "en"
         set_language(lang_code)
         self.retranslate_ui()
+
+    def show_about_dialog(self):
+        about_text = (
+            "<b>App Name v1.0</b><br>"
+            "© 2026 Your Company Name. All rights reserved.<br><br>"
+            "This software is subject to the terms of the enclosed EULA.<br><br>"
+            "<i>Third-party credits (and their dependencies):</i><br>"
+            "- PySide6 (LGPLv3)<br>"
+            "- Pandas, Openpyxl, Openpyxl-image-loader, Pillow, Jinja2, PyInstaller, PyQtDarkTheme (MIT/BSD/Apache)"
+        )
+        # Using About dialog natively formats it nicely
+        QMessageBox.about(self, "About", about_text)
 
     def add_new_tab(self, base_key="industrial_plant", number=None):
         if number is None:
@@ -514,6 +531,7 @@ class MainWindow(QMainWindow):
         self.btn_load.setText(translate("load_config"))
         self.btn_save.setText(translate("save_data"))
         self.btn_calc.setText(translate("run_calc"))
+        self.btn_about.setText("About")
 
         for i in range(self.tab_bar.count()):
             base_key, number = self.tab_base_names.get(i, ("industrial_plant", i+1))
