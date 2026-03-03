@@ -2,7 +2,6 @@ https://github.com/irotaicnoc/quotation_gui/tree/pyqt6
 
 import excel? data
 export SAP
-if it finds no excel file, it shouldn't open the selection window
 add Excel icon to "lista della spesa"
 Aggiungi licenza?
 

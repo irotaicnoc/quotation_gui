@@ -27,6 +27,7 @@ class ProductSelectionDialog(QDialog):
         self.setWindowTitle(translate("select_products"))
         self.resize(700, 500)
         self.selected_data = []
+        self.load_successful = False
 
         layout = QVBoxLayout(self)
 
@@ -104,6 +105,8 @@ class ProductSelectionDialog(QDialog):
                             self.table.setItem(row_idx, actual_col, QTableWidgetItem("No Image"))
                     else:
                         self.table.setItem(row_idx, actual_col, QTableWidgetItem(str(value)))
+
+            self.load_successful = True
 
         except Exception as e:
             error_title = translate("error")

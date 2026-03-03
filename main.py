@@ -81,6 +81,10 @@ class CollapsibleBox(QWidget):
 
         dialog = data_manager.ProductSelectionDialog(file_path, self)
 
+        # Do not open the dialog if an error occurred during data loading
+        if not dialog.load_successful:
+            return
+
         # If the user clicks "OK"
         if dialog.exec() == QDialog.DialogCode.Accepted:
             for product_data in dialog.selected_data:
