@@ -2,7 +2,7 @@ CURRENT_LANG = "it"
 
 TRANSLATIONS = {
     "en": {
-        "app_title": "App UI Schema",
+        "app_title": "Quotation Application",
         "theme": "Theme:",
         "language": "Language:",
         "system": "System",
@@ -41,7 +41,7 @@ TRANSLATIONS = {
         "error_loading_file": "Error loading file"
     },
     "it": {
-        "app_title": "Schema UI dell'App",
+        "app_title": "Programma di Quotazione",
         "theme": "Tema:",
         "language": "Lingua:",
         "system": "Sistema",

@@ -1,8 +1,12 @@
 https://github.com/irotaicnoc/quotation_gui/tree/pyqt6
 
-import excel? data
-export SAP
-Aggiungi licenza?
+TODO:
+    import excel? data
+    export SAP
+    Aggiungi licenza?
+    Your other libraries (pandas, openpyxl, qdarktheme, Pillow) use permissive licenses (like MIT or BSD). These allow
+    commercial use without exposing your source code, but usually require you to include their copyright notices somewhere
+    in your app (e.g., in an "About" or "Credits" menu).
 
 PyInstaller command to create a standalone executable for the GUI application:
     pyinstaller --noconsole --onefile --icon="assets/app_icon.ico" --add-data="styles;styles" --add-data="assets;assets" --name "Stima Impianti" main.py
@@ -14,11 +18,8 @@ CHIEDI
     I dati per la "lista della spesa" ce li hai solo in formato excel?
 
     La ricerca di casi simili va fatta per parte di impianto o per tutto l'impianto?
-        cioè per singola tab di Excel o per tutto l'Excel?
+        Cioè per singola tab di Excel o per tutto l'Excel?
 
 
 
-Hello! This is the GUI for an application I am creating. I am using PyQt6 and PyQtDarkTheme as base with some custom modifications in style.qss.
-
-Can you help me add 2 fields to the rows? They are "Description" and "Part Number", to insert just after "Name".
-Remember to add the necessary translations please.
+Hello! This is the GUI for an application I am creating. I am using PySide6 and PyQtDarkTheme as base with some custom modifications.
