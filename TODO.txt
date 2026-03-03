@@ -4,6 +4,7 @@ import excel? data
 export SAP
 if it finds no excel file, it shouldn't open the selection window
 add Excel icon to "lista della spesa"
+Aggiungi licenza?
 
 PyInstaller command to create a standalone executable for the GUI application:
     pyinstaller --noconsole --onefile --icon="assets/app_icon.ico" --add-data="styles;styles" --add-data="assets;assets" --name "Stima Impianti" main.py
