@@ -8,6 +8,7 @@ excel_folder_path = Path(".")
 
 # # Files
 app_icon_name = "app_icon.ico"
+excel_icon_name = "excel_icon_no_bg.png"
 generic_custom_style_name = "style.qss"
 menu_custom_style_name = "menu_style.qss"
 tab_custom_style_name = "tab_style.qss"

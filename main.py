@@ -31,6 +31,8 @@ class CollapsibleBox(QWidget):
         self.browse_btn = None
         if with_browse:
             self.browse_btn = QPushButton()
+            excel_icon_path = utils.resource_path(config.assets_folder_path / config.excel_icon_name)
+            self.browse_btn.setIcon(QIcon(excel_icon_path))
             header_layout.addWidget(self.browse_btn)
 
         header_layout.addStretch()
