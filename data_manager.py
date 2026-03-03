@@ -1,12 +1,12 @@
 import json
 import openpyxl
 import pandas as pd
-from PyQt6.QtCore import Qt
+from PySide6.QtCore import Qt
 from PIL.ImageQt import ImageQt
-from PyQt6.QtGui import QPixmap
+from PySide6.QtGui import QPixmap
 from openpyxl_image_loader import SheetImageLoader
-from PyQt6.QtWidgets import (QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem,
-                             QPushButton, QHBoxLayout, QWidget, QCheckBox, QMessageBox, QLabel)
+from PySide6.QtWidgets import (QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem,
+                               QPushButton, QHBoxLayout, QWidget, QCheckBox, QMessageBox, QLabel)
 
 from localization import translate
 

@@ -5,10 +5,10 @@ description = "Simple quotation software with a graphical user interface."
 authors = [{ name = "Marco Conciatori", email = "conciatori.marco91@gmail.com" }]
 requires-python = ">=3.13"
 dependencies = [
-    "PyQt6",
     "pandas",
     "jinja2",
     "Pillow",
+    "PySide6",
     "openpyxl",
     "pyinstaller",
     "pyqtdarktheme",
