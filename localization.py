@@ -35,7 +35,6 @@ TRANSLATIONS = {
         "save_dialog": "Save Data",
         "load_dialog": "Load Data",
         "select_products": "Select Products",
-        "ok": "OK",
         "cancel": "Cancel",
         "select": "Select",
         "error_loading_file": "Error loading file"
@@ -74,7 +73,6 @@ TRANSLATIONS = {
         "save_dialog": "Salva Dati",
         "load_dialog": "Carica Dati",
         "select_products": "Seleziona Prodotti",
-        "ok": "OK",
         "cancel": "Annulla",
         "select": "Seleziona",
         "error_loading_file": "Errore nel caricamento del file"

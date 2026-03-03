@@ -106,7 +106,6 @@ class ProductGrid(QFrame):
         self.grid_layout = QGridLayout()
         self.main_layout.addLayout(self.grid_layout)
 
-        # Updated column stretches to accommodate new columns
         self.grid_layout.setColumnStretch(0, 3)  # Name
         self.grid_layout.setColumnStretch(1, 3)  # Description
         self.grid_layout.setColumnStretch(2, 2)  # Part Number
@@ -121,7 +120,6 @@ class ProductGrid(QFrame):
         self.active_rows = []
         self.header_labels = []
 
-        # Added description and part_number to headers
         header_keys = [
             "name",
             "description",
@@ -135,7 +133,6 @@ class ProductGrid(QFrame):
         ]
         for col, key in enumerate(header_keys):
             lbl = QLabel()
-            # Changed > 2 to > 4 so that text inputs stay left-aligned and numbers are center-aligned
             lbl.setAlignment(Qt.AlignmentFlag.AlignCenter if col > 4 else Qt.AlignmentFlag.AlignLeft)
             self.grid_layout.addWidget(lbl, 0, col)
             self.header_labels.append((lbl, key))
@@ -178,8 +175,8 @@ class ProductGrid(QFrame):
             part_num_edit.setText(data.get("part_number", ""))
             dimension_combo.setCurrentText(data.get("dimension", ""))
             spec2_combo.setCurrentText(data.get("spec2", ""))
-            price_box.setValue(data.get("price", 0.0))
-            qty_box.setValue(data.get("qty", 0))
+            price_box.setValue(float(data.get("price", 0.0)))
+            qty_box.setValue(int(data.get("qty", 0)))
 
         row_widgets = [
             name_edit,

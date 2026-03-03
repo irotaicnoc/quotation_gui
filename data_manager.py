@@ -37,7 +37,7 @@ class ProductSelectionDialog(QDialog):
 
         # Setup Buttons
         btn_layout = QHBoxLayout()
-        self.btn_ok = QPushButton(translate("ok"))
+        self.btn_ok = QPushButton("OK")
         self.btn_cancel = QPushButton(translate("cancel"))
         btn_layout.addWidget(self.btn_ok)
         btn_layout.addWidget(self.btn_cancel)
