@@ -7,6 +7,7 @@ requires-python = ">=3.13"
 dependencies = [
     "PyQt6",
     "pandas",
+    "jinja2",
     "Pillow",
     "openpyxl",
     "pyinstaller",
