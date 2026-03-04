@@ -459,7 +459,7 @@ class MainWindow(QMainWindow):
         try:
             app_data = data_manager.load_from_json(file_path)
         except Exception as e:
-            QMessageBox.critical(self, translate("error"), f"{translate('could_not_load')}{e}")
+            QMessageBox.critical(self, translate("error"), f"{translate('could_not_load')}\n{e}")
             return
 
         while self.tab_bar.count() > 0:
