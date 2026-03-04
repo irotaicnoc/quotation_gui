@@ -9,6 +9,8 @@ TODO:
         includila in pyinstaller con --add-data
         completa about message
         includi licenze delle altre librerie con pip-licenses --with-license-file > THIRDPARTY_LICENSES.txt
+        Se serve fai richiesta per essere whitelistato da microsoft e antivirus. ci sono 2 modi, uno veloce e a
+            pagamento, uno lento e gratuito. Va bene quello lento di solito.
 
 
 PyInstaller command to create a standalone executable for the GUI application:
