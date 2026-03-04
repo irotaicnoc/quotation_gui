@@ -37,7 +37,17 @@ TRANSLATIONS = {
         "select_products": "Select Products",
         "cancel": "Cancel",
         "select": "Select",
-        "error_loading_file": "Error loading file"
+        "error_loading_file": "Error loading file",
+        "eula_title": "End User License Agreement",
+        "eula_accept_label": "Please read and accept the EULA to continue:",
+        "eula_error": "Error: {file_name} not found. Please ensure the license file is included with the application.",
+        "close": "Close",
+        "accept": "Accept",
+        "decline": "Decline",
+        "about_title": "About",
+        "about_text": "<b>App Name v1.0</b><br>© 2026 Your Company Name. All rights reserved."
+                      "<br><br><i>Third-party credits (and their dependencies):</i><br>",
+        "view_eula": "View EULA",
     },
     "it": {
         "app_title": "Programma di Quotazione",
@@ -75,7 +85,18 @@ TRANSLATIONS = {
         "select_products": "Seleziona Prodotti",
         "cancel": "Annulla",
         "select": "Seleziona",
-        "error_loading_file": "Errore nel caricamento del file"
+        "error_loading_file": "Errore nel caricamento del file",
+        "eula_title": "Accordo di Licenza per l'Utente Finale",
+        "eula_accept_label": "Si prega di leggere e accettare l'EULA per continuare:",
+        "eula_error": "Errore: {file_name} non trovato. Assicurarsi che il"
+                      " file di licenza sia incluso nell'applicazione.",
+        "close": "Chiudi",
+        "accept": "Accetta",
+        "decline": "Rifiuta",
+        "about_title": "Informazioni",
+        "about_text": "<b>App Name v1.0</b><br>© 2026 Your Company Name. Tutti i diritti riservati."
+                      "<br><br><i>Crediti di terze parti (e relative dipendenze):</i><br>",
+        "view_eula": "Visualizza EULA",
     }
 }
 

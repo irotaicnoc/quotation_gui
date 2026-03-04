@@ -4,11 +4,13 @@ from PySide6.QtWidgets import QDialog, QVBoxLayout, QLabel, QTextEdit, QHBoxLayo
 
 import utils
 import config
+from localization import translate
+
 
 class EULADialog(QDialog):
     def __init__(self, parent=None, readonly=False):
         super().__init__(parent)
-        self.setWindowTitle("End User License Agreement")
+        self.setWindowTitle(translate("eula_title"))
         self.resize(600, 400)
         self.setModal(True)
 
@@ -16,9 +18,9 @@ class EULADialog(QDialog):
 
         # Change label based on mode
         if readonly:
-            lbl = QLabel("End User License Agreement:")
+            lbl = QLabel(f'{translate("eula_title")}:')
         else:
-            lbl = QLabel("Please read and accept the EULA to continue:")
+            lbl = QLabel(translate("eula_accept_label"))
         layout.addWidget(lbl)
 
         self.text_edit = QTextEdit()
@@ -30,8 +32,7 @@ class EULADialog(QDialog):
             with open(eula_path, "r", encoding="utf-8") as f:
                 eula_text = f.read()
         except FileNotFoundError:
-            eula_text = (f"Error: {config.license_file_name} not found. Please ensure"
-                         f" the license file is included with the application.")
+            eula_text = translate("eula_error").format(file_name=config.license_file_name)
 
         self.text_edit.setText(eula_text)
         layout.addWidget(self.text_edit)
@@ -41,12 +42,12 @@ class EULADialog(QDialog):
 
         # Change buttons based on mode
         if readonly:
-            self.btn_close = QPushButton("Close")
+            self.btn_close = QPushButton(translate("close"))
             btn_layout.addWidget(self.btn_close)
             self.btn_close.clicked.connect(self.accept)
         else:
-            self.btn_accept = QPushButton("Accept")
-            self.btn_decline = QPushButton("Decline")
+            self.btn_accept = QPushButton(translate("accept"))
+            self.btn_decline = QPushButton(translate("decline"))
             btn_layout.addWidget(self.btn_accept)
             btn_layout.addWidget(self.btn_decline)
             self.btn_accept.clicked.connect(self.accept)
@@ -68,27 +69,28 @@ def eula_agreement_dialog():
 def show_about_dialog(parent: QWidget):
     # Create a custom dialog to add the "View EULA" button
     about_dialog = QDialog(parent)
-    about_dialog.setWindowTitle("About")
+    about_dialog.setWindowTitle(translate("about_title"))
     layout = QVBoxLayout(about_dialog)
 
-    about_text = QLabel(
-        "<b>App Name v1.0</b><br>"
-        "© 2026 Your Company Name. All rights reserved.<br><br>"
-        "<i>Third-party credits (and their dependencies):</i><br>"
-        "- PySide6 (LGPLv3)<br>"
-        "- Pandas, Openpyxl, Openpyxl-image-loader, Pillow, Jinja2, PyInstaller, PyQtDarkTheme (MIT/BSD/Apache)"
+    # Combine translated descriptive text with hardcoded libraries and licenses
+    about_content = (
+            translate("about_text") +
+            "- PySide6 (LGPLv3)<br>"
+            "- Pandas, Openpyxl, Openpyxl-image-loader, Pillow, Jinja2, PyInstaller, PyQtDarkTheme (MIT/BSD/Apache)"
     )
+    about_text = QLabel(about_content)
     layout.addWidget(about_text)
+
     btn_layout = QHBoxLayout()
     btn_layout.addStretch()
 
-    btn_view_eula = QPushButton("View EULA")
+    btn_view_eula = QPushButton(translate("view_eula"))
     # Open EULA dialog in readonly mode
     eula_dialog = EULADialog(parent, readonly=True)
     btn_view_eula.clicked.connect(lambda: eula_dialog.exec())
     btn_layout.addWidget(btn_view_eula)
 
-    btn_close = QPushButton("Close")
+    btn_close = QPushButton(translate("close"))
     btn_close.clicked.connect(about_dialog.accept)
     btn_layout.addWidget(btn_close)
 
