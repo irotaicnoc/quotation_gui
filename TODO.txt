@@ -3,13 +3,13 @@ https://github.com/irotaicnoc/quotation_gui/tree/pyqt6
 TODO:
     import excel? data
     export SAP
-    licenza
+    robe legali
         RIATTIVA FIRST-TIME-CHECK EULA
-        CREA EULA.txt
-        includila in pyinstaller con --add-data
-        completa about message
-        includi licenze delle altre librerie con pip-licenses --with-license-file > THIRDPARTY_LICENSES.txt
-        Se serve fai richiesta per essere whitelistato da microsoft e antivirus. ci sono 2 modi, uno veloce e a
+        includila EULA in pyinstaller con --add-data "EULA.txt;."
+        completa messaggio About
+        includi licenze delle altre librerie con pip-licenses --with-license-file > licenses/THIRDPARTY_LICENSES.txt
+            Serve mostrare il file THIRDPARTY_LICENSES.txt in About o EULA?
+        Se serve fai richiesta per essere whitelistato da microsoft e antivirus. Ci sono 2 modi, uno veloce e a
             pagamento, uno lento e gratuito. Va bene quello lento di solito.
 
 

@@ -2,6 +2,8 @@ import sys
 from PySide6.QtCore import QSettings
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QLabel, QTextEdit, QHBoxLayout, QPushButton, QWidget
 
+import utils
+import config
 
 class EULADialog(QDialog):
     def __init__(self, parent=None, readonly=False):
@@ -19,10 +21,19 @@ class EULADialog(QDialog):
             lbl = QLabel("Please read and accept the EULA to continue:")
         layout.addWidget(lbl)
 
-        # In your real app, you can load this from a packaged EULA.txt file
         self.text_edit = QTextEdit()
         self.text_edit.setReadOnly(True)
-        self.text_edit.setText("END USER LICENSE AGREEMENT\n\n1. Terms of Use...\n2. Liability...\n\n(Replace this with your actual EULA text or load from EULA.txt)")
+
+        # Load EULA from file
+        eula_path = utils.resource_path(config.licenses_folder_path / config.license_file_name)
+        try:
+            with open(eula_path, "r", encoding="utf-8") as f:
+                eula_text = f.read()
+        except FileNotFoundError:
+            eula_text = (f"Error: {config.license_file_name} not found. Please ensure"
+                         f" the license file is included with the application.")
+
+        self.text_edit.setText(eula_text)
         layout.addWidget(self.text_edit)
 
         btn_layout = QHBoxLayout()
@@ -34,8 +45,8 @@ class EULADialog(QDialog):
             btn_layout.addWidget(self.btn_close)
             self.btn_close.clicked.connect(self.accept)
         else:
-            self.btn_accept = QPushButton("I Accept")
-            self.btn_decline = QPushButton("I Decline")
+            self.btn_accept = QPushButton("Accept")
+            self.btn_decline = QPushButton("Decline")
             btn_layout.addWidget(self.btn_accept)
             btn_layout.addWidget(self.btn_decline)
             self.btn_accept.clicked.connect(self.accept)
