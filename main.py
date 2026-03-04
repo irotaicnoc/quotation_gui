@@ -7,6 +7,7 @@ from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
                                QDoubleSpinBox, QComboBox, QGridLayout, QFileDialog, QDialog)
 
 import utils
+import legal
 import config
 import calculator
 import data_manager
@@ -307,7 +308,7 @@ class MainWindow(QMainWindow):
 
         # Added About Button
         self.btn_about = QPushButton()
-        self.btn_about.clicked.connect(self.show_about_dialog)
+        self.btn_about.clicked.connect(lambda: legal.show_about_dialog(self))
         tab_layout.addWidget(self.btn_about)
 
         main_layout.addLayout(tab_layout)
@@ -355,18 +356,6 @@ class MainWindow(QMainWindow):
         lang_code = "it" if index == 0 else "en"
         set_language(lang_code)
         self.retranslate_ui()
-
-    def show_about_dialog(self):
-        about_text = (
-            "<b>App Name v1.0</b><br>"
-            "© 2026 Your Company Name. All rights reserved.<br><br>"
-            "This software is subject to the terms of the enclosed EULA.<br><br>"
-            "<i>Third-party credits (and their dependencies):</i><br>"
-            "- PySide6 (LGPLv3)<br>"
-            "- Pandas, Openpyxl, Openpyxl-image-loader, Pillow, Jinja2, PyInstaller, PyQtDarkTheme (MIT/BSD/Apache)"
-        )
-        # Using About dialog natively formats it nicely
-        QMessageBox.about(self, "About", about_text)
 
     def add_new_tab(self, base_key="industrial_plant", number=None):
         if number is None:
@@ -555,6 +544,10 @@ if __name__ == "__main__":
         custom_colors={"primary": "#3982FA"},
         additional_qss=utils.load_stylesheet(config.generic_custom_style_name),
     )
+
+    # First Time EULA Check
+    # legal.eula_agreement_dialog()
+
     window = MainWindow()
     window.show()
     sys.exit(app.exec())

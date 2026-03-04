@@ -3,10 +3,13 @@ https://github.com/irotaicnoc/quotation_gui/tree/pyqt6
 TODO:
     import excel? data
     export SAP
-    Aggiungi licenza?
-    Your other libraries (pandas, openpyxl, qdarktheme, Pillow) use permissive licenses (like MIT or BSD). These allow
-    commercial use without exposing your source code, but usually require you to include their copyright notices somewhere
-    in your app (e.g., in an "About" or "Credits" menu).
+    licenza
+        RIATTIVA FIRST-TIME-CHECK EULA
+        CREA EULA.txt
+        includila in pyinstaller con --add-data
+        completa about message
+        includi licenze delle altre librerie con pip-licenses --with-license-file > THIRDPARTY_LICENSES.txt
+
 
 PyInstaller command to create a standalone executable for the GUI application:
     pyinstaller --noconsole --onefile --icon="assets/app_icon.ico" --add-data="styles;styles" --add-data="assets;assets" --name "Stima Impianti" main.py
