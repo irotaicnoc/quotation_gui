@@ -33,16 +33,30 @@ class TextFileDialog(QDialog):
         try:
             if "json" in file_name:
                 raw_data = data_manager.load_from_json(file_path)
-                content = json.dumps(raw_data, indent=4)  # Converts the dict to a nicely formatted string
+
+                # Convert JSON list to an HTML string
+                html_content = ""
+                for pkg in raw_data:
+                    name = pkg.get("Name", "Unknown Package")
+                    version = pkg.get("Version", "")
+                    license_name = pkg.get("License", "Unknown License")
+                    license_text = pkg.get("LicenseText", "No license text provided.")
+
+                    html_content += f"<h3>{name} (v{version})</h3>"
+                    html_content += f"<p><b>License:</b> {license_name}</p>"
+                    html_content += f"<pre style='background-color: #2b2b2b; padding: 10px;'>{license_text}</pre>"
+                    html_content += "<hr>"
+
+                self.text_edit.setHtml(html_content) # Use setHtml instead of setText
             else:
                 with open(file_path, "r", encoding="utf-8") as f:
-                    content = f.read()
-        except FileNotFoundError:
-            content = translate("file_not_found_error")
-        except json.JSONDecodeError:
-            content = "Error: The JSON file is empty or incorrectly formatted."
+                    self.text_edit.setText(f.read())
 
-        self.text_edit.setText(content)
+        except FileNotFoundError:
+            self.text_edit.setText(translate("file_not_found_error"))
+        except json.JSONDecodeError:
+            self.text_edit.setText("Error: The JSON file is empty or incorrectly formatted.")
+
         layout.addWidget(self.text_edit)
 
         btn_layout = QHBoxLayout()
