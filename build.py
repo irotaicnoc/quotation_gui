@@ -1,6 +1,7 @@
 import subprocess
 import sys
 
+import config
 from generate_licenses import generate_licenses_file
 
 
@@ -19,7 +20,7 @@ def build_app():
         "--add-data", "styles:styles",
         "--add-data", "assets:assets",
         "--icon", "assets/app_icon.ico",
-        "--name", "Stima Impianti",
+        "--name", config.APP_NAME,
         "main.py"
     ]
 

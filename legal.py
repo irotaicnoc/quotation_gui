@@ -79,7 +79,7 @@ class TextFileDialog(QDialog):
 
 
 def eula_agreement_dialog():
-    settings = QSettings("YourCompany", "YourApp")
+    settings = QSettings(config.COMPANY_NAME, config.APP_NAME)
     if not settings.value("eula_accepted", False, type=bool):
         eula_dialog = TextFileDialog(
             title=translate("eula_title"),

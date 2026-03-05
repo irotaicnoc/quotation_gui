@@ -22,3 +22,9 @@ PRODUCT_FILES = {
     "product_1": "INTERFACCIA-2025-sez01.2.xlsx",
     "product_2": "path/to/another_file.xlsx",
 }
+
+# LEGAL_INFO
+COMPANY_NAME = "MarcoConciatori"
+APP_NAME = "Stima Impianti"
+APP_VERSION = "0.5.0"
+YEAR = 2026
