@@ -1,9 +1,10 @@
 import subprocess
-from pathlib import Path
+
+import config
 
 
 def generate_licenses_file():
-    output_path = Path("THIRDPARTY_LICENSES.json")
+    output_path = config.licenses_folder_path / config.third_party_license_file_name
     output_path.parent.mkdir(exist_ok=True)  # Ensure the licenses folder exists
 
     try:
