@@ -16,6 +16,7 @@ menu_custom_style_name = "menu_style.qss"
 tab_custom_style_name = "tab_style.qss"
 
 license_file_name = "EULA.txt"
+third_party_license_file_name = "THIRDPARTY_LICENSES.json"
 
 product_files = {
     "product_1": "INTERFACCIA-2025-sez01.2.xlsx",

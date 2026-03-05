@@ -4,37 +4,42 @@ from PySide6.QtWidgets import QDialog, QVBoxLayout, QLabel, QTextEdit, QHBoxLayo
 
 import utils
 import config
+import data_manager
 from localization import translate
 
 
-class EULADialog(QDialog):
-    def __init__(self, parent=None, readonly=False):
+class TextFileDialog(QDialog):
+    def __init__(self, title: str, file_name: str, parent: QWidget = None, readonly: bool = False):
         super().__init__(parent)
-        self.setWindowTitle(translate("eula_title"))
+        self.setWindowTitle(title)
         self.resize(600, 400)
         self.setModal(True)
 
         layout = QVBoxLayout(self)
 
-        # Change label based on mode
-        if readonly:
-            lbl = QLabel(f'{translate("eula_title")}:')
-        else:
-            lbl = QLabel(translate("eula_accept_label"))
-        layout.addWidget(lbl)
+        if "EULA" in file_name:
+            if readonly:
+                lbl = QLabel(f'{translate("eula_title")}:')
+            else:
+                lbl = QLabel(translate("eula_accept_label"))
+            layout.addWidget(lbl)
 
         self.text_edit = QTextEdit()
         self.text_edit.setReadOnly(True)
 
-        # Load EULA from file
-        eula_path = utils.resource_path(config.licenses_folder_path / config.license_file_name)
+        # Load file
+        file_path = utils.resource_path(config.licenses_folder_path / file_name)
         try:
-            with open(eula_path, "r", encoding="utf-8") as f:
-                eula_text = f.read()
+            if "json" in file_name:
+                content = data_manager.load_from_json(file_path)
+            else:
+                with open(file_path, "r", encoding="utf-8") as f:
+                    content = f.read()
         except FileNotFoundError:
-            eula_text = translate("eula_error").format(file_name=config.license_file_name)
+            # Reusing the eula_error translation or making a generic one
+            content = translate("file_not_found_error")
 
-        self.text_edit.setText(eula_text)
+        self.text_edit.setText(content)
         layout.addWidget(self.text_edit)
 
         btn_layout = QHBoxLayout()
@@ -59,7 +64,12 @@ class EULADialog(QDialog):
 def eula_agreement_dialog():
     settings = QSettings("YourCompany", "YourApp")
     if not settings.value("eula_accepted", False, type=bool):
-        eula_dialog = EULADialog(readonly=False)
+        eula_dialog = TextFileDialog(
+            title=translate("eula_title"),
+            file_name=config.license_file_name,
+            parent=None,
+            readonly=False,
+        )
         if eula_dialog.exec() == QDialog.DialogCode.Accepted:
             settings.setValue("eula_accepted", True)
         else:
@@ -84,12 +94,31 @@ def show_about_dialog(parent: QWidget):
     btn_layout = QHBoxLayout()
     btn_layout.addStretch()
 
+    # View EULA Button
     btn_view_eula = QPushButton(translate("view_eula"))
-    # Open EULA dialog in readonly mode
-    eula_dialog = EULADialog(parent, readonly=True)
-    btn_view_eula.clicked.connect(lambda: eula_dialog.exec())
+    btn_view_eula.clicked.connect(
+        lambda: TextFileDialog(
+            title=translate("eula_title"),
+            file_name=config.license_file_name,
+            parent=parent,
+            readonly=True,
+        ).exec()
+    )
     btn_layout.addWidget(btn_view_eula)
 
+    # View Third-Party Licenses Button
+    btn_view_third_party = QPushButton(translate("view_third_party"))
+    btn_view_third_party.clicked.connect(
+        lambda: TextFileDialog(
+            title=translate("view_third_party"),
+            file_name=config.third_party_license_file_name,
+            parent=parent,
+            readonly=True,
+        ).exec()
+    )
+    btn_layout.addWidget(btn_view_third_party)
+
+    # Close Button
     btn_close = QPushButton(translate("close"))
     btn_close.clicked.connect(about_dialog.accept)
     btn_layout.addWidget(btn_close)
