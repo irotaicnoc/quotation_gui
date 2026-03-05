@@ -53,7 +53,7 @@ class TextFileDialog(QDialog):
                     self.text_edit.setText(f.read())
 
         except FileNotFoundError:
-            self.text_edit.setText(translate("file_not_found_error"))
+            self.text_edit.setText(translate("file_not_found_error", file_name=file_path))
         except json.JSONDecodeError:
             self.text_edit.setText("Error: The JSON file is empty or incorrectly formatted.")
 
@@ -101,7 +101,13 @@ def show_about_dialog(parent: QWidget):
 
     # Combine translated descriptive text with hardcoded libraries and licenses
     about_content = (
-            translate("about_text") +
+            translate(
+                "about_text",
+                app_name=config.APP_NAME,
+                app_version=config.APP_VERSION,
+                year=config.YEAR,
+                company_name=config.COMPANY_NAME,
+            ) +
             "- PySide6 (LGPLv3)<br>"
             "- Pandas, Pillow, Openpyxl-image-loader,"
             "<br>   Openpyxl, Jinja2, PyInstaller,"

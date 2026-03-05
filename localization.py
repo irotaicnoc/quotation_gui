@@ -45,7 +45,7 @@ TRANSLATIONS = {
         "accept": "Accept",
         "decline": "Decline",
         "about_title": "About",
-        "about_text": "<b>App Name v1.0</b><br>© 2026 Your Company Name. All rights reserved."
+        "about_text": "<b>{app_name} v{app_version}</b><br>© {year} {company_name}. All rights reserved."
                       "<br><br><i>Third-party credits (and their dependencies):</i><br>",
         "view_eula": "View EULA",
         "view_third_party": "Third-Party Licenses",
@@ -95,7 +95,7 @@ TRANSLATIONS = {
         "accept": "Accetta",
         "decline": "Rifiuta",
         "about_title": "Informazioni",
-        "about_text": "<b>App Name v1.0</b><br>© 2026 Your Company Name. Tutti i diritti riservati."
+        "about_text": "<b>{app_name} v{app_version}</b><br>© {year} {company_name}. Tutti i diritti riservati."
                       "<br><br><i>Crediti di terze parti (e relative dipendenze):</i><br>",
         "view_eula": "Visualizza EULA",
         "view_third_party": "Licenze di Terze Parti",
@@ -109,6 +109,11 @@ def set_language(lang_code):
     if lang_code in TRANSLATIONS:
         CURRENT_LANG = lang_code
 
+def translate(key, **kwargs):
 
-def translate(key):
     return TRANSLATIONS.get(CURRENT_LANG, {}).get(key, key)
+    if kwargs:
+        # This automatically replaces {key} with the provided value
+        return text.format(**kwargs)
+
+    return text

@@ -379,7 +379,7 @@ class MainWindow(QMainWindow):
 
     def close_tab(self, index):
         tab_name = self.tab_bar.tabText(index)
-        msg_text = translate("close_prompt").replace("{tab_name}", tab_name)
+        msg_text = translate("close_prompt", tab_name=tab_name)
 
         reply = QMessageBox.question(
             self,
