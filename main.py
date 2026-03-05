@@ -546,7 +546,7 @@ if __name__ == "__main__":
     )
 
     # First Time EULA Check
-    # legal.eula_agreement_dialog()
+    legal.eula_agreement_dialog(config.INITIAL_EULA_DIALOG)
 
     window = MainWindow()
     window.show()

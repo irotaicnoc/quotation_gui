@@ -5,14 +5,8 @@ TODO:
     export SAP
     robe legali
         RIATTIVA FIRST-TIME-CHECK EULA
-        includila EULA in pyinstaller con --add-data "EULA.txt;."
         Completa messaggio About
         Completa messaggio EULA
-        Includi licenze delle altre librerie con
-            pip-licenses --with-license-file > licenses/THIRDPARTY_LICENSES.txt
-            pip-licenses --with-license-file --format=json | Out-File -FilePath licenses/THIRDPARTY_LICENSES.json -Encoding utf8
-            va incluso con pyinstaller come l'EULA?
-            Serve mostrare il file THIRDPARTY_LICENSES.txt in About o EULA?
         Se serve fai richiesta per essere whitelistato da microsoft e antivirus. Ci sono 2 modi, uno veloce e a
             pagamento, uno lento e gratuito. Va bene quello lento di solito.
 

@@ -78,11 +78,13 @@ class TextFileDialog(QDialog):
         layout.addLayout(btn_layout)
 
 
-def eula_agreement_dialog():
+def eula_agreement_dialog(initial_eula_dialog: str) -> None:
+    assert initial_eula_dialog == "yes" or initial_eula_dialog == "no" or initial_eula_dialog == "auto"
+    if config.INITIAL_EULA_DIALOG == "no":
+        return
     settings = QSettings(config.COMPANY_NAME, config.APP_NAME)
-    if config.FORCE_EULA_DIALOG:
+    if config.INITIAL_EULA_DIALOG == "yes":
         settings.remove("eula_accepted")
-
     if not settings.value("eula_accepted", False, type=bool):
         eula_dialog = TextFileDialog(
             title=translate("eula_title"),
