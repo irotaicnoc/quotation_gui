@@ -32,7 +32,7 @@ class CollapsibleBox(QWidget):
         self.browse_btn = None
         if with_browse:
             self.browse_btn = QPushButton()
-            excel_icon_path = utils.resource_path(config.assets_folder_path / config.excel_icon_name)
+            excel_icon_path = utils.resource_path(config.ASSETS_FOLDER_PATH / config.EXCEL_ICON_NAME)
             self.browse_btn.setIcon(QIcon(excel_icon_path))
             header_layout.addWidget(self.browse_btn)
 
@@ -77,7 +77,7 @@ class CollapsibleBox(QWidget):
             print("Error: this CollapsibleBox instance doesn't have a browse_button.")
 
     def open_product_dialog(self, product_name: str) -> None:
-        file_path = config.product_files.get(product_name)
+        file_path = config.PRODUCT_FILES.get(product_name)
         if not file_path:
             print("No file configured for this category.")
             return
@@ -151,12 +151,12 @@ class ProductGrid(QFrame):
         part_num_edit = QLineEdit()
 
         dimension_combo = QComboBox()
-        dimension_combo.setStyleSheet(utils.load_stylesheet(config.menu_custom_style_name))
+        dimension_combo.setStyleSheet(utils.load_stylesheet(config.MENU_CUSTOM_STYLE_NAME))
         dimension_combo.addItems(
             ['', '1/2"', '3/4"', '1"', '1 1/2"', '2"', '2 1/2"', '3"', '4"', '6"', '8"', '10"', '12"']
         )
         spec2_combo = QComboBox()
-        spec2_combo.setStyleSheet(utils.load_stylesheet(config.menu_custom_style_name))
+        spec2_combo.setStyleSheet(utils.load_stylesheet(config.MENU_CUSTOM_STYLE_NAME))
         spec2_combo.addItems(['', 'Material X', 'Material Y', 'Material Z'])
         price_box = QDoubleSpinBox()
         price_box.setMaximum(999999.99)
@@ -256,7 +256,7 @@ class ProductGrid(QFrame):
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        icon_path = utils.resource_path(config.assets_folder_path / config.app_icon_name)
+        icon_path = utils.resource_path(config.ASSETS_FOLDER_PATH / config.APP_ICON_NAME)
         self.setWindowIcon(QIcon(icon_path))
         self.tab_counter = 1
         self.tab_grids = {}
@@ -276,7 +276,7 @@ class MainWindow(QMainWindow):
         self.tab_bar.setTabsClosable(True)
         self.tab_bar.setExpanding(False)
         # Widget-level style overrides app-level qdarktheme styles
-        self.tab_bar.setStyleSheet(utils.load_stylesheet(config.tab_custom_style_name))
+        self.tab_bar.setStyleSheet(utils.load_stylesheet(config.TAB_CUSTOM_STYLE_NAME))
         self.tab_bar.tabCloseRequested.connect(self.close_tab)
         self.tab_bar.currentChanged.connect(self.change_tab)
 
@@ -293,7 +293,7 @@ class MainWindow(QMainWindow):
         tab_layout.addWidget(self.lbl_theme)
 
         self.theme_combo = QComboBox()
-        self.theme_combo.setStyleSheet(utils.load_stylesheet(config.menu_custom_style_name))
+        self.theme_combo.setStyleSheet(utils.load_stylesheet(config.MENU_CUSTOM_STYLE_NAME))
         self.theme_combo.currentTextChanged.connect(self.apply_theme)
         tab_layout.addWidget(self.theme_combo)
 
@@ -301,7 +301,7 @@ class MainWindow(QMainWindow):
         tab_layout.addWidget(self.lbl_lang)
 
         self.lang_combo = QComboBox()
-        self.lang_combo.setStyleSheet(utils.load_stylesheet(config.menu_custom_style_name))
+        self.lang_combo.setStyleSheet(utils.load_stylesheet(config.MENU_CUSTOM_STYLE_NAME))
         self.lang_combo.addItems(["Italiano", "English"])
         self.lang_combo.currentIndexChanged.connect(self.change_language)
         tab_layout.addWidget(self.lang_combo)
@@ -349,7 +349,7 @@ class MainWindow(QMainWindow):
             theme_name,
             corner_shape="rounded",
             custom_colors={"primary": "#3B82F6"},
-            additional_qss=utils.load_stylesheet(config.generic_custom_style_name),
+            additional_qss=utils.load_stylesheet(config.GENERIC_CUSTOM_STYLE_NAME),
         )
 
     def change_language(self, index):
@@ -542,7 +542,7 @@ if __name__ == "__main__":
         "auto",
         corner_shape="rounded",
         custom_colors={"primary": "#3982FA"},
-        additional_qss=utils.load_stylesheet(config.generic_custom_style_name),
+        additional_qss=utils.load_stylesheet(config.GENERIC_CUSTOM_STYLE_NAME),
     )
 
     # First Time EULA Check

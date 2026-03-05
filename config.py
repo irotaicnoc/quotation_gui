@@ -2,23 +2,23 @@ from pathlib import Path
 
 # PATHS
 # # Folders
-styles_folder_path = Path("styles")
-assets_folder_path = Path("assets")
-licenses_folder_path = Path("licenses")
-excel_folder_path = Path(".")
+STYLES_FOLDER_PATH = Path("styles")
+ASSETS_FOLDER_PATH = Path("assets")
+LICENSES_FOLDER_PATH = Path("licenses")
+EXCEL_FOLDER_PATH = Path(".")
 
 # # Files
-app_icon_name = "app_icon.ico"
-excel_icon_name = "excel_icon_no_bg.png"
+APP_ICON_NAME = "app_icon.ico"
+EXCEL_ICON_NAME = "excel_icon_no_bg.png"
 
-generic_custom_style_name = "style.qss"
-menu_custom_style_name = "menu_style.qss"
-tab_custom_style_name = "tab_style.qss"
+GENERIC_CUSTOM_STYLE_NAME = "style.qss"
+MENU_CUSTOM_STYLE_NAME = "menu_style.qss"
+TAB_CUSTOM_STYLE_NAME = "tab_style.qss"
 
-license_file_name = "EULA.txt"
-third_party_license_file_name = "THIRDPARTY_LICENSES.json"
+LICENSE_FILE_NAME = "EULA.txt"
+THIRD_PARTY_LICENSE_FILE_NAME = "THIRDPARTY_LICENSES.json"
 
-product_files = {
+PRODUCT_FILES = {
     "product_1": "INTERFACCIA-2025-sez01.2.xlsx",
     "product_2": "path/to/another_file.xlsx",
 }

@@ -29,7 +29,7 @@ class TextFileDialog(QDialog):
         self.text_edit.setReadOnly(True)
 
         # Load file
-        file_path = utils.resource_path(config.licenses_folder_path / file_name)
+        file_path = utils.resource_path(config.LICENSES_FOLDER_PATH / file_name)
         try:
             if "json" in file_name:
                 raw_data = data_manager.load_from_json(file_path)
@@ -69,7 +69,7 @@ def eula_agreement_dialog():
     if not settings.value("eula_accepted", False, type=bool):
         eula_dialog = TextFileDialog(
             title=translate("eula_title"),
-            file_name=config.license_file_name,
+            file_name=config.LICENSE_FILE_NAME,
             parent=None,
             readonly=False,
         )
@@ -102,7 +102,7 @@ def show_about_dialog(parent: QWidget):
     btn_view_eula.clicked.connect(
         lambda: TextFileDialog(
             title=translate("eula_title"),
-            file_name=config.license_file_name,
+            file_name=config.LICENSE_FILE_NAME,
             parent=parent,
             readonly=True,
         ).exec()
@@ -114,7 +114,7 @@ def show_about_dialog(parent: QWidget):
     btn_view_third_party.clicked.connect(
         lambda: TextFileDialog(
             title=translate("view_third_party"),
-            file_name=config.third_party_license_file_name,
+            file_name=config.THIRD_PARTY_LICENSE_FILE_NAME,
             parent=parent,
             readonly=True,
         ).exec()

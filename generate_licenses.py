@@ -4,7 +4,7 @@ import config
 
 
 def generate_licenses_file():
-    output_path = config.licenses_folder_path / config.third_party_license_file_name
+    output_path = config.LICENSES_FOLDER_PATH / config.THIRD_PARTY_LICENSE_FILE_NAME
     output_path.parent.mkdir(exist_ok=True)  # Ensure the licenses folder exists
 
     try:

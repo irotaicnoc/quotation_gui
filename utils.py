@@ -15,7 +15,7 @@ def resource_path(relative_path):
 
 
 def load_stylesheet(file_name="style.qss"):
-    file_path = resource_path(os.path.join(config.styles_folder_path, file_name))
+    file_path = resource_path(os.path.join(config.STYLES_FOLDER_PATH, file_name))
     try:
         with open(file_path, "r") as f:
             return f.read()
