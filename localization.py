@@ -105,13 +105,13 @@ TRANSLATIONS = {
 
 
 def set_language(lang_code):
-    global CURRENT_LANG
     if lang_code in TRANSLATIONS:
-        CURRENT_LANG = lang_code
+        config.CURRENT_LANG = lang_code
+
 
 def translate(key, **kwargs):
+    text = TRANSLATIONS.get(config.CURRENT_LANG, {}).get(key, key)
 
-    return TRANSLATIONS.get(CURRENT_LANG, {}).get(key, key)
     if kwargs:
         # This automatically replaces {key} with the provided value
         return text.format(**kwargs)

@@ -31,7 +31,7 @@ class TextFileDialog(QDialog):
         # Load file
         file_path = utils.resource_path(config.LICENSES_FOLDER_PATH / file_name)
         try:
-            if "json" in file_name:
+            if file_name.endswith(".json"):
                 raw_data = data_manager.load_from_json(file_path)
 
                 # Convert JSON list to an HTML string
@@ -47,7 +47,7 @@ class TextFileDialog(QDialog):
                     html_content += f"<pre style='background-color: #2b2b2b; padding: 10px;'>{license_text}</pre>"
                     html_content += "<hr>"
 
-                self.text_edit.setHtml(html_content) # Use setHtml instead of setText
+                self.text_edit.setHtml(html_content)
             else:
                 with open(file_path, "r", encoding="utf-8") as f:
                     self.text_edit.setText(f.read())
@@ -110,8 +110,8 @@ def show_about_dialog(parent: QWidget):
             ) +
             "- PySide6 (LGPLv3)<br>"
             "- Pandas, Pillow, Openpyxl-image-loader,"
-            "<br>   Openpyxl, Jinja2, PyInstaller,"
-            "<br>   PyQtDarkTheme (MIT/BSD/Apache)"
+            "<br> Openpyxl, Jinja2, PyInstaller,"
+            "<br> PyQtDarkTheme (MIT/BSD/Apache)"
     )
     about_text = QLabel(about_content)
     layout.addWidget(about_text)

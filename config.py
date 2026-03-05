@@ -28,3 +28,7 @@ COMPANY_NAME = "MarcoConciatori"
 APP_NAME = "Stima Impianti"
 APP_VERSION = "0.5.0"
 YEAR = 2026
+
+
+# SETTINGS
+CURRENT_LANG = "it"

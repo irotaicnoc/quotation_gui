@@ -1,6 +1,6 @@
 [project]
 name = "quotation-gui"
-version = "0.1.0"
+version = "0.5.0"
 description = "Quotation application with GUI."
 authors = [{ name = "Marco Conciatori", email = "conciatori.marco91@gmail.com" }]
 requires-python = ">=3.13"
