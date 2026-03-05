@@ -89,7 +89,9 @@ def show_about_dialog(parent: QWidget):
     about_content = (
             translate("about_text") +
             "- PySide6 (LGPLv3)<br>"
-            "- Pandas, Openpyxl, Openpyxl-image-loader, Pillow, Jinja2, PyInstaller, PyQtDarkTheme (MIT/BSD/Apache)"
+            "- Pandas, Pillow, Openpyxl-image-loader,"
+            "<br>   Openpyxl, Jinja2, PyInstaller,"
+            "<br>   PyQtDarkTheme (MIT/BSD/Apache)"
     )
     about_text = QLabel(about_content)
     layout.addWidget(about_text)
