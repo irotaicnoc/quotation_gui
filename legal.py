@@ -101,18 +101,16 @@ def show_about_dialog(parent: QWidget):
     layout = QVBoxLayout(about_dialog)
 
     # Combine translated descriptive text with hardcoded libraries and licenses
-    about_content = (
-            translate(
-                "about_text",
-                app_name=config.APP_NAME,
-                app_version=config.APP_VERSION,
-                year=config.YEAR,
-                company_name=config.COMPANY_NAME,
-            ) +
-            "- PySide6 (LGPLv3)<br>"
-            "- Pandas, Pillow, Openpyxl-image-loader,"
-            "<br> Openpyxl, Jinja2, PyInstaller,"
-            "<br> PyQtDarkTheme (MIT/BSD/Apache)"
+    about_content = (translate(
+        "about_text",
+        app_name=config.APP_NAME,
+        app_version=config.APP_VERSION,
+        year=config.YEAR,
+        company_name=config.COMPANY_NAME,
+    ) +
+                     "- PySide6 (LGPLv3)<br>"
+                     "- Pandas, Pillow, Openpyxl-image-loader,<br>&nbsp;&nbsp;&nbsp;&nbsp; Openpyxl,"
+                     " Jinja2, PyInstaller,<br>&nbsp;&nbsp;&nbsp;&nbsp; PyQtDarkTheme (MIT/BSD/Apache)"
     )
     about_text = QLabel(about_content)
     layout.addWidget(about_text)
