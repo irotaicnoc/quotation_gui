@@ -4,5 +4,5 @@ build/
 dist/
 
 data_dump.json
-Stima Impianti.spec
+StimaImpianti.spec
 *.xlsx
