@@ -55,7 +55,7 @@ class TextFileDialog(QDialog):
         except FileNotFoundError:
             self.text_edit.setText(translate("file_not_found_error", file_name=file_path))
         except json.JSONDecodeError:
-            self.text_edit.setText("Error: The JSON file is empty or incorrectly formatted.")
+            self.text_edit.setText(translate("json_error", file_name=file_path))
 
         layout.addWidget(self.text_edit)
 

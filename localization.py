@@ -1,4 +1,4 @@
-CURRENT_LANG = "it"
+import config
 
 TRANSLATIONS = {
     "en": {
@@ -49,7 +49,7 @@ TRANSLATIONS = {
                       "<br><br><i>Third-party credits (and their dependencies):</i><br>",
         "view_eula": "View EULA",
         "view_third_party": "Third-Party Licenses",
-        "third_party_error": "Error: {file_name} not found.",
+        "json_error": "Error: the JSON {file_name} file is empty or incorrectly formatted."
     },
     "it": {
         "app_title": "Programma di Quotazione",
@@ -62,6 +62,7 @@ TRANSLATIONS = {
         "save_data": "Salva Dati",
         "run_calc": "Esegui Calcoli",
         "add_row": "+ Aggiungi Riga",
+        # TODO: cambia nella versione definitiva
         "browse": "Lista della Spesa",
         "name": "Nome",
         "description": "Descrizione",
@@ -99,7 +100,7 @@ TRANSLATIONS = {
                       "<br><br><i>Crediti di terze parti (e relative dipendenze):</i><br>",
         "view_eula": "Visualizza EULA",
         "view_third_party": "Licenze di Terze Parti",
-        "third_party_error": "Errore: {file_name} non trovato.",
+        "json_error": "Errore: il file JSON {file_name} è vuoto o formattato incorrettamente."
     }
 }
 
