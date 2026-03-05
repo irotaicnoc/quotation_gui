@@ -3,6 +3,7 @@ from pathlib import Path
 
 # SETTINGS
 CURRENT_LANG = "it"
+FORCE_EULA_DIALOG = True
 
 
 # LEGAL_INFO
