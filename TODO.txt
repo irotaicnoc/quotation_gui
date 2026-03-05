@@ -10,7 +10,7 @@ TODO:
         Completa messaggio EULA
         Includi licenze delle altre librerie con
             pip-licenses --with-license-file > licenses/THIRDPARTY_LICENSES.txt
-            pip-licenses --with-license-file --format=json > licenses/THIRDPARTY_LICENSES.json
+            pip-licenses --with-license-file --format=json | Out-File -FilePath licenses/THIRDPARTY_LICENSES.json -Encoding utf8
             va incluso con pyinstaller come l'EULA?
             Serve mostrare il file THIRDPARTY_LICENSES.txt in About o EULA?
         Se serve fai richiesta per essere whitelistato da microsoft e antivirus. Ci sono 2 modi, uno veloce e a

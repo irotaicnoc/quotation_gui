@@ -12,12 +12,12 @@ from localization import translate
 
 
 def save_to_json(filepath, data):
-    with open(filepath, 'w') as f:
+    with open(filepath, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=4)
 
 
 def load_from_json(filepath):
-    with open(filepath, 'r') as f:
+    with open(filepath, 'r', encoding='utf-8') as f:
         return json.load(f)
 
 

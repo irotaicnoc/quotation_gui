@@ -1,4 +1,5 @@
 import sys
+import json
 from PySide6.QtCore import QSettings
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QLabel, QTextEdit, QHBoxLayout, QPushButton, QWidget
 
@@ -31,13 +32,15 @@ class TextFileDialog(QDialog):
         file_path = utils.resource_path(config.licenses_folder_path / file_name)
         try:
             if "json" in file_name:
-                content = data_manager.load_from_json(file_path)
+                raw_data = data_manager.load_from_json(file_path)
+                content = json.dumps(raw_data, indent=4)  # Converts the dict to a nicely formatted string
             else:
                 with open(file_path, "r", encoding="utf-8") as f:
                     content = f.read()
         except FileNotFoundError:
-            # Reusing the eula_error translation or making a generic one
             content = translate("file_not_found_error")
+        except json.JSONDecodeError:
+            content = "Error: The JSON file is empty or incorrectly formatted."
 
         self.text_edit.setText(content)
         layout.addWidget(self.text_edit)
