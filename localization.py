@@ -105,16 +105,33 @@ TRANSLATIONS = {
 }
 
 
-def set_language(lang_code):
-    if lang_code in TRANSLATIONS:
-        config.CURRENT_LANG = lang_code
+def set_language(language_abbreviation: str) -> None:
+    if language_abbreviation in TRANSLATIONS:
+        config.CURRENT_LANG = language_abbreviation
 
 
-def translate(key, **kwargs):
-    text = TRANSLATIONS.get(config.CURRENT_LANG, {}).get(key, key)
+def translate(key: str, specify_language_abbreviation: str = None, **kwargs):
+    if specify_language_abbreviation:
+        text = TRANSLATIONS.get(specify_language_abbreviation, {}).get(key, key)
+    else:
+        text = TRANSLATIONS.get(config.CURRENT_LANG, {}).get(key, key)
 
     if kwargs:
         # This automatically replaces {key} with the provided value
         return text.format(**kwargs)
 
     return text
+
+
+def get_language_index(language_abbreviation: str) -> int:
+    language_index = 0  # Italian
+    if language_abbreviation == "en":
+        language_index = 1
+    return language_index
+
+
+def get_language_abbreviation(language_index: int) -> str:
+    language_abbreviation = "it"
+    if language_index == 1:
+        language_abbreviation = "en"
+    return language_abbreviation
