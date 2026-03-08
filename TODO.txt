@@ -3,6 +3,7 @@ https://github.com/irotaicnoc/quotation_gui/tree/pyqt6
 TODO:
     import excel? data
     export SAP
+    aggiungi icona all'accettazione dell'EULA
     robe legali
         RIATTIVA FIRST-TIME-CHECK EULA
         Completa messaggio About
@@ -10,6 +11,7 @@ TODO:
         controlla contenuto EULA
         Se serve fai richiesta per essere whitelistato da microsoft e antivirus. Ci sono 2 modi, uno veloce e a
             pagamento, uno lento e gratuito. Va bene quello lento di solito.
+    Save config changes to os so they are persistent?
 
 
 PyInstaller command to create a standalone executable for the GUI application:
