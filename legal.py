@@ -1,7 +1,8 @@
 import sys
 import json
 from PySide6.QtCore import QSettings
-from PySide6.QtWidgets import QDialog, QVBoxLayout, QLabel, QTextEdit, QHBoxLayout, QPushButton, QWidget
+from PySide6.QtWidgets import (QDialog, QVBoxLayout, QLabel, QTextEdit,
+                               QHBoxLayout, QPushButton, QWidget, QComboBox)
 
 import utils
 import config
@@ -9,11 +10,14 @@ import data_manager
 from localization import translate
 
 
-def get_eula_html(file_name: str) -> str:
+def get_eula_html(file_name: str, lang_code: str = None) -> str:
     """Returns the localized EULA text/HTML."""
+    if lang_code is None:
+        lang_code = config.CURRENT_LANG
+
     file_name_no_extension = file_name.split(".")[0]
     file_extension = file_name.split(".")[-1]
-    localized_file_name = f"{file_name_no_extension}_{config.CURRENT_LANG}.{file_extension}"
+    localized_file_name = f"{file_name_no_extension}_{lang_code}.{file_extension}"
     file_path = utils.resource_path(config.LICENSES_FOLDER_PATH / localized_file_name)
 
     try:
@@ -60,14 +64,33 @@ class TextFileDialog(QDialog):
         self.resize(600, 400)
         self.setModal(True)
 
+        self.file_name = file_name
+        self.is_html_format = is_html_format
+
         layout = QVBoxLayout(self)
         is_eula = "EULA" in file_name
         if is_eula:
+            top_layout = QHBoxLayout()
             if readonly:
                 lbl = QLabel(f'{translate("eula_title")}:')
             else:
                 lbl = QLabel(translate("eula_accept_label"))
-            layout.addWidget(lbl)
+            top_layout.addWidget(lbl)
+            top_layout.addStretch()
+
+            # Add Language Dropdown
+            self.lang_combo = QComboBox()
+            self.lang_combo.setStyleSheet(utils.load_stylesheet(config.MENU_CUSTOM_STYLE_NAME))
+            self.lang_combo.addItem("Italiano", "it")
+            self.lang_combo.addItem("English", "en")
+            language_index = 0  # Italian
+            if config.CURRENT_LANG == "en":
+                language_index = 1
+            self.lang_combo.setCurrentIndex(language_index)
+
+            self.lang_combo.currentIndexChanged.connect(self._reload_eula)
+            top_layout.addWidget(self.lang_combo)
+            layout.addLayout(top_layout)
 
         self.text_edit = QTextEdit()
         self.text_edit.setReadOnly(True)
@@ -75,11 +98,7 @@ class TextFileDialog(QDialog):
         if "THIRDPARTY" in file_name:
             self.text_edit.setHtml(get_third_party_licenses_html(file_name))
         elif is_eula:
-            content = get_eula_html(file_name)
-            if is_html_format:
-                self.text_edit.setHtml(content)
-            else:
-                self.text_edit.setText(content)
+            self._reload_eula()
         else:
             # Fallback for any other standard text files
             file_path = utils.resource_path(config.LICENSES_FOLDER_PATH / file_name)
@@ -110,6 +129,15 @@ class TextFileDialog(QDialog):
             self.btn_decline.clicked.connect(self.reject)
 
         layout.addLayout(btn_layout)
+
+    def _reload_eula(self):
+        """Reloads the EULA text when the language is changed via the combobox."""
+        lang_code = self.lang_combo.currentData()
+        content = get_eula_html(self.file_name, lang_code)
+        if self.is_html_format:
+            self.text_edit.setHtml(content)
+        else:
+            self.text_edit.setText(content)
 
 
 def eula_agreement_dialog(initial_eula_dialog: str) -> None:
