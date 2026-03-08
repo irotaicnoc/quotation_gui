@@ -4,7 +4,8 @@ TODO:
     import excel? data
     export SAP
     aggiungi icona all'accettazione dell'EULA
-    robe legali
+    mettere una barra col menu in cima?
+    Robe legali
         RIATTIVA FIRST-TIME-CHECK EULA
         Completa messaggio About
         Sostituisci {APP_NAME} in EULA

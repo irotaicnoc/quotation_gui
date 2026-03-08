@@ -553,6 +553,7 @@ if __name__ == "__main__":
     # First Time EULA Check
     legal.eula_agreement_dialog(config.INITIAL_EULA_DIALOG)
 
+    # start app
     window = MainWindow()
     window.show()
     sys.exit(app.exec())

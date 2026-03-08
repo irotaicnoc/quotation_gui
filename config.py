@@ -3,6 +3,8 @@ from pathlib import Path
 
 # SETTINGS
 CURRENT_LANG = "it"
+# CURRENT_LANG = "en"
+
 # possible values:
 # - "yes": ask to accept EULA each time the app is started
 # - "no": never ask to accept EULA
