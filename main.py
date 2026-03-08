@@ -1,6 +1,6 @@
 import sys
 import qdarktheme
-from PySide6.QtCore import Qt, QLocale
+from PySide6.QtCore import Qt, QLocale, QSettings
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QScrollArea,
                                QLabel, QFrame, QMessageBox, QToolButton, QTabBar, QStackedWidget, QLineEdit, QSpinBox,
@@ -11,7 +11,7 @@ import legal
 import config
 import calculator
 import data_manager
-from localization import translate, set_language
+from localization import translate, set_language, get_language_abbreviation
 
 
 class CollapsibleBox(QWidget):
@@ -351,7 +351,12 @@ class MainWindow(QMainWindow):
         )
 
     def change_language(self, index):
-        lang_code = "it" if index == 0 else "en"
+        lang_code = get_language_abbreviation(index)
+
+        # save choice for when the app is used in the future
+        settings = QSettings(config.COMPANY_NAME, config.APP_NAME)
+        settings.setValue("app_language", lang_code)
+
         set_language(lang_code)
         self.retranslate_ui()
 
@@ -534,14 +539,16 @@ class MainWindow(QMainWindow):
                     item.widget().retranslate_ui()
 
 
-def app_setup(app: QApplication) -> None:
+def app_setup(application: QApplication) -> None:
     # Set icon
     icon_path = utils.resource_path(config.ASSETS_FOLDER_PATH / config.APP_ICON_NAME)
-    app.setWindowIcon(QIcon(icon_path))
+    application.setWindowIcon(QIcon(icon_path))
 
-    # Autodetect system language and set as default
+    # Autodetect system language as default fallback
     sys_lang = QLocale.system().name()[:2]
-    config.CURRENT_LANG = sys_lang
+    # Retrieve the language the user selected previously (if present)
+    settings = QSettings(config.COMPANY_NAME, config.APP_NAME)
+    config.CURRENT_LANG = settings.value("app_language", sys_lang, type=str)
 
 
 if __name__ == "__main__":
