@@ -1,6 +1,6 @@
 import sys
 import qdarktheme
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QLocale
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QScrollArea,
                                QLabel, QFrame, QMessageBox, QToolButton, QTabBar, QStackedWidget, QLineEdit, QSpinBox,
@@ -544,6 +544,11 @@ if __name__ == "__main__":
         custom_colors={"primary": "#3982FA"},
         additional_qss=utils.load_stylesheet(config.GENERIC_CUSTOM_STYLE_NAME),
     )
+
+    # Autodetect system language and set default
+    sys_lang = QLocale.system().name()[:2]
+    print(f"System language: {sys_lang}")
+    config.CURRENT_LANG = sys_lang
 
     # First Time EULA Check
     legal.eula_agreement_dialog(config.INITIAL_EULA_DIALOG)
