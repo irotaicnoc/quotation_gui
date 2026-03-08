@@ -256,8 +256,6 @@ class ProductGrid(QFrame):
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        icon_path = utils.resource_path(config.ASSETS_FOLDER_PATH / config.APP_ICON_NAME)
-        self.setWindowIcon(QIcon(icon_path))
         self.tab_counter = 1
         self.tab_grids = {}
         self.tab_base_names = {}
@@ -536,19 +534,25 @@ class MainWindow(QMainWindow):
                     item.widget().retranslate_ui()
 
 
+def app_setup(app: QApplication) -> None:
+    # Set icon
+    icon_path = utils.resource_path(config.ASSETS_FOLDER_PATH / config.APP_ICON_NAME)
+    app.setWindowIcon(QIcon(icon_path))
+
+    # Autodetect system language and set as default
+    sys_lang = QLocale.system().name()[:2]
+    config.CURRENT_LANG = sys_lang
+
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+    app_setup(app)
     qdarktheme.setup_theme(
         "auto",
         corner_shape="rounded",
         custom_colors={"primary": "#3982FA"},
         additional_qss=utils.load_stylesheet(config.GENERIC_CUSTOM_STYLE_NAME),
     )
-
-    # Autodetect system language and set default
-    sys_lang = QLocale.system().name()[:2]
-    print(f"System language: {sys_lang}")
-    config.CURRENT_LANG = sys_lang
 
     # First Time EULA Check
     legal.eula_agreement_dialog(config.INITIAL_EULA_DIALOG)
