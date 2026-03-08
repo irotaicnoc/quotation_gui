@@ -46,7 +46,7 @@ TRANSLATIONS = {
         "decline": "Decline",
         "about_title": "About",
         "about_text": "<b>{app_name} v{app_version}</b><br>© {year} {company_name}. All rights reserved."
-                      "<br><br><i>Third-party credits (and their dependencies):</i><br>",
+                      "<br><br>Software for industrial plant quotations.",
         "view_eula": "View EULA",
         "view_third_party": "Third-Party Licenses",
         "json_error": "Error: the JSON {file_name} file is empty or incorrectly formatted."
@@ -97,7 +97,7 @@ TRANSLATIONS = {
         "decline": "Rifiuta",
         "about_title": "Informazioni",
         "about_text": "<b>{app_name} v{app_version}</b><br>© {year} {company_name}. Tutti i diritti riservati."
-                      "<br><br><i>Crediti di terze parti (e relative dipendenze):</i><br>",
+                      "<br><br>Software per la quotazione di impianti industriali.",
         "view_eula": "Visualizza EULA",
         "view_third_party": "Licenze di Terze Parti",
         "json_error": "Errore: il file JSON {file_name} è vuoto o formattato incorrettamente."

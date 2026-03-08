@@ -1,6 +1,6 @@
 import sys
 import json
-from PySide6.QtCore import QSettings
+from PySide6.QtCore import QSettings, Qt
 from PySide6.QtWidgets import (QDialog, QVBoxLayout, QLabel, QTextEdit,
                                QHBoxLayout, QPushButton, QWidget, QComboBox)
 
@@ -168,19 +168,17 @@ def show_about_dialog(parent: QWidget):
     about_dialog.setWindowTitle(translate("about_title"))
     layout = QVBoxLayout(about_dialog)
 
-    # Combine translated descriptive text with hardcoded libraries and licenses
-    about_content = (translate(
+    # Translated descriptive text
+    about_content = translate(
         "about_text",
         app_name=config.APP_NAME,
         app_version=config.APP_VERSION,
         year=config.YEAR,
         company_name=config.COMPANY_NAME,
-    ) +
-                     "- PySide6 (LGPLv3)<br>"
-                     "- Pandas, Pillow, Openpyxl-image-loader,<br>&nbsp;&nbsp;&nbsp;&nbsp; Openpyxl,"
-                     " Jinja2, PyInstaller,<br>&nbsp;&nbsp;&nbsp;&nbsp; PyQtDarkTheme (MIT/BSD/Apache)"
     )
+
     about_text = QLabel(about_content)
+    about_text.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
     layout.addWidget(about_text)
 
     btn_layout = QHBoxLayout()
