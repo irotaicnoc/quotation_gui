@@ -1,10 +1,11 @@
 https://github.com/irotaicnoc/quotation_gui/tree/pyqt6
 
 TODO:
-    import excel? data
+    import (excel?) data
     export SAP
     aggiungi icona all'accettazione dell'EULA
     mettere una barra col menu in cima?
+    fix: parte della finestra dell'eula non viene tradotta cambiando lingua (pulsanti e header)
     Robe legali
         RIATTIVA FIRST-TIME-CHECK EULA
         Completa messaggio About
