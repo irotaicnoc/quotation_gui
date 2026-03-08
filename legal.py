@@ -92,6 +92,7 @@ class TextFileDialog(QDialog):
 
 
 def eula_agreement_dialog(initial_eula_dialog: str) -> None:
+    # TODO: remove in final version
     assert initial_eula_dialog == "yes" or initial_eula_dialog == "no" or initial_eula_dialog == "auto"
     if config.INITIAL_EULA_DIALOG == "no":
         return
