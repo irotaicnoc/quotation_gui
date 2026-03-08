@@ -6,7 +6,8 @@ TODO:
     robe legali
         RIATTIVA FIRST-TIME-CHECK EULA
         Completa messaggio About
-        Completa messaggio EULA
+        Sostituisci {APP_NAME} in EULA
+        controlla contenuto EULA
         Se serve fai richiesta per essere whitelistato da microsoft e antivirus. Ci sono 2 modi, uno veloce e a
             pagamento, uno lento e gratuito. Va bene quello lento di solito.
 
