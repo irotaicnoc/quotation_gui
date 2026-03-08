@@ -10,7 +10,13 @@ from localization import translate
 
 
 class TextFileDialog(QDialog):
-    def __init__(self, title: str, file_name: str, parent: QWidget = None, readonly: bool = False):
+    def __init__(self,
+                 title: str,
+                 file_name: str,
+                 parent: QWidget = None,
+                 readonly: bool = True,
+                 is_html_format: bool = False,
+                 ):
         super().__init__(parent)
         self.setWindowTitle(title)
         self.resize(600, 400)
@@ -19,6 +25,10 @@ class TextFileDialog(QDialog):
         layout = QVBoxLayout(self)
 
         if "EULA" in file_name:
+            # get the text in the correct language
+            file_name_no_extension = file_name.split(".")[0]
+            extension = file_name.split(".")[-1]
+            file_name = f"{file_name_no_extension}_{config.CURRENT_LANG}.{extension}"
             if readonly:
                 lbl = QLabel(f'{translate("eula_title")}:')
             else:
@@ -50,7 +60,10 @@ class TextFileDialog(QDialog):
                 self.text_edit.setHtml(html_content)
             else:
                 with open(file_path, "r", encoding="utf-8") as f:
-                    self.text_edit.setText(f.read())
+                    if is_html_format:
+                        self.text_edit.setHtml(f.read())
+                    else:
+                        self.text_edit.setText(f.read())
 
         except FileNotFoundError:
             self.text_edit.setText(translate("file_not_found_error", file_name=file_path))
@@ -91,6 +104,7 @@ def eula_agreement_dialog(initial_eula_dialog: str) -> None:
             file_name=config.LICENSE_FILE_NAME,
             parent=None,
             readonly=False,
+            is_html_format=True,
         )
         if eula_dialog.exec() == QDialog.DialogCode.Accepted:
             settings.setValue("eula_accepted", True)
@@ -130,6 +144,7 @@ def show_about_dialog(parent: QWidget):
             file_name=config.LICENSE_FILE_NAME,
             parent=parent,
             readonly=True,
+            is_html_format=True,
         ).exec()
     )
     btn_layout.addWidget(btn_view_eula)
