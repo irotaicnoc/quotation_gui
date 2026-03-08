@@ -1,0 +1,18 @@
+<h3>ACCORDO DI LICENZA CON L'UTENTE FINALE (EULA)</h3>
+<p><strong>Ultimo aggiornamento:</strong> 08/03/2026</p>
+<p>Il presente Accordo di Licenza con l'Utente Finale ("Accordo") è un accordo legale tra te (persona fisica o singola entità giuridica, l'"Utente") e Marco Conciatori ("Sviluppatore") per l'applicazione software {APP_NAME} ("Software").</p>
+<p>Installando, copiando o altrimenti utilizzando il Software, accetti di essere vincolato dai termini del presente Accordo. Se non accetti, non utilizzare il Software.</p>
+<p><strong>1. CONCESSIONE DELLA LICENZA</strong><br>
+Lo Sviluppatore ti concede una licenza limitata, revocabile, non esclusiva e non trasferibile per scaricare, installare e utilizzare il Software strettamente in conformità con i termini del presente Accordo.</p>
+<p><strong>2. DIRITTI DI PROPRIETÀ INTELLETTUALE</strong><br>
+Il Software e tutti i diritti di proprietà intellettuale in esso contenuti sono di proprietà dello Sviluppatore. Questo Accordo non ti concede alcun diritto di utilizzare tali contenuti se non come parte del Software.</p>
+<p><strong>3. ESCLUSIONE DI GARANZIE</strong><br>
+IL SOFTWARE È FORNITO "COSÌ COM'È", SENZA GARANZIE DI ALCUN TIPO, ESPRESSE O IMPLICITE. Lo Sviluppatore non fornisce alcuna garanzia in merito all'accuratezza, all'affidabilità o alla completezza di qualsiasi preventivo, calcolo o risultato generato dal Software. L'Utente si assume tutti i rischi associati all'uso del Software.</p>
+<p><strong>4. LIMITAZIONE DI RESPONSABILITÀ</strong><br>
+IN NESSUN CASO LO SVILUPPATORE SARÀ RESPONSABILE PER QUALSIASI DANNO SPECIALE, INCIDENTALE, INDIRETTO O CONSEQUENZIALE (INCLUSI, SENZA LIMITAZIONE, DANNI PER PERDITA DI PROFITTI AZIENDALI, INTERRUZIONE DI ATTIVITÀ, PERDITA DI INFORMAZIONI AZIENDALI O QUALSIASI ALTRA PERDITA PECUNIARIA) DERIVANTE DALL'USO O DALL'INCAPACITÀ DI UTILIZZARE IL SOFTWARE, ANCHE SE LO SVILUPPATORE È STATO AVVISATO DELLA POSSIBILITÀ DI TALI DANNI.</p>
+<p><strong>5. COMPONENTI DI TERZE PARTI</strong><br>
+Il Software include componenti open-source di terze parti. L'utilizzo di tali componenti è regolato dalle rispettive licenze, accessibili nel menu "Informazioni su" (About) del Software.</p>
+<p><strong>6. RISOLUZIONE</strong><br>
+Il presente Accordo è in vigore fino alla sua risoluzione. I tuoi diritti ai sensi del presente Accordo termineranno automaticamente senza alcun preavviso da parte dello Sviluppatore in caso di mancato rispetto di qualsiasi termine del presente Accordo. Al momento della risoluzione, devi cessare ogni utilizzo del Software e distruggerne tutte le copie.</p>
+<p><strong>7. LINGUA PREVALENTE</strong><br>
+Questo Accordo può essere tradotto in altre lingue per comodità dell'Utente. Tuttavia, la versione in lingua inglese del presente Accordo è la versione legalmente vincolante e prevalente. In caso di conflitto, discrepanza o incoerenza tra la versione inglese e qualsiasi versione tradotta, prevarrà la versione inglese.</p>

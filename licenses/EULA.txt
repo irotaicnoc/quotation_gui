@@ -1,6 +1,0 @@
-END USER LICENSE AGREEMENT
-
-1. Terms of Use...
-2. Liability...
-
-(Replace this with your actual EULA text or load from EULA.txt)
